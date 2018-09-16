@@ -25,9 +25,11 @@ from testLogger import *
 import UserInterface as UI
 
 
-def train(modelname, epoch, model, optimizer, scheduler=None):
+def train(modelname, epoch, model, optimizer, scheduler=None, InitIncFactorC=1, DecayC=1):
     model.train()
+    incFactor = InitIncFactorC
     for corrEpoch in range(0, epoch):
+        incFactor = incFactor ** DecayC
         if scheduler != None:
             scheduler.step()
         for batch_idx, (data, target) in enumerate(trainLoader):
@@ -38,7 +40,8 @@ def train(modelname, epoch, model, optimizer, scheduler=None):
             loss = criterion(output.view(-1, 1), target.view(-1, 1))
             loss.backward(retain_graph=True)
             optimizer.step()
-
+            if modelname == 'Soft to Hard Quantization'
+                model.q1.weight[:, 2] = torch.mul(model.q1.weight[:, 2], incFactor)
             if batch_idx % 10 == 0:
                 UI.trainIteration(modelname, corrEpoch, epoch, batch_idx, data,
                                   trainLoader, loss)
@@ -117,8 +120,6 @@ for constPerm in constantPermutationns:
     QUANTIZATION_RATE = math.log2(codebookSize)*OUTPUT_DIMENSION/INPUT_DIMENSION
 
     # Generate uniform codebooks for the train sets
-    X_codebook = UniformQuantizer.codebook_uniform(trainData.X_var,
-                                                   codebookSize)
     S_codebook = UniformQuantizer.codebook_uniform(trainData.S_var,
                                                    codebookSize)
 

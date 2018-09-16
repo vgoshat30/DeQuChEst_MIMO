@@ -12,7 +12,7 @@ CODEBOOK_LR = 0.1
 
 # Only uncommented models will be trained and tested
 modelsToActivate = [
-    'Passing Gradient',
+    #'Passing Gradient',
     'Soft to Hard Quantization'
 ]
 

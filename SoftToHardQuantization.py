@@ -4,9 +4,7 @@ from torch.nn.parameter import Parameter
 from torch.nn.modules.module import Module
 
 import numpy
-
 import sympy as sym
-
 from ProjectConstants import *
 
 
@@ -51,12 +49,18 @@ class quantizationLayer(Module):
     def forward(self, input):
         ret = torch.zeros(input.size())
         # The first two for loops run on all the input values
-        for ii in range(0, input.size(0)):
-            for jj in range(0, input.size(1)):
-                for kk in range(0, self.codebookSize - 1):
-                    ret[ii, jj] += self.weight[kk, 0] * \
-                        torch.tanh(self.weight[kk, 2] *
-                                   (input[ii, jj] - self.weight[kk, 1]))
+        # for ii in range(0, input.size(0)):
+        #     for jj in range(0, input.size(1)):
+        #         for kk in range(0, self.codebookSize - 1):
+        #             ret[ii, jj] += self.weight[kk, 0] * \
+        #                 torch.tanh(self.weight[kk, 2] *
+        #                            (input[ii, jj] - self.weight[kk, 1]))
+
+        for kk in range(0, self.codebookSize - 1):
+            addVal = torch.mul(input, self.weight[kk, 2])
+            addVal = torch.add(addVal, self.weight[kk, 1])
+            addVal = torch.tanh(addVal)
+            ret = torch.add(ret, self.weight[kk, 0], addVal) # out=None ?
         return ret
 
 
