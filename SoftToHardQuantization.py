@@ -60,7 +60,8 @@ class quantizationLayer(Module):
             addVal = torch.mul(input, self.weight[kk, 2])
             addVal = torch.add(addVal, self.weight[kk, 1])
             addVal = torch.tanh(addVal)
-            ret = torch.add(ret, self.weight[kk, 0], addVal) # out=None ?
+            addVal = torch.mul(addVal, self.weight[kk, 0])
+            ret = torch.add(ret, addVal) # out=None ?
         return ret
 
 

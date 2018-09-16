@@ -25,11 +25,10 @@ from testLogger import *
 import UserInterface as UI
 
 
-def train(modelname, epoch, model, optimizer, scheduler=None, InitIncFactorC=1, DecayC=1):
+def train(modelname, epoch, model, optimizer, scheduler=None, InitIncFactorC=1, DecayC=1, boostFreq=300):
     model.train()
     incFactor = InitIncFactorC
     for corrEpoch in range(0, epoch):
-        incFactor = incFactor ** DecayC
         if scheduler != None:
             scheduler.step()
         for batch_idx, (data, target) in enumerate(trainLoader):
@@ -38,10 +37,14 @@ def train(modelname, epoch, model, optimizer, scheduler=None, InitIncFactorC=1, 
             optimizer.zero_grad()
             output = model(data)
             loss = criterion(output.view(-1, 1), target.view(-1, 1))
-            loss.backward(retain_graph=True)
+            loss.backward()
             optimizer.step()
-            if modelname == 'Soft to Hard Quantization'
-                model.q1.weight[:, 2] = torch.mul(model.q1.weight[:, 2], incFactor)
+            if modelname == 'Soft to Hard Quantization' and batch_idx % boostFreq == 0:
+                model.q1.weight[0:, 2].data.mul_(incFactor)
+                incFactor = incFactor ** DecayC
+                print('===========================================================')
+                print('Boosting c coefficients by factor: ', incFactor)
+                print('===========================================================')
             if batch_idx % 10 == 0:
                 UI.trainIteration(modelname, corrEpoch, epoch, batch_idx, data,
                                   trainLoader, loss)
@@ -201,7 +204,7 @@ for constPerm in constantPermutationns:
         model_tanhQuantize_runtime = datetime.now()
         train(modelname, corrTopEpoch, softToHardQuantization_model,
               softToHardQuantization_optimizer,
-              softToHardQuantization_scheduler)
+              softToHardQuantization_scheduler, InitIncFactorC=2, DecayC=0.8, boostFreq=300)
         model_tanhQuantize_runtime = datetime.now() - model_tanhQuantize_runtime
 
         # Testing 'Soft to Hard Quantization':
