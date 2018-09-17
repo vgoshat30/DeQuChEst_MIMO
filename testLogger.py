@@ -706,6 +706,7 @@ class testlogger:
         indexAlpha = 0.5
         datatipAlpha = 1
         dataTipFontsize = 6
+        legendFontsize = 7
         textboxAlpha = 0.8
         textOffset = 0.0005
         tickOffset = 0.001
@@ -983,7 +984,7 @@ class testlogger:
         plt.xlabel('Rate', fontsize=18, fontname='Times New Roman')
         plt.ylabel('Average Distortion', fontsize=18,
                    fontname='Times New Roman')
-        ax.legend(fontsize=14)
+        ax.legend(fontsize=legendFontsize)
         ax.autoscale(enable=True, axis='x', tight=True)
         # Show figure
         plt.show()

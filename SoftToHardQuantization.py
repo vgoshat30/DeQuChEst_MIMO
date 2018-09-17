@@ -39,7 +39,7 @@ class quantizationLayer(Module):
         self.codebookSize = M
         # There are three group of parameters: {ai, bi, ci}, as described in
         # the paper
-        self.weight = Parameter(torch.Tensor(self.codebookSize - 1, 3))
+        self.weight = Parameter(torch.Tensor(self.codebookSize - 1, 2))
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -57,11 +57,12 @@ class quantizationLayer(Module):
         #                            (input[ii, jj] - self.weight[kk, 1]))
 
         for kk in range(0, self.codebookSize - 1):
-            addVal = torch.mul(input, self.weight[kk, 2])
-            addVal = torch.add(addVal, self.weight[kk, 1])
+            # addVal = torch.mul(input, self.weight[kk, 2])
+            addVal = torch.add(input, self.weight[kk, 1])
+            addVal = torch.mul(addVal, MAGIC_C)
             addVal = torch.tanh(addVal)
             addVal = torch.mul(addVal, self.weight[kk, 0])
-            ret = torch.add(ret, addVal) # out=None ?
+            ret = torch.add(ret, addVal)  # out=None ?
         return ret
 
 
@@ -94,20 +95,20 @@ def getParameters(model):
     # Coefficients of the tanh
     a = parameters[:, 0]
     b = parameters[:, 1]
-    c = parameters[:, 2]
+    # c = parameters[:, 2]
 
     # Sort the coefficients by ascending order of the bi-s
-    b_sortedIndecies = b.argsort()
-    a = a[b_sortedIndecies]
-    b = b[b_sortedIndecies]
-    c = c[b_sortedIndecies]
+    sortedIndecies = b.argsort()
+    a = a[sortedIndecies]
+    b = b[sortedIndecies]
+    c = None  # c[sortedIndecies]
 
     # Create symbolic variable x
     symX = sym.symbols('x')
 
-    sym_tanh = a[0] * sym.tanh(c[0] * (symX + b[0]))
+    sym_tanh = a[0] * sym.tanh(MAGIC_C*(symX + b[0]))
     for ii in range(1, len(b)):
-        sym_tanh = sym_tanh + a[ii] * sym.tanh(c[ii] * (symX + b[ii]))
+        sym_tanh = sym_tanh + a[ii] * sym.tanh(MAGIC_C*(symX + b[ii]))
     # Convert the symbolic functions to numpy friendly (for substitution)
     q = sym.lambdify(symX, sym_tanh, "numpy")
 
@@ -144,4 +145,4 @@ def quantize(input, a, b, c, q):
         return sum(a), len(b)
     for ii in range(0, len(b)):
         if b[ii] < input and input <= b[ii + 1]:
-            return q((b[ii + 1] + b[ii])/2), ii + 1
+            return q((b[ii] + b[ii+1])/2), ii + 1

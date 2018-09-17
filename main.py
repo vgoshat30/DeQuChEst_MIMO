@@ -25,9 +25,9 @@ from testLogger import *
 import UserInterface as UI
 
 
-def train(modelname, epoch, model, optimizer, scheduler=None, InitIncFactorC=1, DecayC=1, boostFreq=300):
+def train(modelname, epoch, model, optimizer, scheduler=None, initIncFactorC=1, decayC=1, boostFreq=300):
     model.train()
-    incFactor = InitIncFactorC
+    incFactor = initIncFactorC
     for corrEpoch in range(0, epoch):
         if scheduler != None:
             scheduler.step()
@@ -39,15 +39,13 @@ def train(modelname, epoch, model, optimizer, scheduler=None, InitIncFactorC=1, 
             loss = criterion(output.view(-1, 1), target.view(-1, 1))
             loss.backward()
             optimizer.step()
-            if modelname == 'Soft to Hard Quantization' and batch_idx % boostFreq == 0:
-                model.q1.weight[0:, 2].data.mul_(incFactor)
-                incFactor = incFactor ** DecayC
-                print('===========================================================')
-                print('Boosting c coefficients by factor: ', incFactor)
-                print('===========================================================')
+            # if modelname == 'Soft to Hard Quantization' and batch_idx % boostFreq == 0:
+            #     model.q1.weight[0:, 2].data.mul_(incFactor)
+            #     incFactor = incFactor ** decayC
+
             if batch_idx % 10 == 0:
                 UI.trainIteration(modelname, corrEpoch, epoch, batch_idx, data,
-                                  trainLoader, loss)
+                                  trainLoader, loss, incFactor)
 
 
 def testPassingGradient(modelname, model):
@@ -68,7 +66,7 @@ def testPassingGradient(modelname, model):
 
 def testSoftToHardQuantization(modelname, model, codebookSize):
     a, b, c, q = SoftToHardQuantization.getParameters(model)
-    log.log(a=a, b=b, c=c)
+    log.log(a=a, b=b)
 
     classificationCounter = np.zeros(codebookSize)
     test_loss = 0
@@ -204,7 +202,9 @@ for constPerm in constantPermutationns:
         model_tanhQuantize_runtime = datetime.now()
         train(modelname, corrTopEpoch, softToHardQuantization_model,
               softToHardQuantization_optimizer,
-              softToHardQuantization_scheduler, InitIncFactorC=2, DecayC=0.8, boostFreq=300)
+              softToHardQuantization_scheduler, initIncFactorC=INITIAL_C_FACTOR,
+              decayC=C_DECAY,
+              boostFreq=C_BOOST_FREQUENCY)
         model_tanhQuantize_runtime = datetime.now() - model_tanhQuantize_runtime
 
         # Testing 'Soft to Hard Quantization':
