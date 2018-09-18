@@ -1,37 +1,48 @@
-## Welcome to GitHub Pages
+## Deep Quantization for Channel Estimation in Massive MIMO Systems
 
-You can use the [editor on GitHub](https://github.com/vgoshat30/DeQuChEst_MIMO/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+This is the source code implementing the neural networks (NN's) used in numerical study described in M.Shohat, G.Tsintsadze, N.Shlezinger, and Y.C. Eldar paper, entitled the same.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+The repository contains all the essential code to perform the following:
+- Create a dedicated dataset which can be used for training and testing the NN (MATLAB).
+- Use it in the learning proccess of the NN in one of the two methods described in the paper (PYTHON).
+- Obtain the results of tests, including saving, displaying and editing (all results are saved and menaged in MATLAB .mat file, via PYTHON code).
 
-### Markdown
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+### Setup
 
-```markdown
-Syntax highlighted code block
 
-# Header 1
-## Header 2
-### Header 3
 
-- Bulleted
-- List
+#### PYTHON Packages
 
-1. Numbered
-2. List
+In order to be able to run all PYTHON code in this project you will need the following libraries:
 
-**Bold** and _Italic_ and `Code` text
+- [PyTorch](https://pytorch.org)
+- [NumPy and SciPy](https://scipy.org/scipylib/download.html)
+- [SymPy](https://www.sympy.org/en/index.html)
+- [Matplotlib](https://matplotlib.org)
 
-[Link](url) and ![Image](src)
+Once you installed the packages above, you should download the project .zip and unzip it on your system.
+
+
+
+
+#### Creating Data
+
+Before running the NN, you have to create a MATLAB .mat file which will hold the data needed to train and test the NN and few vectors which will be used to create the theoretical bounds while displaying the NN results.
+
+
+For this purpose, open the project directory in MATLAB, and run the following function in the command window:
 ```
+generateData('Filename', 'data')
+```
+This will create the described above file with the name 'data.mat' in the project directory, using deafult parametrs. If you wish to choose the saving location or define your own parameters you can do it using optional Name-Value pairs, for example:
+```
+generateData('Filename', 'justTrying', 'Autosave', 'off', 'Users', 4, 'Antennas', 10)
+```
+will let you choose the saving diretory and create the data with specified numbers of users and antennas.
+For further information reffer the function documentation by typing `doc generateData` in the command window.
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/vgoshat30/DeQuChEst_MIMO/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+**Note!**
+  If a .mat file with the name you chose already exists, you will be notified.
+  If you choose to replace it, BE SURE you want raplace it.
+    
