@@ -37,12 +37,34 @@ generateData('Filename', 'data')
 ```
 This will create the described above file with the name 'data.mat' in the project directory, using deafult parametrs. If you wish to choose the saving location or define your own parameters you can do it using optional Name-Value pairs, for example:
 ```
-generateData('Filename', 'justTrying', 'Autosave', 'off', 'Users', 4, 'Antennas', 10)
+generateData('Filename', 'data', 'Autosave', 'off', 'Users', 4, 'Antennas', 10)
 ```
-will let you choose the saving diretory and create the data with specified numbers of users and antennas.
+This will let you choose the saving diretory and create the data with specified numbers of users and antennas.
 For further information reffer the function documentation by typing `doc generateData` in the command window.
 
 **Note!**
   If a .mat file with the name you chose already exists, you will be notified.
   If you choose to replace it, BE SURE you want raplace it.
-    
+
+
+
+After creating the .mat file above, you are ready to run the NN.
+
+
+
+### Running
+
+
+
+Generally speaking, the only two file you will interact with (before inspecting the NN results) are:
+- main.py
+- ProjectConstants.py
+And the only one you will have to edit is ProjectConstants.py. This file consists of three small parts:
+
+#### Training, Testing and Logging Data
+
+Here you define the names of the .mat file, the code handles. The first one:
+```
+DATA_MAT_FILE = 'data.mat'
+```
+Is the file you created in the section [Creating Data](####creating-cata) above.
