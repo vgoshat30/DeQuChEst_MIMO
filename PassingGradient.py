@@ -13,15 +13,15 @@ import UniformQuantizer
 
 class network(nn.Module):
 
-    def __init__(self, codebook):
+    def __init__(self, codebook, inputDimention, outputDimention):
         super(network, self).__init__()
-        self.l1 = nn.Linear(INPUT_DIMENSION, 520)
+        self.l1 = nn.Linear(inputDimention, 520)
         # See Hardware-Limited Task-Based Quantization Proposion 3. for the
         # choice of output features
-        self.l2 = nn.Linear(520, OUTPUT_DIMENSION)
-        self.l3 = nn.Linear(OUTPUT_DIMENSION, 240)
+        self.l2 = nn.Linear(520, outputDimention)
+        self.l3 = nn.Linear(outputDimention, 240)
         self.l4 = nn.Linear(240, 120)
-        self.l5 = nn.Linear(120, OUTPUT_DIMENSION)
+        self.l5 = nn.Linear(120, outputDimention)
         self.q1 = quantizationLayer.apply
         self.codebook = codebook
 

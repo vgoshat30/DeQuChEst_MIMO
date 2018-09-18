@@ -3,32 +3,26 @@
 ########################################################################
 
 
-def trainMessage(model, epoch, lr, codebookSize):
+def trainMessage(model, epoch, lr, codebookSize, magic_c=None):
     print('\n\n'
           '===================================================================='
           '\n\n\tTraining \'{}\' Model\n\n'
           'Epochs number:\t{}\n'
           'Learning Rate:\t{}\n'
           'Codebook Size:\t{}\n'
+          'MAGIC_C:\t{}\n\n'
           '===================================================================='
           '\n\n'
-          .format(model, epoch, lr, codebookSize))
+          .format(model, epoch, lr, codebookSize, magic_c))
 
 
 def trainIteration(modelname, corrEpoch, epoch, batch_idx, data, trainLoader,
-                   loss, incFactor=0):
-    if incFactor:
-        print('Training \'{}\' Model:\tEpoch: {}/{} [{}/{} ({:.0f}%)]\t'
-              'Linear Loss: {:.6f}\tMultiplying c coeffs by: {}'
-              .format(modelname, corrEpoch+1, epoch, batch_idx * len(data),
-                      len(trainLoader.dataset),
-                      100. * batch_idx / len(trainLoader), loss, incFactor))
-    else:
-        print('Training \'{}\' Model:\tEpoch: {}/{} [{}/{} ({:.0f}%)]\t'
-              'Linear Loss: {:.6f}'
-              .format(modelname, corrEpoch+1, epoch, batch_idx * len(data),
-                      len(trainLoader.dataset),
-                      100. * batch_idx / len(trainLoader), loss))
+                   loss):
+    print('Training \'{}\' Model:\tEpoch: {}/{} [{}/{} ({:.0f}%)]\t'
+          'Linear Loss: {:.6f}'
+          .format(modelname, corrEpoch+1, epoch, batch_idx * len(data),
+                  len(trainLoader.dataset),
+                  100. * batch_idx / len(trainLoader), loss))
 
 
 ########################################################################
@@ -52,7 +46,8 @@ def testIteration(modelname, batch_idx, data, testLoader):
                   100. * batch_idx / len(testLoader)))
 
 
-def testResultsPassingGradient(modelname, epoch, lr, codebookSize, rate, loss):
+def testResults(modelname, epoch, lr, codebookSize, rate, loss,
+                classificationByWord=None, magic_c=None):
     print('\n\n'
           '===================================================================='
           '\n\n\tResults of \'{}\' Testing\n\n'
@@ -62,31 +57,12 @@ def testResultsPassingGradient(modelname, epoch, lr, codebookSize, rate, loss):
           '| - Epochs number:\t{}\t|\n'
           '| - Learning Rate:\t{}\t|\n'
           '| - Codebook Size:\t{}\t|\n'
-          '|_______________________________|\n\n'
-          'Rate:\t{}\n'
-          'Average Loss:\t{}\n\n'
-          '===================================================================='
-          '\n\n'
-          .format(modelname, epoch, lr, codebookSize, rate, loss))
-
-
-def testResultsSoftToHard(modelname, epoch, lr, codebookSize, rate, loss,
-                          classificationByWord, initialCMultIter=None, decayCIter=None,
-                          boostFreqIter=None):
-    print('\n\n'
-          '===================================================================='
-          '\n\n\tResults of \'{}\' Testing\n\n'
-          '_________________________________\n'
-          '|\tTraining Parameters\t|\n'
-          '|\t\t\t\t|\n'
-          '| - Epochs number:\t{}\t|\n'
-          '| - Learning Rate:\t{}\t|\n'
-          '| - Codebook Size:\t{}\t|\n'
+          '| - MAGIC_C:\t\t{}\t|\n'
           '|_______________________________|\n\n'
           'Rate:\t{}\n'
           'Average Loss:\t{}\n'
           'Num. of clasifications by word:\t{}\n\n'
           '===================================================================='
           '\n\n'
-          .format(modelname, epoch, lr, codebookSize, rate, loss,
+          .format(modelname, epoch, lr, codebookSize, magic_c, rate, loss,
                   classificationByWord))

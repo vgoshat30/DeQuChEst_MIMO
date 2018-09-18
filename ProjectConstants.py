@@ -1,14 +1,13 @@
-""" Constants file """
-import math
-
 ################################################################################
-###                       Neural Network constants                           ###
+###                   Training, Testing and Logging Data                     ###
 ################################################################################
 
-BATCH_SIZE = 8
-INPUT_DIMENSION = 240
-OUTPUT_DIMENSION = 80
-CODEBOOK_LR = 0.1
+DATA_MAT_FILE = 'data.mat'
+TEST_LOG_MAT_FILE = 'tempTestLog.mat'
+
+################################################################################
+###                          Models to Activate                              ###
+################################################################################
 
 # Only uncommented models will be trained and tested
 modelsToActivate = [
@@ -16,13 +15,12 @@ modelsToActivate = [
     'Soft to Hard Quantization'
 ]
 
-# ------------------------------
+################################################################################
+###                       Neural Network constants                           ###
+################################################################################
 
+BATCH_SIZE = 8
 EPOCH_RANGE = [5, 8]
 LR_RANGE = [0.2, 0.21]
-M_RANGE = [17, 18, 19, 20]
-INITIAL_C_FACTOR = 5
-C_DECAY = 0.99
-C_BOOST_FREQUENCY = 300
-
-MAGIC_C = 8
+M_RANGE = [5, 6, 7]
+MAGIC_C_RANGE = [7, 8]

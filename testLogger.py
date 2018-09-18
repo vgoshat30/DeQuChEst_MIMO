@@ -105,6 +105,8 @@ class testlogger:
             self.bCoefs = pythonMatFile['bCoefs']
             # "Slopes" of sum of tanh function (c coefficients)
             self.cCoefs = pythonMatFile['cCoefs']
+            # Multiplier of the tanh argument
+            self.magic_c = pythonMatFile['magic_c']
 
             # If the test log is not empty, reducing the dimentions of all
             # parameters to one
@@ -112,6 +114,7 @@ class testlogger:
                 self.aCoefs = self.aCoefs[0]
                 self.bCoefs = self.bCoefs[0]
                 self.cCoefs = self.cCoefs[0]
+                self.magic_c = self.magic_c[0]
 
     def addEmptyTest(self):
         '''Append empty elements to all log fields
@@ -189,6 +192,8 @@ class testlogger:
                 self.bCoefs = np.append(self.bCoefs, np.empty((1, 1), float))
                 # "Slopes" of sum of tanh function (c coefficients)
                 self.cCoefs = np.append(self.cCoefs, np.empty((1, 1), float))
+                # Multiplier of the tanh argument
+                self.magic_c = np.append(self.magic_c, np.empty((1, 1), float))
 
     def log(self, test=None, **kwargs):
         '''Manipulate content of a log element
@@ -232,10 +237,12 @@ class testlogger:
                     The shifts of the sum of tanh function.
                     Pass as a list even if there is only one element
                     (see aCoefs above)
-                slope : float
+                c : list
+                    The "slopes" of the sum of tanh function.
+                    Pass as a list even if there is only one element
+                    (see aCoefs above)
+                magic_c : float
                     Multiplier of the argument of the sum of tanh function.
-                stretch : float
-                    The stretching of he sum of tanh function.
 
         Example
         -------
@@ -320,6 +327,8 @@ class testlogger:
                     self.bCoefs[testIndex] = kwargs[key]
                 if key is 'c':
                     self.cCoefs[testIndex] = kwargs[key]
+                if key is 'magic_c':
+                    self.magic_c[testIndex] = kwargs[key]
 
         self.save()
         print("Logged test number ", testIndex+1,
@@ -449,6 +458,7 @@ class testlogger:
                 self.aCoefs = np.delete(self.aCoefs, deleteIndex, 0)
                 self.bCoefs = np.delete(self.bCoefs, deleteIndex, 0)
                 self.cCoefs = np.delete(self.cCoefs, deleteIndex, 0)
+                self.magic_c = np.delete(self.magic_c, deleteIndex, 0)
 
             print('Deleted test(s):', np.array(deleteIndex) + 1,
                   "\nFrom testlogger:", self.filename)
@@ -467,6 +477,7 @@ class testlogger:
                 self.aCoefs = np.empty((0, 1), object)  # MATLAB Cell
                 self.bCoefs = np.empty((0, 1), object)  # MATLAB Cell
                 self.cCoefs = np.empty((0, 1), object)  # MATLAB Cell
+                self.magic_c = np.empty((0, 1), float)  # MATLAB Array
 
             print('Cleared testlogger:', self.filename)
 
@@ -632,6 +643,11 @@ class testlogger:
                     else:
                         cCoefsToPrint = self.cCoefs[currTest-1]
 
+                    if not self.magic_c[currTest-1]:
+                        magicCToPrint = dontExistMessage
+                    else:
+                        magicCToPrint = self.magic_c[currTest-1]
+
                 if self.loggerType == 'normal':
                     print("\n\nTest {} Info\n\n"
                           "Rate:\t\t{}\n"
@@ -659,6 +675,7 @@ class testlogger:
                           "Tanh a coeffs:\t{}\n"
                           "Tanh b coeffs:\t{}\n"
                           "Tanh c coeffs:\t{}\n"
+                          "MAGIC_C:\t{}\n"
                           "Train Runtime: \t{}\n"
                           "Train Epochs:\t{}\n"
                           "Logging Time: \t{}\n"
@@ -667,7 +684,7 @@ class testlogger:
                                   self.loss[currTest-1], codewordNumToPrint,
                                   algToPrint, learningRateToPrint,
                                   aCoefsToPrint, bCoefsToPrint,
-                                  cCoefsToPrint,
+                                  cCoefsToPrint, magicCToPrint,
                                   runtimeToPrint, epochToPrint,
                                   removeCellFormat(self.logtime[currTest-1]),
                                   noteToPrint))
@@ -715,17 +732,13 @@ class testlogger:
         # Define which lines to plot
         whichToPlot = [1,  # No quantization
                        1,  # Asymptotic optimal task-based
-                       0,  # LBG task-based
                        1,  # Asymptotic optimal task-ignorant
-                       0,  # LBG task-ignorant
                        1]  # Hardware limited upper bound
 
         # Set the legend labels
         labels = ['No quantization',
                   'Asymptotic optimal task-based',
-                  'LBG task-based',
                   'Asymptotic optimal task-ignorant',
-                  'LBG task-ignorant',
                   'Hardware limited upper bound']
 
         markers = ['x', '', '', '', '', '']
@@ -876,7 +889,7 @@ class testlogger:
         # Create fill vectors
         xFill = np.concatenate((self.theoryRate[0],
                                 np.flip(self.theoryRate[0], 0)), axis=0)
-        yFill = np.concatenate((self.theoryLoss[5, :],
+        yFill = np.concatenate((self.theoryLoss[3, :],
                                 np.flip(self.theoryLoss[1, :], 0)), axis=0)
 
         plt.close('all')
@@ -1014,6 +1027,7 @@ class testlogger:
             saveVars['aCoefs'] = self.aCoefs
             saveVars['bCoefs'] = self.bCoefs
             saveVars['cCoefs'] = self.cCoefs
+            saveVars['magic_c'] = self.magic_c
 
         sio.savemat(self.filename, saveVars)
 
@@ -1181,6 +1195,7 @@ def createMatFile(name, type, theoryRate, theoryLoss):
         variables['aCoefs'] = np.empty((0, 1), object)  # MATLAB Cell
         variables['bCoefs'] = np.empty((0, 1), object)  # MATLAB Cell
         variables['cCoefs'] = np.empty((0, 1), object)  # MATLAB Cell
+        variables['magic_c'] = np.empty((0, 1), float)  # MATLAB Array
 
     if os.path.exists(name):
         print("Test logger", name, "of type '" + type + "' already exists...")

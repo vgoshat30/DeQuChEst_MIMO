@@ -21,6 +21,8 @@ from torch.autograd import Variable
 import scipy.io as sio
 import numpy as np
 
+from ProjectConstants import *
+
 
 class ShlezDatasetTrain(Dataset):
     """
@@ -29,12 +31,15 @@ class ShlezDatasetTrain(Dataset):
         and variance of the X data (to be used for creation of a codebook)
     """
 
-    def __init__(self):
+    def __init__(self, matFile):
         # Loading .mat file
-        shlezMat = sio.loadmat('shlezingerMat.mat')
+        shlezMat = sio.loadmat(matFile)
         # Getting train data variables from the .mat file:
         Xdata = shlezMat['trainX']
         Sdata = shlezMat['trainS']
+        # Setting input and output dimetions (defined in ProjectConstants.py)
+        self.inputDim = Xdata.shape[1]
+        self.outputDim = Sdata.shape[1]
         # Expected value estimation
         self.X_mean = np.mean(Xdata)
         self.S_mean = np.mean(Sdata)
@@ -58,9 +63,9 @@ class ShlezDatasetTrain(Dataset):
 class ShlezDatasetTest(Dataset):
     """ Data class for the testing data set (X and S pairs) """
 
-    def __init__(self):
+    def __init__(self, matFile):
         # Loading .mat file
-        shlezMat = sio.loadmat('shlezingerMat.mat')
+        shlezMat = sio.loadmat(matFile)
         # Getting test data variables from the .mat file:
         Xdata = shlezMat['dataX']
         Sdata = shlezMat['dataS']
