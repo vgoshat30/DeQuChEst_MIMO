@@ -3,7 +3,7 @@
 ################################################################################
 
 DATA_MAT_FILE = 'data.mat'
-TEST_LOG_MAT_FILE = 'tempTestLog.mat'
+TEST_LOG_MAT_FILE = 'testLog.mat'
 
 ################################################################################
 ###                          Models to Activate                              ###
@@ -20,7 +20,7 @@ modelsToActivate = [
 ################################################################################
 
 BATCH_SIZE = 8
-EPOCH_RANGE = [5, 8]
+EPOCH_RANGE = [5, ]
 LR_RANGE = [0.2, 0.21]
 M_RANGE = [5, 6, 7]
 MAGIC_C_RANGE = [7, 8]

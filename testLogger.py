@@ -741,12 +741,12 @@ class testlogger:
                   'Asymptotic optimal task-ignorant',
                   'Hardware limited upper bound']
 
-        markers = ['x', '', '', '', '', '']
-        lineStyles = [':', '--', '-', '--', '-', '--']
-        linecolors = ['black', 'red', 'red', 'blue', 'red', 'lime']
-        lineWidths = [1, 1, 1, 1, 1, 1.5]
-        markerSizes = [4, 1, 1, 1, 1, 1]
-        markerLinewidths = [1, 1, 1, 1, 1, 1]
+        markers = ['x', '', '', '']
+        lineStyles = [':', '--', '--', '--']
+        linecolors = ['black', 'red', 'blue', 'lime']
+        lineWidths = [1, 1, 1, 1.5]
+        markerSizes = [4, 1, 1, 1]
+        markerLinewidths = [1, 1, 1, 1]
         pointMarker = 'x'
         pointsColor = 'orange'
         chosenMarker = 'o'

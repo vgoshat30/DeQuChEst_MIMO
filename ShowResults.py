@@ -82,10 +82,10 @@ log = testlogger(TEST_LOG_MAT_FILE)
 # log.delete([19, 17, 13, 14])
 
 # # Show content of tests
-log.content('all')
+# log.content('all')
 
 # # Plot test log
 log.plot()
 
 # Plot soft and hard quantization functions of specific test
-plotTanhFunction(log, 1)
+# plotTanhFunction(log, 1)
