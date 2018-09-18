@@ -67,4 +67,4 @@ Here you define the names of the .mat file, the code handles. The first one:
 ```
 DATA_MAT_FILE = 'data.mat'
 ```
-Is the file you created in the section [Creating Data](#creating-cata) above.
+Is the file you created in the section [Creating Data](####creating-data) above.
