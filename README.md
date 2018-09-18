@@ -107,3 +107,63 @@ Make sure that you are in the project directory.
 ------
 
 ### Inspect Results
+
+
+Each time a test is finished, you will see its summary in the consule which will resemble this:
+
+```
+====================================================================
+
+	Results of 'Soft to Hard Quantization' Testing
+
+_________________________________
+|	Training Parameters	|
+|				|
+| - Epochs number:	5	|
+| - Learning Rate:	0.2	|
+| - Codebook Size:	5	|
+| - MAGIC_C:		8	|
+|_______________________________|
+
+Rate:	0.7739760316291207
+Average Loss:	0.47106388211250305
+Num. of clasifications by word:	[536393. 405070. 117703. 465403. 523431.]
+
+====================================================================
+```
+
+Followed by an indication that a new test was logged to the `TEST_LOG_MAT_FILE` defined in [Training, Testing and Logging Data](#training,-testing-and-logging-data) which will be:
+
+```
+Logged test number  2 	in testlogger: tempTestLog.mat
+```
+
+As you want to check the results and compare them to the theoretical bounds, you will use the file 'ShowResults.py' from the project directory. Here you will interact with lines 81-91 with the function calls described bellow:
+
+
+Delete one or several tests:
+
+```
+log.delete([1, 5, 9])
+```
+
+_**Note!**_
+  PAY ATTENTION TO THE DELETE FUNCTION! IT DELETES THE TEST LOG! COMMENT IT!
+  
+Show content of one or several tests:
+
+```
+log.content('last')
+```
+
+Plot all the loss vs. rate results of the test, in respect to the theoretical bounds (the results should be in the cyan area):
+
+```
+log.plot()
+```
+
+Plot the soft and hard quantization layer of **one** of the runs (rellevant only for Soft to Hard Quantization method):
+
+```
+plotTanhFunction(log, 1)
+```
