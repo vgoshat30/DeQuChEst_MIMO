@@ -132,7 +132,7 @@ Num. of clasifications by word:	[536393. 405070. 117703. 465403. 523431.]
 ====================================================================
 ```
 
-Followed by an indication that a new test was logged to the `TEST_LOG_MAT_FILE` defined in [Training, Testing and Logging Data](#training,-testing-and-logging-data) which will be:
+Followed by an indication that a new test was logged to the `TEST_LOG_MAT_FILE` defined in [Training, Testing and Logging Data](#training-testing-and-logging-data) which will be:
 
 ```
 Logged test number  2 	in testlogger: tempTestLog.mat
@@ -166,4 +166,11 @@ Plot the soft and hard quantization layer of **one** of the runs (rellevant only
 
 ```
 plotTanhFunction(log, 1)
+```
+
+
+For full information about the abbilities of the functions delete() content() and plot() of the testlogger, reffer test logger documentation (as mentioned earlier):
+```
+from testLogger import *
+help(testlogger)
 ```
