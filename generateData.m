@@ -121,7 +121,7 @@ function generateData(varargin)
     s_fT = p.Results.TrainSetSize;
     s_fD = p.Results.TestSetSize;
     
-    v_fRate = 0.01:0.01:p.Results.MaxRate;
+    v_fRate = 0.01:0.0001:p.Results.MaxRate;
     %% Generate training data and pilot matrix
     s_fK = 2*s_fNt * s_fNu;
     s_fN = s_fK * s_fRatio;

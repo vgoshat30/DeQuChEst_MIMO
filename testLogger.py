@@ -741,7 +741,7 @@ class testlogger:
                   'Asymptotic optimal task-ignorant',
                   'Hardware limited upper bound']
 
-        markers = ['x', '', '', '']
+        markers = ['', '', '', '']
         lineStyles = [':', '--', '--', '--']
         linecolors = ['black', 'red', 'blue', 'lime']
         lineWidths = [1, 1, 1, 1.5]

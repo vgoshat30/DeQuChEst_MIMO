@@ -13,13 +13,15 @@ class network(nn.Module):
 
     def __init__(self, codebookSize, inputDimention, outputDimention, magic_c):
         super(network, self).__init__()
-        self.l1 = nn.Linear(inputDimention, 520)
+        print(type(inputDimention))
+        self.l1 = nn.Linear(inputDimention, math.floor(0.5 * inputDimention))
         # See Hardware-Limited Task-Based Quantization Proposion 3. for the
         # choice of output features
-        self.l2 = nn.Linear(520, outputDimention)
-        self.l3 = nn.Linear(outputDimention, 240)
-        self.l4 = nn.Linear(240, 120)
-        self.l5 = nn.Linear(120, outputDimention)
+        self.l2 = nn.Linear(math.floor(0.5 * inputDimention), outputDimention)
+        self.l3 = nn.Linear(outputDimention, math.floor(1.5 * outputDimention))
+        self.l4 = nn.Linear(math.floor(1.5 * outputDimention),
+                            math.floor(1.3 * outputDimention))
+        self.l5 = nn.Linear(math.floor(1.3 * outputDimention), outputDimention)
         self.q1 = quantizationLayer(
             outputDimention, outputDimention, codebookSize, magic_c)
 
