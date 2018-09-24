@@ -64,7 +64,7 @@ def testResults(modelname, epoch, lr, codebookSize, rate, loss,
           '|_______________________________|\n\n'
           'Rate:\t{}\n'
           'Average Loss:\t{}\n'
-          'Num. of clasifications by word:\t{}\n\n'
+          'Num. of classifications by word:\t{}\n\n'
           '===================================================================='
           '\n\n'
           .format(modelname, epoch, lr, codebookSize, layersDimentions,

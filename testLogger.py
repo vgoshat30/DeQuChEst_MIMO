@@ -224,6 +224,8 @@ class testlogger:
                     Number of quantization codewords
                 learningRate : float
                     The learning rate of the learning algorithm
+                layersDim: list
+                    Dimention ratios between layers of the NN
                 runtime : datetime.timedelta
                     Time spent on the learning proccess
                 algorithm : str
@@ -622,7 +624,7 @@ class testlogger:
                         self.layersDim[currTest-1][0, 0] == 0):
                     layersDimToPrint = dontExistMessage
                 else:
-                    layersDimToPrint = self.layersDim[currTest-1][0]
+                    layersDimToPrint = self.layersDim[currTest-1]
 
                 if not self.runtime[currTest-1]:
                     runtimeToPrint = dontExistMessage
@@ -644,19 +646,19 @@ class testlogger:
                             self.aCoefs[currTest-1][0, 0] == 0):
                         aCoefsToPrint = dontExistMessage
                     else:
-                        aCoefsToPrint = self.aCoefs[currTest-1][0]
+                        aCoefsToPrint = self.aCoefs[currTest-1]
 
                     if (self.bCoefs[currTest-1].size == 1 and
                             self.bCoefs[currTest-1][0, 0] == 0):
                         bCoefsToPrint = dontExistMessage
                     else:
-                        bCoefsToPrint = self.bCoefs[currTest-1][0]
+                        bCoefsToPrint = self.bCoefs[currTest-1]
 
                     if (self.cCoefs[currTest-1].size == 1 and
                             self.cCoefs[currTest-1][0, 0] == 0):
                         cCoefsToPrint = dontExistMessage
                     else:
-                        cCoefsToPrint = self.cCoefs[currTest-1][0]
+                        cCoefsToPrint = self.cCoefs[currTest-1]
 
                     if not self.magic_c[currTest-1]:
                         magicCToPrint = dontExistMessage

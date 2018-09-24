@@ -4,8 +4,8 @@ This is the source code implementing the neural networks (NN's) used in the nume
 
 The repository contains all the essential code to perform the following:
 - Create a dedicated dataset which can be used for training and testing the NN (MATLAB).
-- Use it in the learning proccess of the NN in one of the two methods described in the paper (PYTHON).
-- Obtain the results of tests, including saving, displaying and editing (all results are saved and menaged in MATLAB .mat file, via PYTHON code).
+- Use it in the learning process of the NN in one of the two methods described in the paper (PYTHON).
+- Obtain the results of tests, including saving, displaying and editing (all results are saved and managed in MATLAB .mat file, via PYTHON code).
 
 
 ------
@@ -37,16 +37,16 @@ For this purpose, open the project directory in MATLAB, and run the following fu
 ```
 generateData('Filename', 'data')
 ```
-This will create the described above file with the name 'data.mat' in the project directory, using deafult parametrs. If you wish to choose the saving location or define your own parameters you can do it using optional Name-Value pairs, for example:
+This will create the described above file with the name 'data.mat' in the project directory, using default parameters. If you wish to choose the saving location or define your own parameters you can do it using optional Name-Value pairs, for example:
 ```
 generateData('Filename', 'data', 'Autosave', 'off', 'Users', 4, 'Antennas', 10)
 ```
-This will let you choose the saving diretory and create the data with specified numbers of users and antennas.
-For further information reffer the function documentation by typing `doc generateData` in the command window.
+This will let you choose the saving directory and create the data with specified numbers of users and antennas.
+For further information refer the function documentation by typing `doc generateData` in the command window.
 
 _**Note!**_
   If a .mat file with the name you chose already exists, you will be notified.
-  If you choose to replace it, BE SURE you want raplace it.
+  If you choose to replace it, BE SURE you want replace it.
 
 
 ------
@@ -73,7 +73,7 @@ Will contain each test performed on the trained NN. At first this file will not 
 
 All the test log manipulation are performed using the testLogger.py module in the project directory.
 
-For information about all possible interaction with a test log .mat file see testLogger.py help using python consule (from the project directory):
+For information about all possible interaction with a test log .mat file see testLogger.py help using python console (from the project directory):
 ```
 from testLogger import *
 help(testlogger)
@@ -89,7 +89,7 @@ _**Note!**_
 #### Neural Network constants
 The constants in this section define lists of parameters for the NN to iterate on. The NN will be trained and tested for each possible combination of the parameters values.
 
-Make sure to define all the parameters except `BATCH_SIZE` as lists even if they have only one element (so they can be iterable). For example: `EPOCH_RANGE = [5, ]`
+Make sure to define all the parameters except `BATCH_SIZE` as lists even if they have only one element (so they can be itterable). For example: `EPOCH_RANGE = [5, ]`
 
 
 ------
@@ -109,7 +109,7 @@ Make sure that you are in the project directory.
 ### Inspect Results
 
 
-Each time a test is finished, you will see its summary in the consule which will resemble this:
+Each time a test is finished, you will see its summary in the console which will resemble this:
 
 ```
 ====================================================================
@@ -127,7 +127,7 @@ _________________________________
 
 Rate:	0.7739760316291207
 Average Loss:	0.47106388211250305
-Num. of clasifications by word:	[536393. 405070. 117703. 465403. 523431.]
+Num. of classifications by word:	[536393. 405070. 117703. 465403. 523431.]
 
 ====================================================================
 ```
@@ -162,14 +162,14 @@ Plot all the loss vs. rate results of the test, in respect to the theoretical bo
 log.plot()
 ```
 
-Plot the soft and hard quantization layer of **one** of the runs (rellevant only for Soft to Hard Quantization method):
+Plot the soft and hard quantization layer of **one** of the runs (relevant only for Soft to Hard Quantization method):
 
 ```
 plotTanhFunction(log, 1)
 ```
 
 
-For full information about the abbilities of the functions delete() content() and plot() of the testlogger, reffer test logger documentation (as mentioned earlier):
+For full information about the abilities of the functions delete() content() and plot() of the testlogger, refer test logger documentation (as mentioned earlier):
 ```
 from testLogger import *
 help(testlogger)

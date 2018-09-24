@@ -85,7 +85,7 @@ log = testlogger(TEST_LOG_MAT_FILE)
 # log.content('all')
 
 # Plot test log
-log.plot()
+# log.plot()
 
 # Plot soft and hard quantization functions of specific test
 # plotTanhFunction(log, 8)
