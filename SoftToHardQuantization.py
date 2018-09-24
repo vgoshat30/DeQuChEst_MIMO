@@ -11,17 +11,21 @@ from ProjectConstants import *
 
 class network(nn.Module):
 
-    def __init__(self, codebookSize, inputDimention, outputDimention, magic_c):
+    def __init__(self, codebookSize, inputDimention, outputDimention, magic_c,
+                 layersDimentions):
         super(network, self).__init__()
-        print(type(inputDimention))
-        self.l1 = nn.Linear(inputDimention, math.floor(0.5 * inputDimention))
+        self.l1 = nn.Linear(inputDimention, math.floor(layersDimentions[0] *
+                                                       inputDimention))
         # See Hardware-Limited Task-Based Quantization Proposion 3. for the
         # choice of output features
-        self.l2 = nn.Linear(math.floor(0.5 * inputDimention), outputDimention)
-        self.l3 = nn.Linear(outputDimention, math.floor(1.5 * outputDimention))
-        self.l4 = nn.Linear(math.floor(1.5 * outputDimention),
-                            math.floor(1.3 * outputDimention))
-        self.l5 = nn.Linear(math.floor(1.3 * outputDimention), outputDimention)
+        self.l2 = nn.Linear(math.floor(layersDimentions[0] * inputDimention),
+                            outputDimention)
+        self.l3 = nn.Linear(outputDimention, math.floor(layersDimentions[1] *
+                                                        outputDimention))
+        self.l4 = nn.Linear(math.floor(layersDimentions[1] * outputDimention),
+                            math.floor(layersDimentions[2] * outputDimention))
+        self.l5 = nn.Linear(math.floor(layersDimentions[2] * outputDimention),
+                            outputDimention)
         self.q1 = quantizationLayer(
             outputDimention, outputDimention, codebookSize, magic_c)
 

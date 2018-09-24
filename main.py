@@ -116,11 +116,12 @@ testData = ShlezDatasetTest(DATA_MAT_FILE)
 testLoader = DataLoader(dataset=testData, batch_size=BATCH_SIZE, shuffle=True)
 
 
-constantPermutationns = [(epoch, lr, codebookSize, magic_c)
+constantPermutationns = [(epoch, lr, codebookSize, magic_c, layersDimentions)
                          for epoch in EPOCH_RANGE
                          for lr in LR_RANGE
                          for codebookSize in M_RANGE
-                         for magic_c in MAGIC_C_RANGE]
+                         for magic_c in MAGIC_C_RANGE
+                         for layersDimentions in LAYERS_DIM_RANGE]
 
 # Iterating on all possible remutations of train epochs, learning rate, and
 # codebookSize arrays defined in the ProjectConstants module
@@ -129,6 +130,7 @@ for constPerm in constantPermutationns:
     lr = constPerm[1]
     codebookSize = constPerm[2]
     magic_c = constPerm[3]
+    layersDimentions = constPerm[4]
     QUANTIZATION_RATE = math.log2(codebookSize) *\
         trainData.outputDim/trainData.inputDim
 
@@ -143,10 +145,12 @@ for constPerm in constantPermutationns:
     # The 'Passing Gradinet' model, as described in the paper.
     passingGradient_model = PassingGradient.network(S_codebook,
                                                     trainData.inputDim,
-                                                    trainData.outputDim)
+                                                    trainData.outputDim,
+                                                    layersDimentions)
     # The 'Soft to Hard Quantization' model, as described in the paper.
     softToHardQuantization_model = SoftToHardQuantization.network(
-        codebookSize, trainData.inputDim, trainData.outputDim, magic_c)
+        codebookSize, trainData.inputDim, trainData.outputDim, magic_c,
+        layersDimentions)
 
     criterion = nn.MSELoss()
 
@@ -173,7 +177,8 @@ for constPerm in constantPermutationns:
 
         # Training 'Passing Gradient':
 
-        UI.trainMessage(modelname, corrTopEpoch, lr, codebookSize)
+        UI.trainMessage(modelname, corrTopEpoch, lr, codebookSize,
+                        layersDimentions)
         model_linUniformQunat_runtime = datetime.now()
         train(modelname, corrTopEpoch, passingGradient_model,
               passingGradient_optimizer, passingGradient_scheduler)
@@ -187,11 +192,12 @@ for constPerm in constantPermutationns:
                                                          passingGradient_model)
         UI.testResults(modelname, corrTopEpoch, lr, codebookSize,
                        QUANTIZATION_RATE,
-                       model_linUniformQunat_loss)
+                       model_linUniformQunat_loss, layersDimentions)
         log.log(rate=QUANTIZATION_RATE, loss=model_linUniformQunat_loss,
                 algorithm=modelname,
                 codewordNum=codebookSize,
                 learningRate=lr,
+                layersDim=layersDimentions,
                 epochs=corrTopEpoch,
                 runtime=model_linUniformQunat_runtime)
 
@@ -204,7 +210,8 @@ for constPerm in constantPermutationns:
 
         # Training 'Soft to Hard Quantization':
 
-        UI.trainMessage(modelname, corrTopEpoch, lr, codebookSize, magic_c)
+        UI.trainMessage(modelname, corrTopEpoch, lr, codebookSize,
+                        layersDimentions, magic_c)
         model_tanhQuantize_runtime = datetime.now()
         train(modelname, corrTopEpoch, softToHardQuantization_model,
               softToHardQuantization_optimizer,
@@ -220,11 +227,12 @@ for constPerm in constantPermutationns:
 
         UI.testResults(modelname, corrTopEpoch, lr, codebookSize,
                        QUANTIZATION_RATE, model_tanhQuantize_loss,
-                       classificationByWord, magic_c)
+                       layersDimentions,  classificationByWord, magic_c)
         log.log('last', rate=QUANTIZATION_RATE, loss=model_tanhQuantize_loss,
                 algorithm=modelname,
                 codewordNum=codebookSize,
                 learningRate=lr,
+                layersDim=layersDimentions,
                 epochs=corrTopEpoch,
                 magic_c=magic_c,
                 runtime=model_tanhQuantize_runtime)

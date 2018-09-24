@@ -73,6 +73,8 @@ class testlogger:
         self.codewordNum = pythonMatFile['codewordNum']
         # Learning rate multiplier in the learning algorithm
         self.learningRate = pythonMatFile['learningRate']
+        # Dimention rations of the NN layers
+        self.layersDim = pythonMatFile['layersDim']
         # Training runtime
         self.runtime = pythonMatFile['runTime']
         # The time the logging was performed
@@ -91,6 +93,7 @@ class testlogger:
             self.loss = self.loss[0]
             self.codewordNum = self.codewordNum[0]
             self.learningRate = self.learningRate[0]
+            self.layersDim = self.layersDim[0]
             self.runtime = self.runtime[0]
             self.logtime = self.logtime[0]
             self.algorithm = self.algorithm[0]
@@ -174,6 +177,8 @@ class testlogger:
             # Apend empty ndarray of float to learningRate
             self.learningRate = np.append(self.learningRate,
                                           np.empty((1, 1), float))
+            # Apend empty ndarray of float to layersDim
+            self.layersDim = np.append(self.layersDim, np.empty((1, 1), float))
             # Append empty string to runtime
             self.runtime = np.append(self.runtime, '')
             # Set the logging time to current time
@@ -312,6 +317,8 @@ class testlogger:
                 self.codewordNum[testIndex] = kwargs[key]
             if key is 'learningRate':
                 self.learningRate[testIndex] = kwargs[key]
+            if key is 'layersDim':
+                self.layersDim[testIndex] = kwargs[key]
             if key is 'runtime':
                 self.runtime[testIndex] = str(kwargs[key])
             if key is 'algorithm':
@@ -448,6 +455,7 @@ class testlogger:
             self.loss = np.delete(self.loss, deleteIndex, 0)
             self.codewordNum = np.delete(self.codewordNum, deleteIndex, 0)
             self.learningRate = np.delete(self.learningRate, deleteIndex, 0)
+            self.layersDim = np.delete(self.layersDim, deleteIndex, 0)
             self.runtime = np.delete(self.runtime, deleteIndex, 0)
             self.logtime = np.delete(self.logtime, deleteIndex, 0)
             self.algorithm = np.delete(self.algorithm, deleteIndex, 0)
@@ -467,6 +475,7 @@ class testlogger:
             self.loss = np.empty((0, 1), float)  # MATLAB Array of doubles
             self.codewordNum = np.empty((0, 1), float)  # MATLAB Array
             self.learningRate = np.empty((0, 1), float)  # MATLAB Array
+            self.layersDim = np.empty((0, 1), object)  # MATLAB Cell
             self.runtime = np.empty((0, 1), object)  # MATLAB Cell
             self.logtime = np.empty((0, 1), object)  # MATLAB Cell
             self.algorithm = np.empty((0, 1), object)  # MATLAB Cell
@@ -609,6 +618,12 @@ class testlogger:
                 else:
                     learningRateToPrint = self.learningRate[currTest-1]
 
+                if (self.layersDim[currTest-1].size == 1 and
+                        self.layersDim[currTest-1][0, 0] == 0):
+                    layersDimToPrint = dontExistMessage
+                else:
+                    layersDimToPrint = self.layersDim[currTest-1][0]
+
                 if not self.runtime[currTest-1]:
                     runtimeToPrint = dontExistMessage
                 else:
@@ -629,19 +644,19 @@ class testlogger:
                             self.aCoefs[currTest-1][0, 0] == 0):
                         aCoefsToPrint = dontExistMessage
                     else:
-                        aCoefsToPrint = self.aCoefs[currTest-1]
+                        aCoefsToPrint = self.aCoefs[currTest-1][0]
 
                     if (self.bCoefs[currTest-1].size == 1 and
                             self.bCoefs[currTest-1][0, 0] == 0):
                         bCoefsToPrint = dontExistMessage
                     else:
-                        bCoefsToPrint = self.bCoefs[currTest-1]
+                        bCoefsToPrint = self.bCoefs[currTest-1][0]
 
                     if (self.cCoefs[currTest-1].size == 1 and
                             self.cCoefs[currTest-1][0, 0] == 0):
                         cCoefsToPrint = dontExistMessage
                     else:
-                        cCoefsToPrint = self.cCoefs[currTest-1]
+                        cCoefsToPrint = self.cCoefs[currTest-1][0]
 
                     if not self.magic_c[currTest-1]:
                         magicCToPrint = dontExistMessage
@@ -655,6 +670,7 @@ class testlogger:
                           "Codewords Num.: {}\n"
                           "Algorithm:\t{}\n"
                           "Learning rate:\t{}\n"
+                          "Layers Dimentions:\t{}\n"
                           "Train Runtime: \t{}\n"
                           "Train Epochs:\t{}\n"
                           "Logging Time: \t{}\n"
@@ -662,7 +678,7 @@ class testlogger:
                           .format(currTest, self.rate[currTest-1],
                                   self.loss[currTest-1], codewordNumToPrint,
                                   algToPrint, learningRateToPrint,
-                                  runtimeToPrint, epochToPrint,
+                                  layersDimToPrint, runtimeToPrint, epochToPrint,
                                   removeCellFormat(self.logtime[currTest-1]),
                                   noteToPrint))
                 elif self.loggerType == 'tanh':
@@ -672,6 +688,7 @@ class testlogger:
                           "Codewords Num.: {}\n"
                           "Algorithm:\t{}\n"
                           "Learning rate:\t{}\n"
+                          "Layers Dim.:\t{}\n"
                           "Tanh a coeffs:\t{}\n"
                           "Tanh b coeffs:\t{}\n"
                           "Tanh c coeffs:\t{}\n"
@@ -683,8 +700,8 @@ class testlogger:
                           .format(currTest, self.rate[currTest-1],
                                   self.loss[currTest-1], codewordNumToPrint,
                                   algToPrint, learningRateToPrint,
-                                  aCoefsToPrint, bCoefsToPrint,
-                                  cCoefsToPrint, magicCToPrint,
+                                  layersDimToPrint, aCoefsToPrint,
+                                  bCoefsToPrint, cCoefsToPrint, magicCToPrint,
                                   runtimeToPrint, epochToPrint,
                                   removeCellFormat(self.logtime[currTest-1]),
                                   noteToPrint))
@@ -1018,6 +1035,7 @@ class testlogger:
                     'lossResults': self.loss,
                     'codewordNum': self.codewordNum,
                     'learningRate': self.learningRate,
+                    'layersDim': self.layersDim,
                     'time': self.logtime,
                     'algorithmName': self.algorithm,
                     'runTime': self.runtime,
@@ -1172,6 +1190,7 @@ def createMatFile(name, type, theoryRate, theoryLoss):
     loss = np.empty((0, 1), float)  # MATLAB Array of doubles
     codewordNum = np.empty((0, 1), float)  # MATLAB Array of doubles
     learningRate = np.empty((0, 1), float)  # MATLAB Array of doubles
+    layersDim = np.empty((0, 1), object)  # MATLAB Cell
     runtime = np.empty((0, 1), object)  # MATLAB Cell
     logtime = np.empty((0, 1), object)  # MATLAB Cell
     algorithm = np.empty((0, 1), object)  # MATLAB Cell
@@ -1185,6 +1204,7 @@ def createMatFile(name, type, theoryRate, theoryLoss):
                  'lossResults': loss,
                  'codewordNum': codewordNum,
                  'learningRate': learningRate,
+                 'layersDim': layersDim,
                  'time': logtime,
                  'algorithmName': algorithm,
                  'runTime': runtime,

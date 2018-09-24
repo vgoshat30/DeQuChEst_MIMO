@@ -3,17 +3,19 @@
 ########################################################################
 
 
-def trainMessage(model, epoch, lr, codebookSize, magic_c=None):
+def trainMessage(model, epoch, lr, codebookSize, layersDimentions,
+                 magic_c=None):
     print('\n\n'
           '===================================================================='
           '\n\n\tTraining \'{}\' Model\n\n'
           'Epochs number:\t{}\n'
           'Learning Rate:\t{}\n'
           'Codebook Size:\t{}\n'
+          'Layers Dim:\t{}\n'
           'MAGIC_C:\t{}\n\n'
           '===================================================================='
           '\n\n'
-          .format(model, epoch, lr, codebookSize, magic_c))
+          .format(model, epoch, lr, codebookSize, layersDimentions, magic_c))
 
 
 def trainIteration(modelname, corrEpoch, epoch, batch_idx, data, trainLoader,
@@ -47,7 +49,7 @@ def testIteration(modelname, batch_idx, data, testLoader):
 
 
 def testResults(modelname, epoch, lr, codebookSize, rate, loss,
-                classificationByWord=None, magic_c=None):
+                layersDimentions, classificationByWord=None, magic_c=None):
     print('\n\n'
           '===================================================================='
           '\n\n\tResults of \'{}\' Testing\n\n'
@@ -57,6 +59,7 @@ def testResults(modelname, epoch, lr, codebookSize, rate, loss,
           '| - Epochs number:\t{}\t|\n'
           '| - Learning Rate:\t{}\t|\n'
           '| - Codebook Size:\t{}\t|\n'
+          '| - Layers Dim:\t{}\t|\n'
           '| - MAGIC_C:\t\t{}\t|\n'
           '|_______________________________|\n\n'
           'Rate:\t{}\n'
@@ -64,5 +67,5 @@ def testResults(modelname, epoch, lr, codebookSize, rate, loss,
           'Num. of clasifications by word:\t{}\n\n'
           '===================================================================='
           '\n\n'
-          .format(modelname, epoch, lr, codebookSize, magic_c, rate, loss,
-                  classificationByWord))
+          .format(modelname, epoch, lr, codebookSize, layersDimentions,
+                  magic_c, rate, loss, classificationByWord))
