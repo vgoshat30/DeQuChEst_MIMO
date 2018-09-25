@@ -16,14 +16,14 @@ The repository contains all the essential code to perform the following:
 
 #### PYTHON Packages
 
-In order to be able to run all PYTHON code in this project you will need the following libraries:
+In order to be able to run all PYTHON code in this project you will need the following packages:
 
-- [PyTorch](https://pytorch.org)
-- [NumPy and SciPy](https://scipy.org/scipylib/download.html)
+- [PyTorch](https://pytorch.org/get-started/locally/)
+- [NumPy and SciPy](https://scipy.org/install.html)
 - [SymPy](https://www.sympy.org/en/index.html)
 - [Matplotlib](https://matplotlib.org)
 
-Once you installed the packages above, you should download the project .zip and unzip it on your system.
+Once you have the packages above installed, you should download the project .zip and unzip it on your system.
 
 
 
