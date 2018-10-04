@@ -22,6 +22,7 @@ In order to be able to run all PYTHON code in this project you will need the fol
 - [NumPy and SciPy](https://scipy.org/install.html)
 - [SymPy](https://docs.sympy.org/latest/install.html) (Install using `conda install sympy`)
 - [Matplotlib](https://matplotlib.org) (Should be already installed with PYTHON)
+- [h5py] (https://pypi.org/project/h5py/)
 
 Once you have the packages above installed, you should download the project .zip and unzip it on your system.
 
