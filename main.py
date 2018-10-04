@@ -14,6 +14,10 @@ import scipy.io as sio
 import numpy as np
 import math
 from datetime import datetime
+import h5py
+
+
+
 
 import PassingGradient
 import SoftToHardQuantization
@@ -93,10 +97,21 @@ def testSoftToHardQuantization(modelname, model, codebookSize, magic_c):
 #########################################################################
 
 
-# Assigning the log mat file to a testlogger class
-theory = sio.loadmat(DATA_MAT_FILE)
+# Loading theoretical data from the data .mat file into a dictionary
+UI.readingDataFile(DATA_MAT_FILE)
+theory = {}
+dataFile = h5py.File(DATA_MAT_FILE)
+for k, v in dataFile.items():
+    theory[k] = np.array(v)
+
+# Extracting theory data vectors
 theoryRate = theory['v_fRate']
 theoryLoss = theory['m_fCurves']
+# Extracting train and test data
+trainX = theory['trainX']
+trainS = theory['trainS']
+testX = theory['dataX']
+testS = theory['dataS']
 # Trying to create a new test log mat file for the case that such one does
 # not exist
 log = createMatFile(TEST_LOG_MAT_FILE, 'tanh', theoryRate, theoryLoss)
@@ -108,11 +123,11 @@ log = createMatFile(TEST_LOG_MAT_FILE, 'tanh', theoryRate, theoryLoss)
 
 
 # Get the class containing the train data from dataLoader.py
-trainData = ShlezDatasetTrain(DATA_MAT_FILE)
+trainData = ShlezDatasetTrain(trainX, trainS)
 # define training dataloader
 trainLoader = DataLoader(dataset=trainData, batch_size=BATCH_SIZE, shuffle=True)
 # Do the same for the test data
-testData = ShlezDatasetTest(DATA_MAT_FILE)
+testData = ShlezDatasetTest(testX, testS)
 testLoader = DataLoader(dataset=testData, batch_size=BATCH_SIZE, shuffle=True)
 
 
@@ -138,31 +153,8 @@ for constPerm in constantPermutationns:
     S_codebook = UniformQuantizer.codebook_uniform(trainData.S_var,
                                                    codebookSize)
 
-    #########################################################################
-    ###                    Initializing both models                       ###
-    #########################################################################
-
-    # The 'Passing Gradinet' model, as described in the paper.
-    passingGradient_model = PassingGradient.network(S_codebook,
-                                                    trainData.inputDim,
-                                                    trainData.outputDim,
-                                                    layersDimentions)
-    # The 'Soft to Hard Quantization' model, as described in the paper.
-    softToHardQuantization_model = SoftToHardQuantization.network(
-        codebookSize, trainData.inputDim, trainData.outputDim, magic_c,
-        layersDimentions)
-
+    # device = torch.device('cpu')
     criterion = nn.MSELoss()
-
-    passingGradient_optimizer = optim.SGD(passingGradient_model.parameters(),
-                                          lr=lr, momentum=0.5)
-    softToHardQuantization_optimizer = optim.SGD(
-        softToHardQuantization_model.parameters(), lr=lr, momentum=0.5)
-
-    passingGradient_scheduler = optim.lr_scheduler.ExponentialLR(
-        passingGradient_optimizer, gamma=0.7, last_epoch=-1)
-    softToHardQuantization_scheduler = optim.lr_scheduler.ExponentialLR(
-        softToHardQuantization_optimizer, gamma=0.7, last_epoch=-1)
 
     ########################################################################
     ###               Training and testing all networks                  ###
@@ -175,8 +167,19 @@ for constPerm in constantPermutationns:
     if 'Passing Gradient' in modelsToActivate:
         modelname = 'Passing Gradient'
 
-        # Training 'Passing Gradient':
+        # Defining the 'Passing Gradinet' model, as described in the paper.
+        passingGradient_model = PassingGradient.network(S_codebook,
+                                                        trainData.inputDim,
+                                                        trainData.outputDim,
+                                                        layersDimentions)
 
+        passingGradient_optimizer = optim.SGD(passingGradient_model.parameters(),
+                                              lr=lr, momentum=0.5)
+
+        passingGradient_scheduler = optim.lr_scheduler.ExponentialLR(
+            passingGradient_optimizer, gamma=0.7, last_epoch=-1)
+
+        # Training 'Passing Gradient':
         UI.trainMessage(modelname, corrTopEpoch, lr, codebookSize,
                         layersDimentions)
         model_linUniformQunat_runtime = datetime.now()
@@ -208,8 +211,18 @@ for constPerm in constantPermutationns:
     if 'Soft to Hard Quantization' in modelsToActivate:
         modelname = 'Soft to Hard Quantization'
 
-        # Training 'Soft to Hard Quantization':
+        # Defining the 'Soft to Hard Quantization' model, as described in the paper.
+        softToHardQuantization_model = SoftToHardQuantization.network(
+            codebookSize, trainData.inputDim, trainData.outputDim, magic_c,
+            layersDimentions)#.to(device)
 
+        softToHardQuantization_optimizer = optim.SGD(
+            softToHardQuantization_model.parameters(), lr=lr, momentum=0.5)
+
+        softToHardQuantization_scheduler = optim.lr_scheduler.ExponentialLR(
+            softToHardQuantization_optimizer, gamma=0.7, last_epoch=-1)
+
+        # Training 'Soft to Hard Quantization':
         UI.trainMessage(modelname, corrTopEpoch, lr, codebookSize,
                         layersDimentions, magic_c)
         model_tanhQuantize_runtime = datetime.now()

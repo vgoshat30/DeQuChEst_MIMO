@@ -19,13 +19,13 @@ modelsToActivate = [
 ###                       Neural Network constants                           ###
 ################################################################################
 
-BATCH_SIZE = 10
+BATCH_SIZE = 1
 EPOCH_RANGE = [12, ]
 LR_RANGE = [0.2]
 M_RANGE = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 MAGIC_C_RANGE = [5, ]
 
-LAYERS_DIM_RANGE = [[3, 5, 2],
+LAYERS_DIM_RANGE = [[1.1, 3, 1.2],
                     [4, 2, 1],
                     [10, 5, 4],
                     [1.1, 5, 0.5]]

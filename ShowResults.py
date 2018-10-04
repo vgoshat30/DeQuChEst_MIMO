@@ -1,18 +1,9 @@
-import scipy.io as sio
-import scipy.optimize as optim
 import sympy as sym
-import numpy as np
 import matplotlib.pyplot as plt
-from random import random
-from datetime import datetime
-from torch.nn.parameter import Parameter
-import torch
-import sys
-import time
 
 from testLogger import *
-import UserInterface as UI
 from ProjectConstants import *
+
 
 
 def plotTanhFunction(testLog, testNumber):
@@ -85,7 +76,7 @@ log = testlogger(TEST_LOG_MAT_FILE)
 # log.content('all')
 
 # Plot test log
-# log.plot()
+log.plot()
 
 # Plot soft and hard quantization functions of specific test
 # plotTanhFunction(log, 8)

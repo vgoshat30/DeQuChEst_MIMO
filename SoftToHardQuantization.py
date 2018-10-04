@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from torch.nn.parameter import Parameter
 from torch.nn.modules.module import Module
+from torch.autograd import Variable
 import math
 
 import numpy
@@ -54,7 +55,7 @@ class quantizationLayer(Module):
         self.weight.data.uniform_(-stdv, stdv)
 
     def forward(self, input):
-        ret = torch.zeros(input.size())
+        ret = Variable(torch.zeros(input.size()), requires_grad=False)
 
         for kk in range(0, self.codebookSize - 1):
             tempVal = torch.add(input, self.weight[kk, 1])

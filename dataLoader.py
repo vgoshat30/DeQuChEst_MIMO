@@ -31,12 +31,7 @@ class ShlezDatasetTrain(Dataset):
         and variance of the X data (to be used for creation of a codebook)
     """
 
-    def __init__(self, matFile):
-        # Loading .mat file
-        shlezMat = sio.loadmat(matFile)
-        # Getting train data variables from the .mat file:
-        Xdata = shlezMat['trainX']
-        Sdata = shlezMat['trainS']
+    def __init__(self, Xdata, Sdata):
         # Setting input and output dimetions (defined in ProjectConstants.py)
         self.inputDim = Xdata.shape[1]
         self.outputDim = Sdata.shape[1]
@@ -63,12 +58,7 @@ class ShlezDatasetTrain(Dataset):
 class ShlezDatasetTest(Dataset):
     """ Data class for the testing data set (X and S pairs) """
 
-    def __init__(self, matFile):
-        # Loading .mat file
-        shlezMat = sio.loadmat(matFile)
-        # Getting test data variables from the .mat file:
-        Xdata = shlezMat['dataX']
-        Sdata = shlezMat['dataS']
+    def __init__(self, Xdata, Sdata):
 
         # Converting numpy arrays to pytorch tensors:
         self.X_data = torch.from_numpy(Xdata)

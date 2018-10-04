@@ -121,7 +121,7 @@ function generateData(varargin)
     s_fT = p.Results.TrainSetSize;
     s_fD = p.Results.TestSetSize;
     
-    v_fRate = 0.01:0.0001:p.Results.MaxRate;
+    v_fRate = 0.01:0.001:p.Results.MaxRate;
     %% Generate training data and pilot matrix
     s_fK = 2*s_fNt * s_fNu;
     s_fN = s_fK * s_fRatio;
@@ -157,7 +157,7 @@ function generateData(varargin)
         m_fCurves(2, kk) = (0.5 / (1 + s_fPower*s_fTau)) * ...
                          (1 + s_fPower*s_fTau * 2^(-2* s_fRatio* s_fRate));
 
-         % Asymptotic optimal task-ignorant:
+        % Asymptotic optimal task-ignorant:
         m_fCx = 0.5 * [real(m_fSigmaT), -1*imag(m_fSigmaT); ...
                        imag(m_fSigmaT), real(m_fSigmaT)];
         m_fEstMat = sqrt(s_fPower)/(1 + s_fPower*s_fTau) * ...
@@ -212,12 +212,12 @@ function canceled = cautionSave(fileDir,dataX, dataS, trainX, trainS, ...
         switch answer
             case 'Replace'
                 save(fileDir,'dataX', 'dataS', 'trainX', 'trainS', ...
-                     'v_fRate', 'm_fCurves');
+                     'v_fRate', 'm_fCurves', '-v7.3','-nocompression');
             case 'Cancel'
                 canceled = true;
         end
     else
         save(fileDir,'dataX', 'dataS', 'trainX', 'trainS', ...
-                     'v_fRate', 'm_fCurves');
+                     'v_fRate', 'm_fCurves', '-v7.3','-nocompression');
     end
 end
