@@ -14,9 +14,6 @@ import scipy.io as sio
 import numpy as np
 import math
 from datetime import datetime
-import h5py
-
-
 
 
 import PassingGradient
@@ -99,10 +96,12 @@ def testSoftToHardQuantization(modelname, model, codebookSize, magic_c):
 
 # Loading theoretical data from the data .mat file into a dictionary
 UI.readingDataFile(DATA_MAT_FILE)
-theory = {}
-dataFile = h5py.File(DATA_MAT_FILE)
-for k, v in dataFile.items():
-    theory[k] = np.array(v)
+# theory = {}
+# dataFile = h5py.File(DATA_MAT_FILE)
+# for k, v in dataFile.items():
+#     theory[k] = np.array(v)
+
+theory = sio.loadmat(DATA_MAT_FILE)
 
 # Extracting theory data vectors
 theoryRate = theory['v_fRate']
@@ -214,7 +213,7 @@ for constPerm in constantPermutationns:
         # Defining the 'Soft to Hard Quantization' model, as described in the paper.
         softToHardQuantization_model = SoftToHardQuantization.network(
             codebookSize, trainData.inputDim, trainData.outputDim, magic_c,
-            layersDimentions)#.to(device)
+            layersDimentions)  # .to(device)
 
         softToHardQuantization_optimizer = optim.SGD(
             softToHardQuantization_model.parameters(), lr=lr, momentum=0.5)

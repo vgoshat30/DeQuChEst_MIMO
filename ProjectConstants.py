@@ -2,8 +2,8 @@
 ###                   Training, Testing and Logging Data                     ###
 ################################################################################
 
-DATA_MAT_FILE = 'data_a30_u12.mat'
-TEST_LOG_MAT_FILE = 'testLog_a30_u12.mat'
+DATA_MAT_FILE = 'newdata_test.mat'
+TEST_LOG_MAT_FILE = 'newLog_test.mat'
 
 ################################################################################
 ###                          Models to Activate                              ###

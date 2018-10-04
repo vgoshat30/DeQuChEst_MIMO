@@ -5,7 +5,6 @@ from testLogger import *
 from ProjectConstants import *
 
 
-
 def plotTanhFunction(testLog, testNumber):
     def quantize(input, a, b, q):
         """Get the result of the hard quantization function derived from the

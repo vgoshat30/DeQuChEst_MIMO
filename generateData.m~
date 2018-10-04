@@ -12,19 +12,19 @@ function generateData(varargin)
     % Optional Name-Value Pairs:
     %
     %
-    %   generateData('Autosave','on') Displays a folder choosing window
+    %   shlezDataGen('Autosave','on') Displays a folder choosing window
     %                                 before saving the .mat file. Call
     %                                 with 'off' or ommit to automatically
     %                                 save to the corrent directory or to
     %                                 manually chose one.
     %
     %
-    %   generateData('FileName','shlezMat') Choose the file name of the
+    %   shlezDataGen('FileName','shlezMat') Choose the file name of the
     %                                       output .mat file. DO NOT add
     %                                       .mat extention.
     %
     %
-    %   generateData('Directory','shlezMat') Specify the directory of the
+    %   shlezDataGen('Directory','shlezMat') Specify the directory of the
     %                                        output file.
     %
     %
@@ -34,21 +34,21 @@ function generateData(varargin)
     %
     %
     %
-    %   generateData('MaxRate', 5)          Deafult is: 1.5
+    %   shlezDataGen('MaxRate', 5)          Deafult is: 1.5
     %
-    %   generateData('TrainPower', 1:5)     Deafult is: 1:10
+    %   shlezDataGen('TrainPower', 1:5)     Deafult is: 1:10
     %
-    %   generateData('TestPower', 3)        Deafult is: 4
+    %   shlezDataGen('TrainPower', 1:5)     Deafult is: 1:10
     %
-    %   generateData('Users', 5)            Deafult is: 4
+    %   shlezDataGen('Users', 5)            Deafult is: 4
     %
-    %   generateData('Antennas', 15)        Deafult is: 10
+    %   shlezDataGen('Antennas', 15)        Deafult is: 10
     %
-    %   generateData('Ratio', 4)            Deafult is: 3
+    %   shlezDataGen('Ratio', 4)            Deafult is: 3
     %
-    %   generateData('TrainSetSize', 2^5)  Deafult is: 2^15
+    %   shlezDataGen('TrainSetSize', 2^10)  Deafult is: 2^15
     %
-    %   generateData('TestSetSize', 2^5)   Deafult is: 2^10
+    %   shlezDataGen('TestSetSize', 2^15)   Deafult is: 
     %
     %
     %
@@ -81,13 +81,6 @@ function generateData(varargin)
     %   Update description:
     %       Adding option to define parameters via function call (as
     %       varargs)
-    % 
-    % 
-    % Updated 4 Oct 2018
-    % Nir Shlezinger
-    %
-    %   Update description:
-    %       Creating training data based on multiple SNR values.
     
     %% Parsing Input
     p = inputParser;
@@ -243,12 +236,12 @@ function canceled = cautionSave(fileDir,dataX, dataS, trainX, trainS, ...
         switch answer
             case 'Replace'
                 save(fileDir,'dataX', 'dataS', 'trainX', 'trainS', ...
-                     'v_fRate', 'm_fCurves');
+                     'v_fRate', 'm_fCurves', '-v7.3','-nocompression');
             case 'Cancel'
                 canceled = true;
         end
     else
         save(fileDir,'dataX', 'dataS', 'trainX', 'trainS', ...
-                     'v_fRate', 'm_fCurves');
+                     'v_fRate', 'm_fCurves', '-v7.3','-nocompression');
     end
 end
