@@ -14,13 +14,46 @@ def trainMessage(model, epoch, lr, codebookSize, layersDimentions,
           '===================================================================='
           '\n\n\tTraining \'{}\' Model\n\n'
           'Epochs number:\t{}\n'
-          'Learning Rate:\t{}\n'
-          'Codebook Size:\t{}\n'
-          'Layers Dim:\t{}\n'
-          'MAGIC_C:\t{}\n\n'
+          'Learning rate:\t{}\n'
+          'Codebook rize:\t{}\n'
+          'MAGIC_C:\t{}\n'
+          'Layer dim mlt:\t{}\n\n'
+          'Resulting NN structure:\n\n'
+          '-------------------------\n'
+          '|Layer|   In    |  Out  |\n'
+          '-------------------------\n'
+          '|  1  | {}\t| {}\t|\n'
+          '|  2  | {}\t| {}\t|\n'
+          '|-------- RELU ---------|\n'
+          '|  3  | {}\t| {}\t|\n'
+          '|  4  | {}\t| {}\t|\n'
+          '|----- Quantization ----|\n'
+          '|  5  | {}\t| {}\t|\n'
+          '|  6  | {}\t| {}\t|\n'
+          '|-------- RELU ---------|\n'
+          '|  7  | {}\t| {}\t|\n'
+          '|  8  | {}\t| {}\t|\n'
+          '-------------------------\n\n'
           '===================================================================='
           '\n\n'
-          .format(model, epoch, lr, codebookSize, layersDimentions, magic_c))
+          .format(model.modelname, epoch, lr, codebookSize, magic_c,
+                  layersDimentions,
+                  model.l1.weight.shape[1],
+                  model.l1.weight.shape[0],
+                  model.l2.weight.shape[1],
+                  model.l2.weight.shape[0],
+                  model.l3.weight.shape[1],
+                  model.l3.weight.shape[0],
+                  model.l4.weight.shape[1],
+                  model.l4.weight.shape[0],
+                  model.l5.weight.shape[1],
+                  model.l5.weight.shape[0],
+                  model.l6.weight.shape[1],
+                  model.l6.weight.shape[0],
+                  model.l7.weight.shape[1],
+                  model.l7.weight.shape[0],
+                  model.l8.weight.shape[1],
+                  model.l8.weight.shape[0],))
 
 
 def trainIteration(modelname, corrEpoch, epoch, batch_idx, data, trainLoader,

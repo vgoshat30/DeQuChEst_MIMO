@@ -69,10 +69,10 @@ def plotTanhFunction(testLog, testNumber):
 log = testlogger(TEST_LOG_MAT_FILE)
 
 # # Delete tests
-# log.delete(100000)
+# log.delete(10000000)
 
 # Show content of tests
-# log.content('all')
+# log.content([7, 11, 15])
 
 # Plot test log
 log.plot()

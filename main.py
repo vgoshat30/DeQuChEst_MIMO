@@ -135,7 +135,7 @@ constantPermutationns = [(epoch, lr, codebookSize, magic_c, layersDimentions)
                          for lr in LR_RANGE
                          for codebookSize in M_RANGE
                          for magic_c in MAGIC_C_RANGE
-                         for layersDimentions in LAYERS_DIM_RANGE]
+                         for layersDimentions in LAYERS_DIM_MULTIPLIERS_RANGE]
 
 # Iterating on all possible remutations of train epochs, learning rate, and
 # codebookSize arrays defined in the ProjectConstants module
@@ -167,7 +167,7 @@ for constPerm in constantPermutationns:
         modelname = 'Passing Gradient'
 
         # Defining the 'Passing Gradinet' model, as described in the paper.
-        passingGradient_model = PassingGradient.network(S_codebook,
+        passingGradient_model = PassingGradient.network(modelname, S_codebook,
                                                         trainData.inputDim,
                                                         trainData.outputDim,
                                                         layersDimentions)
@@ -179,7 +179,7 @@ for constPerm in constantPermutationns:
             passingGradient_optimizer, gamma=0.7, last_epoch=-1)
 
         # Training 'Passing Gradient':
-        UI.trainMessage(modelname, corrTopEpoch, lr, codebookSize,
+        UI.trainMessage(passingGradient_model, corrTopEpoch, lr, codebookSize,
                         layersDimentions)
         model_linUniformQunat_runtime = datetime.now()
         train(modelname, corrTopEpoch, passingGradient_model,
@@ -188,7 +188,6 @@ for constPerm in constantPermutationns:
             model_linUniformQunat_runtime
 
         # Testing 'Passing Gradient':
-
         UI.testMessage(modelname)
         model_linUniformQunat_loss = testPassingGradient(modelname,
                                                          passingGradient_model)
@@ -212,8 +211,12 @@ for constPerm in constantPermutationns:
 
         # Defining the 'Soft to Hard Quantization' model, as described in the paper.
         softToHardQuantization_model = SoftToHardQuantization.network(
-            codebookSize, trainData.inputDim, trainData.outputDim, magic_c,
-            layersDimentions)  # .to(device)
+            modelname, codebookSize, trainData.inputDim, trainData.outputDim,
+            magic_c, layersDimentions)
+
+        print('DEBUGGING 1: l1.inputDim={}\tl1.outputDim={}'
+              .format(softToHardQuantization_model.l1.weight.shape[0],
+                      softToHardQuantization_model.l1.weight.shape[1]))
 
         softToHardQuantization_optimizer = optim.SGD(
             softToHardQuantization_model.parameters(), lr=lr, momentum=0.5)
@@ -222,8 +225,8 @@ for constPerm in constantPermutationns:
             softToHardQuantization_optimizer, gamma=0.7, last_epoch=-1)
 
         # Training 'Soft to Hard Quantization':
-        UI.trainMessage(modelname, corrTopEpoch, lr, codebookSize,
-                        layersDimentions, magic_c)
+        UI.trainMessage(softToHardQuantization_model, corrTopEpoch, lr,
+                        codebookSize, layersDimentions, magic_c)
         model_tanhQuantize_runtime = datetime.now()
         train(modelname, corrTopEpoch, softToHardQuantization_model,
               softToHardQuantization_optimizer,
@@ -231,7 +234,6 @@ for constPerm in constantPermutationns:
         model_tanhQuantize_runtime = datetime.now() - model_tanhQuantize_runtime
 
         # Testing 'Soft to Hard Quantization':
-
         UI.testMessage(modelname)
         model_tanhQuantize_loss, classificationByWord = \
             testSoftToHardQuantization(modelname, softToHardQuantization_model,

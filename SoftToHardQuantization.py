@@ -3,40 +3,68 @@ import torch.nn as nn
 from torch.nn.parameter import Parameter
 from torch.nn.modules.module import Module
 from torch.autograd import Variable
-import math
+import torch.nn.functional as F
 
+import math
 import numpy
 import sympy as sym
+
 from ProjectConstants import *
 
 
 class network(nn.Module):
 
-    def __init__(self, codebookSize, inputDimention, outputDimention, magic_c,
-                 layersDimentions):
+    def __init__(self, modelname, codebookSize, inputDimention, outputDimention,
+                 magic_c, layersDimentions):
         super(network, self).__init__()
-        self.l1 = nn.Linear(inputDimention, math.floor(layersDimentions[0] *
-                                                       inputDimention))
-        # See Hardware-Limited Task-Based Quantization Proposion 3. for the
-        # choice of output features
+
+        self.modelname = modelname
+
+        self.l1 = nn.Linear(inputDimention,
+                            math.floor(layersDimentions[0] * inputDimention))
+
         self.l2 = nn.Linear(math.floor(layersDimentions[0] * inputDimention),
+                            math.floor(layersDimentions[1] * inputDimention))
+
+        self.l3 = nn.Linear(math.floor(layersDimentions[1] * inputDimention),
+                            math.floor(layersDimentions[2] * inputDimention))
+
+        self.l4 = nn.Linear(math.floor(layersDimentions[2] * inputDimention),
                             outputDimention)
-        self.l3 = nn.Linear(outputDimention, math.floor(layersDimentions[1] *
-                                                        outputDimention))
-        self.l4 = nn.Linear(math.floor(layersDimentions[1] * outputDimention),
-                            math.floor(layersDimentions[2] * outputDimention))
-        self.l5 = nn.Linear(math.floor(layersDimentions[2] * outputDimention),
+
+        self.l5 = nn.Linear(outputDimention,
+                            math.floor(layersDimentions[3] * outputDimention))
+
+        self.l6 = nn.Linear(math.floor(layersDimentions[3] * outputDimention),
+                            math.floor(layersDimentions[4] * outputDimention))
+
+        self.l7 = nn.Linear(math.floor(layersDimentions[4] * outputDimention),
+                            math.floor(layersDimentions[5] * outputDimention))
+
+        self.l8 = nn.Linear(math.floor(layersDimentions[5] * outputDimention),
                             outputDimention)
-        self.q1 = quantizationLayer(
-            outputDimention, outputDimention, codebookSize, magic_c)
+
+        self.q1 = quantizationLayer(outputDimention, outputDimention,
+                                    codebookSize, magic_c)
 
     def forward(self, x):
         x = self.l1(x)
         x = self.l2(x)
-        x = self.q1(x)
+
+        x = F.relu(x)
+
         x = self.l3(x)
         x = self.l4(x)
-        return self.l5(x)
+
+        x = self.q1(x)
+
+        x = self.l5(x)
+        x = self.l6(x)
+
+        x = F.relu(x)
+
+        x = self.l7(x)
+        return self.l8(x)
 
 
 class quantizationLayer(Module):
