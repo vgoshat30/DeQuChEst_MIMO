@@ -2,8 +2,8 @@
 ###                   Training, Testing and Logging Data                     ###
 ################################################################################
 
-DATA_MAT_FILE = 'newdata_test.mat'
-TEST_LOG_MAT_FILE = 'newLog_test.mat'
+DATA_MAT_FILE = 'data_a10_u4_SNR_1_10.mat'
+TEST_LOG_MAT_FILE = 'testLog_a10_u4_SNR_1_10_1.mat'
 
 ################################################################################
 ###                          Models to Activate                              ###
@@ -11,7 +11,7 @@ TEST_LOG_MAT_FILE = 'newLog_test.mat'
 
 # Only uncommented models will be trained and tested
 modelsToActivate = [
-    'Passing Gradient',
+    # 'Passing Gradient',
     'Soft to Hard Quantization'
 ]
 
@@ -22,9 +22,73 @@ modelsToActivate = [
 BATCH_SIZE = 8
 EPOCH_RANGE = [10, ]
 LR_RANGE = [0.2]
-M_RANGE = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+M_RANGE = [6, ]
 MAGIC_C_RANGE = [5, ]
 
-LAYERS_DIM_MULTIPLIERS_RANGE = [[10, 8, 5, 10, 5, 2],
-                                [12, 10, 4, 15, 10, 5],
-                                [8, 5, 2, 8, 5, 2]]
+
+'''Specify different combinations of NN architecture using the following rules:
+-   The ARCHITECTURE must be specified as a list of lists, each list
+    representing one architecture.
+-   The order of the layers in each list will be their order in the module.
+-   There are only three types of layer available:
+    -   linear: specified using the string 'linear' and afterwards (in the next
+        place in the list), the multiplication factor between the input
+        dimention and the output dimention of the layer.
+    -   quantization: specified using the string 'quantization' (nothing else)
+
+        NOTE that the quantization layer MUST be between two linear layers!
+
+    -   relu: specified using the string 'relu' (nothing else)
+-   Disclaimer: Meant to be used with only one quantization layer and relu
+    activation functions appearing between two linear layers. Good behaviour is
+    promised only under those circumstances.
+'''
+ARCHITECTURE = [
+    # ['linear', 5,
+    #  'linear', 0.08,
+    #  'quantization',
+    #  'linear', 10,
+    #  'linear', 0.01],
+
+    ['linear', 2,
+     'linear', 2,
+     'linear', 2,
+     'relu',
+     'linear', 0.5,
+     'linear', 0.5,
+     'linear', 0.5,
+     'quantization',
+     'linear', 5,
+     'linear', 2,
+     'relu',
+     'linear', 0.2,
+     'linear', 0.5],
+
+    # ['linear', 2,
+    #  'linear', 2,
+    #  'linear', 2,
+    #  'relu',
+    #  'linear', 0.5,
+    #  'linear', 0.5,
+    #  'linear', 0.5,
+    #  'quantization',
+    #  'linear', 2,
+    #  'linear', 2,
+    #  'linear', 2,
+    #  'relu',
+    #  'linear', 0.5,
+    #  'linear', 0.5,
+    #  'linear', 0.5],
+
+    ['linear', 10,
+     'linear', 0.8,
+     'relu',
+     'linear', 0.625,
+     'linear', 0.0666667,
+     'quantization',
+     'linear', 10,
+     'linear', 0.5,
+     'relu',
+     'linear', 0.4,
+     'linear', 0.5]
+]

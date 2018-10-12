@@ -15,57 +15,73 @@ import UniformQuantizer
 class network(nn.Module):
 
     def __init__(self, modelname, codebook, inputDimention, outputDimention,
-                 layersDimentions):
+                 architecture):
         super(network, self).__init__()
 
         self.modelname = modelname
-
         self.codebook = codebook
 
-        self.l1 = nn.Linear(inputDimention,
-                            math.floor(layersDimentions[0] * inputDimention))
-
-        self.l2 = nn.Linear(math.floor(layersDimentions[0] * inputDimention),
-                            math.floor(layersDimentions[1] * inputDimention))
-
-        self.l3 = nn.Linear(math.floor(layersDimentions[1] * inputDimention),
-                            math.floor(layersDimentions[2] * inputDimention))
-
-        self.l4 = nn.Linear(math.floor(layersDimentions[2] * inputDimention),
-                            outputDimention)
-
-        self.l5 = nn.Linear(outputDimention,
-                            math.floor(layersDimentions[3] * outputDimention))
-
-        self.l6 = nn.Linear(math.floor(layersDimentions[3] * outputDimention),
-                            math.floor(layersDimentions[4] * outputDimention))
-
-        self.l7 = nn.Linear(math.floor(layersDimentions[4] * outputDimention),
-                            math.floor(layersDimentions[5] * outputDimention))
-
-        self.l8 = nn.Linear(math.floor(layersDimentions[5] * outputDimention),
-                            outputDimention)
-
-        self.q1 = quantizationLayer.apply
+        self.layers = []
+        previousInputDimention = inputDimention
+        waitingForLinearLayerValue = False
+        # Find last occurance of integer (linear layer dimention mutiplier)
+        # in the architecture list
+        lastDimentionEntry = 0
+        layerIndex = 1
+        for index, arcParser in enumerate(architecture):
+            if isinstance(arcParser, int) or isinstance(arcParser, float):
+                lastDimentionEntry = index
+        # Construct the array of layesr.
+        for archIndex, arcParser in enumerate(architecture):
+            # If a linear layer specified, its dimentions multiplier should
+            # follow
+            if waitingForLinearLayerValue:
+                # If its the last linear layer, making shure that its output
+                # dimention is the outout dimention of the module
+                if archIndex == lastDimentionEntry:
+                    layerOutDim = outputDimention
+                # If the next layer is the quantization layer, forcing the
+                # output of the linear layer to be outputDimention
+                elif architecture[archIndex + 1] is 'quantization':
+                    layerOutDim = outputDimention
+                else:
+                    layerOutDim = math.floor(arcParser *
+                                             previousInputDimention)
+                # Adding layer to layers array (for forward implementation)
+                self.layers.append(
+                    nn.Linear(previousInputDimention, layerOutDim))
+                # Asining layer to module
+                self.add_module('l' + str(layerIndex), self.layers[-1])
+                layerIndex += 1
+                previousInputDimention = layerOutDim
+                waitingForLinearLayerValue = False
+            # If requested linear layer, expecting its dimention multiplier in
+            # next loop iteration
+            elif arcParser is 'linear':
+                waitingForLinearLayerValue = True
+            # If requested non linear layer
+            elif arcParser is 'relu':
+                # Adding layer to layers array (for forward implementation)
+                self.layers.append(F.relu)
+            elif arcParser is 'quantization':
+                # Set the input dimention of the nex linear layer to be as the
+                # ouptput of the quantization layer
+                previousInputDimention = outputDimention
+                # Adding layer to layers array (for forward implementation)
+                self.layers.append(quantizationLayer.apply)
+                self.quantizationLayerIndex = layerIndex - 1
+                layerIndex += 1
+            else:
+                raise ValueError('Invalid layer type: ' + arcParser)
+                return
 
     def forward(self, x):
-        x = self.l1(x)
-        x = self.l2(x)
-
-        x = F.relu(x)
-
-        x = self.l3(x)
-        x = self.l4(x)
-
-        x = self.q1(x, self.codebook)
-
-        x = self.l5(x)
-        x = self.l6(x)
-
-        x = F.relu(x)
-
-        x = self.l7(x)
-        return self.l8(x)
+        for correntLayerIndex, correntLayer in enumerate(self.layers):
+            if correntLayerIndex == self.quantizationLayerIndex:
+                x = correntLayer(x, self.codebook)
+            else:
+                x = correntLayer(x)
+        return(x)
 
 
 class quantizationLayer(torch.autograd.Function):
