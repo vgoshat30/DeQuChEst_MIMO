@@ -26,7 +26,8 @@ M_RANGE = [6, ]
 MAGIC_C_RANGE = [5, ]
 
 
-'''Specify different combinations of NN architecture using the following rules:
+'''Instructions for using ARCHITECTURE constant:
+Specify different combinations of NN architecture using the following rules:
 -   The ARCHITECTURE must be specified as a list of lists, each list
     representing one architecture.
 -   The order of the layers in each list will be their order in the module.
