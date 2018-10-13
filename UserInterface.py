@@ -1,26 +1,22 @@
 from ProjectConstants import *
 
-
-def readingDataFile(dataFile):
-    print('\nReading data file \'{}\'...\n'.format(dataFile))
-
-
 ########################################################################
 ###                        Training Messages                         ###
 ########################################################################
 
 
-def trainMessage(model, epoch, lr, codebookSize, architecture,
+def trainMessage(model, dataFile, epoch, lr, codebookSize, architecture,
                  magic_c=None):
     print('\n\n'
           '==================================================================='
           '\n\n\tTraining \'{}\' Model\n\n'
+          'Data file:\t{}\n'
           'Epochs number:\t{}\n'
           'Learning rate:\t{}\n'
           'Codebook Size:\t{}\n'
           'MAGIC_C:\t{}\n\n'
           'Architecture:\n'
-          .format(model.modelname, epoch, lr, codebookSize, magic_c))
+          .format(model.modelname, dataFile, epoch, lr, codebookSize, magic_c))
 
     printIndex = 0
     for param in model.parameters():
@@ -56,13 +52,13 @@ def trainIteration(modelname, corrEpoch, epoch, batch_idx, data, trainLoader,
 ########################################################################
 
 
-def testMessage(model):
+def testMessage(modelName):
     print('\n\n'
           '===================================================================='
           '\n\tTesting \'{}\' Model\n'
           '===================================================================='
           '\n\n'
-          .format(model))
+          .format(modelName))
 
 
 def testIteration(modelname, batch_idx, data, testLoader):

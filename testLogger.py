@@ -8,8 +8,8 @@ This module deals with logging simulation test into a MATLAB .mat file and can:
         bounds.
 An intuition on the usage of this module will be as follows:
     1.  Create a .mat file which will be the log. All inforamtion on your
-        simulation results will be saved there. Be shure to use createMatFile().
-    2.  Once you have a .mat file with correct specifications to serv as a test
+        simulation results will be saved there. Be sure to use createMatFile().
+    2.  Once you have a .mat file with correct specifications to serve as a test
         log, "connect" it to a python variable, using testlogger().
         This will create a testLogger class object.
     3.  Modify the testLogger class object using its available properties.
@@ -55,16 +55,12 @@ class testlogger:
         # mat. file name
         self.filename = name
 
-        # Load data from file
-        pythonMatFile = sio.loadmat(self.filename)
+        try:
+            # Load data from file
+            pythonMatFile = sio.loadmat(self.filename)
+        except:
+            raise IOError("File '" + self.filename + "' does not exist.")
 
-        # Test logger type
-        self.loggerType = removeCellFormat(pythonMatFile['loggerType'])
-
-        # Theoretical vectors to plot in the figure
-        self.theoryLoss = pythonMatFile['m_fCurves']
-        # Rate vector to plot in the figure
-        self.theoryRate = pythonMatFile['v_fRate']
         # Resulted rate of the test
         self.rate = pythonMatFile['rateResults']
         # Resulted loss of the test
@@ -85,6 +81,31 @@ class testlogger:
         self.epochs = pythonMatFile['trainEpochs']
         # A note about the test
         self.note = pythonMatFile['notes']
+        # Amplitudes of sum of tanh function (a coefficients)
+        self.aCoefs = pythonMatFile['aCoefs']
+        # Shifts of sum of tanh function (b coefficients)
+        self.bCoefs = pythonMatFile['bCoefs']
+        # "Slopes" of sum of tanh function (c coefficients)
+        self.cCoefs = pythonMatFile['cCoefs']
+        # Multiplier of the tanh argument
+        self.magic_c = pythonMatFile['magic_c']
+
+        # Training and testing data parameters:
+
+        # Test set size
+        self.s_fD = pythonMatFile['s_fD']
+        # Number of antennas
+        self.s_fNt = pythonMatFile['s_fNt']
+        # Number of users
+        self.s_fNu = pythonMatFile['s_fNu']
+        # Ratio
+        self.s_fRatio = pythonMatFile['s_fRatio']
+        # Train set size
+        self.s_fT = pythonMatFile['s_fT']
+        # Test power
+        self.s_fTestPower = pythonMatFile['s_fTestPower']
+        # Train powers
+        self.v_fTrainPower = pythonMatFile['v_fTrainPower']
 
         # If the test log is not empty, reducing the dimentions of all
         # parameters to one
@@ -99,25 +120,17 @@ class testlogger:
             self.algorithm = self.algorithm[0]
             self.epochs = self.epochs[0]
             self.note = self.note[0]
-
-        # adding special fields for tanh logger
-        if self.loggerType == 'tanh':
-            # Amplitudes of sum of tanh function (a coefficients)
-            self.aCoefs = pythonMatFile['aCoefs']
-            # Shifts of sum of tanh function (b coefficients)
-            self.bCoefs = pythonMatFile['bCoefs']
-            # "Slopes" of sum of tanh function (c coefficients)
-            self.cCoefs = pythonMatFile['cCoefs']
-            # Multiplier of the tanh argument
-            self.magic_c = pythonMatFile['magic_c']
-
-            # If the test log is not empty, reducing the dimentions of all
-            # parameters to one
-            if self.rate.shape[0]:
-                self.aCoefs = self.aCoefs[0]
-                self.bCoefs = self.bCoefs[0]
-                self.cCoefs = self.cCoefs[0]
-                self.magic_c = self.magic_c[0]
+            self.aCoefs = self.aCoefs[0]
+            self.bCoefs = self.bCoefs[0]
+            self.cCoefs = self.cCoefs[0]
+            self.magic_c = self.magic_c[0]
+            self.s_fD = self.s_fD[0]
+            self.s_fNt = self.s_fNt[0]
+            self.s_fNu = self.s_fNu[0]
+            self.s_fRatio = self.s_fRatio[0]
+            self.s_fT = self.s_fT[0]
+            self.s_fTestPower = self.s_fTestPower[0]
+            self.v_fTrainPower = self.v_fTrainPower[0]
 
     def addEmptyTest(self):
         '''Append empty elements to all log fields
@@ -134,13 +147,13 @@ class testlogger:
         >>> from testLogger import *
         >>> myLog = testlogger('tanhLog.mat')
         >>> myLog.content()
-        The testlogger tanhLog.mat is of type 'tanh' and contains 0 tests.
+        The testlogger 'tanhLog.mat' contains 0 tests.
         >>> myLog.addEmptyTest()
         >>> myLog.content('all')
 
         \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 
-        The testlogger tanhLog.mat is of type 'tanh'
+        Content of testlogger 'tempTestLog.mat'
 
          _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 
@@ -153,21 +166,31 @@ class testlogger:
         Codewords Num.: ________________
         Algorithm:	    ________________
         Learning rate:	________________
+        Layers Dim.:	________________
         Tanh a coeffs:	________________
         Tanh b coeffs:	________________
-        Tanh slope:	    ________________
-        Tanh stretch:	________________
+        Tanh c coeffs:	________________
+        MAGIC_C:	    ________________
         Train Runtime: 	________________
         Train Epochs:	________________
-        Logging Time: 	2018-06-09 11:07:19.984452
+        Logging Time: 	2018-10-13 16:28:35.505715
         Note:		    ________________
 
+        Train and test data parameters:
+
+        Train set size (s_fT):		    ________________
+        Test set size (s_fD):		    ________________
+        Antennas num. (s_fNt):		    ________________
+        Users num. (s_fNu):		        ________________
+        Ratio (s_fRatio):	          	________________
+        Test power (s_fTestPower):  	________________
+        Train power (v_fTrainPower):	________________
 
         \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
         '''
         # Append only if there is no empty test at the end of the log already
         if self.rate.all():
-            # Apend -1 to rate results so it can be dicovered as empty test log
+            # Apend 0 to rate results
             self.rate = np.append(self.rate, 0)
             # Apend empty ndarray of float to loss
             self.loss = np.append(self.loss, np.empty((1, 1), float))
@@ -189,16 +212,30 @@ class testlogger:
             self.epochs = np.append(self.epochs, np.empty((1, 1), float))
             # Append empty string to note
             self.note = np.append(self.note, '')
-
-            if self.loggerType == 'tanh':
-                # Amplitudes of sum of tanh function (a coefficients)
-                self.aCoefs = np.append(self.aCoefs, np.empty((1, 1), float))
-                # Shifts of sum of tanh function (b coefficients)
-                self.bCoefs = np.append(self.bCoefs, np.empty((1, 1), float))
-                # "Slopes" of sum of tanh function (c coefficients)
-                self.cCoefs = np.append(self.cCoefs, np.empty((1, 1), float))
-                # Multiplier of the tanh argument
-                self.magic_c = np.append(self.magic_c, np.empty((1, 1), float))
+            # Apend empty ndarray of float
+            self.aCoefs = np.append(self.aCoefs, np.empty((1, 1), float))
+            # Apend empty ndarray of float
+            self.bCoefs = np.append(self.bCoefs, np.empty((1, 1), float))
+            # Apend empty ndarray of float
+            self.cCoefs = np.append(self.cCoefs, np.empty((1, 1), float))
+            # Apend empty ndarray of float
+            self.magic_c = np.append(self.magic_c, np.empty((1, 1), float))
+            # Apend empty ndarray of float
+            self.s_fD = np.append(self.s_fD, np.empty((1, 1), float))
+            # Apend empty ndarray of float
+            self.s_fNt = np.append(self.s_fNt, np.empty((1, 1), float))
+            # Apend empty ndarray of float
+            self.s_fNu = np.append(self.s_fNu, np.empty((1, 1), float))
+            # Apend empty ndarray of float
+            self.s_fRatio = np.append(self.s_fRatio, np.empty((1, 1), float))
+            # Apend empty ndarray of float
+            self.s_fT = np.append(self.s_fT, np.empty((1, 1), float))
+            # Apend empty ndarray of float
+            self.s_fTestPower = np.append(self.s_fTestPower,
+                                          np.empty((1, 1), float))
+            # Apend empty ndarray of float
+            self.v_fTrainPower = np.append(self.v_fTrainPower,
+                                           np.empty((1, 1), float))
 
     def log(self, test=None, **kwargs):
         '''Manipulate content of a log element
@@ -234,8 +271,6 @@ class testlogger:
                     Number of train epochs
                 note : str
                     A note to the test. Contains anything you think is important
-
-            **kwargs (for testlogger of type 'tanh')
                 a : list
                     The amplitude coefficients of the sum of tanh function.
                     Pass as a list even if there is only one element.
@@ -250,6 +285,9 @@ class testlogger:
                     (see aCoefs above)
                 magic_c : float
                     Multiplier of the argument of the sum of tanh function.
+                dataFile : str
+                    Name of the data .mat file used for the training and testing
+                    Specify with .mat extention, for example: 'data.mat'
 
         Example
         -------
@@ -329,15 +367,25 @@ class testlogger:
                 self.epochs[testIndex] = kwargs[key]
             if key is 'note':
                 self.note[testIndex] = kwargs[key]
-            if self.loggerType == 'tanh':
-                if key is 'a':
-                    self.aCoefs[testIndex] = kwargs[key]
-                if key is 'b':
-                    self.bCoefs[testIndex] = kwargs[key]
-                if key is 'c':
-                    self.cCoefs[testIndex] = kwargs[key]
-                if key is 'magic_c':
-                    self.magic_c[testIndex] = kwargs[key]
+            if key is 'a':
+                self.aCoefs[testIndex] = kwargs[key]
+            if key is 'b':
+                self.bCoefs[testIndex] = kwargs[key]
+            if key is 'c':
+                self.cCoefs[testIndex] = kwargs[key]
+            if key is 'magic_c':
+                self.magic_c[testIndex] = kwargs[key]
+            if key is 'dataFile':
+                # Getting train and test data parameters from the data .mat file
+                pythonDataFile = sio.loadmat(kwargs[key])
+
+                self.s_fD[testIndex] = pythonDataFile['s_fD']
+                self.s_fNt[testIndex] = pythonDataFile['s_fNt']
+                self.s_fNu[testIndex] = pythonDataFile['s_fNu']
+                self.s_fRatio[testIndex] = pythonDataFile['s_fRatio']
+                self.s_fT[testIndex] = pythonDataFile['s_fT']
+                self.s_fTestPower[testIndex] = pythonDataFile['s_fTestPower']
+                self.v_fTrainPower[testIndex] = pythonDataFile['v_fTrainPower']
 
         self.save()
         print("Logged test number ", testIndex+1,
@@ -463,12 +511,17 @@ class testlogger:
             self.algorithm = np.delete(self.algorithm, deleteIndex, 0)
             self.epochs = np.delete(self.epochs, deleteIndex, 0)
             self.note = np.delete(self.note, deleteIndex, 0)
-
-            if self.loggerType == 'tanh':
-                self.aCoefs = np.delete(self.aCoefs, deleteIndex, 0)
-                self.bCoefs = np.delete(self.bCoefs, deleteIndex, 0)
-                self.cCoefs = np.delete(self.cCoefs, deleteIndex, 0)
-                self.magic_c = np.delete(self.magic_c, deleteIndex, 0)
+            self.aCoefs = np.delete(self.aCoefs, deleteIndex, 0)
+            self.bCoefs = np.delete(self.bCoefs, deleteIndex, 0)
+            self.cCoefs = np.delete(self.cCoefs, deleteIndex, 0)
+            self.magic_c = np.delete(self.magic_c, deleteIndex, 0)
+            self.s_fD = np.delete(self.s_fD, deleteIndex, 0)
+            self.s_fNt = np.delete(self.s_fNt, deleteIndex, 0)
+            self.s_fNu = np.delete(self.s_fNu, deleteIndex, 0)
+            self.s_fRatio = np.delete(self.s_fRatio, deleteIndex, 0)
+            self.s_fT = np.delete(self.s_fT, deleteIndex, 0)
+            self.s_fTestPower = np.delete(self.s_fTestPower, deleteIndex, 0)
+            self.v_fTrainPower = np.delete(self.v_fTrainPower, deleteIndex, 0)
 
             print('Deleted test(s):', np.array(deleteIndex) + 1,
                   "\nFrom testlogger:", self.filename)
@@ -483,12 +536,17 @@ class testlogger:
             self.algorithm = np.empty((0, 1), object)  # MATLAB Cell
             self.epochs = np.empty((0, 1), float)  # MATLAB Array of doubles
             self.note = np.empty((0, 1), object)  # MATLAB Cell
-
-            if self.loggerType == 'tanh':
-                self.aCoefs = np.empty((0, 1), object)  # MATLAB Cell
-                self.bCoefs = np.empty((0, 1), object)  # MATLAB Cell
-                self.cCoefs = np.empty((0, 1), object)  # MATLAB Cell
-                self.magic_c = np.empty((0, 1), float)  # MATLAB Array
+            self.aCoefs = np.empty((0, 1), object)  # MATLAB Cell
+            self.bCoefs = np.empty((0, 1), object)  # MATLAB Cell
+            self.cCoefs = np.empty((0, 1), object)  # MATLAB Cell
+            self.magic_c = np.empty((0, 1), float)  # MATLAB Array
+            self.s_fD = np.empty((0, 1), float)  # MATLAB Array
+            self.s_fNt = np.empty((0, 1), float)  # MATLAB Array
+            self.s_fNu = np.empty((0, 1), float)  # MATLAB Array
+            self.s_fRatio = np.empty((0, 1), float)  # MATLAB Array
+            self.s_fT = np.empty((0, 1), float)  # MATLAB Array
+            self.s_fTestPower = np.empty((0, 1), float)  # MATLAB Array
+            self.v_fTrainPower = np.empty((0, 1), object)  # MATLAB Cell
 
             print('Cleared testlogger:', self.filename)
 
@@ -531,12 +589,11 @@ class testlogger:
         >>> myLog.log('last', rate=0.2, loss=0.03, note='Content example')
         Logged test number  2 	in testlogger: tanhLog.mat
         >>> myLog.content()
-        The testlogger tanhLog.mat is of type 'tanh' and contains 2 tests.
+        The testlogger 'tanhLog.mat' contains 2 tests.
         >>> myLog.content(2)
-
         \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 
-        The testlogger tanhLog.mat is of type 'tanh'
+        Content of testlogger 'tempTestLog.mat'
 
          _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 
@@ -549,15 +606,25 @@ class testlogger:
         Codewords Num.: 0.05
         Algorithm:	    ________________
         Learning rate:	________________
-        Tanh a coeffs:	[-1.53, 0.24, 2.42]
-        Tanh b coeffs:	[-2.12, -0.97, 3.01]
-        Tanh slope:	    ________________
-        Tanh stretch:	________________
-        Train Runtime: 	0:00:00.000854
+        Layers Dim.:	________________
+        Tanh a coeffs:	________________
+        Tanh b coeffs:	________________
+        Tanh c coeffs:	________________
+        MAGIC_C:	    ________________
+        Train Runtime: 	0:00:00.000011
         Train Epochs:	________________
-        Logging Time: 	2018-06-09 12:27:04.636269
+        Logging Time: 	2018-10-13 16:38:40.383540
         Note:		    Content example
 
+        Train and test data parameters:
+
+        Train set size (s_fT):		    ________________
+        Test set size (s_fD):		    ________________
+        Antennas num. (s_fNt):		    ________________
+        Users num. (s_fNu):		        ________________
+        Ratio (s_fRatio):		        ________________
+        Test power (s_fTestPower):	    ________________
+        Train power (v_fTrainPower):	________________
 
         \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
         '''
@@ -565,9 +632,8 @@ class testlogger:
         dontExistMessage = '________________'
 
         if test is None:
-            print("The testlogger", self.filename,
-                  "is of type '" + self.loggerType + "'",
-                  "and contains", len(self.rate), "tests.")
+            print("The testlogger '" + self.filename +
+                  "' contains", len(self.rate), "tests.")
         else:
             if type(test) is int:
                 if test > len(self.rate):
@@ -601,8 +667,7 @@ class testlogger:
                 return
 
             print("\n\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/"
-                  "\n\nThe testlogger", self.filename, "is of type '" +
-                  self.loggerType + "'\n\n",
+                  "\n\nContent of testlogger '" + self.filename + "'\n\n",
                   "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_\n")
             for ii, currTest in enumerate(testNum):
                 if not self.codewordNum[currTest-1]:
@@ -620,8 +685,9 @@ class testlogger:
                 else:
                     learningRateToPrint = self.learningRate[currTest-1]
 
-                if (self.layersDim[currTest-1].size == 1 and
-                        self.layersDim[currTest-1][0, 0] == 0):
+                if (type(self.layersDim[currTest-1]) is float or
+                    (len(self.layersDim[currTest-1]) == 1 and
+                        self.layersDim[currTest-1][0, 0] == 0)):
                     layersDimToPrint = dontExistMessage
                 else:
                     layersDimToPrint = self.layersDim[currTest-1]
@@ -641,79 +707,109 @@ class testlogger:
                 else:
                     noteToPrint = removeCellFormat(self.note[currTest-1])
 
-                if self.loggerType == 'tanh':
-                    if (self.aCoefs[currTest-1].size == 1 and
-                            self.aCoefs[currTest-1][0, 0] == 0):
-                        aCoefsToPrint = dontExistMessage
-                    else:
-                        aCoefsToPrint = self.aCoefs[currTest-1]
+                if (type(self.layersDim[currTest-1]) is float or
+                    (self.aCoefs[currTest-1].size == 1 and
+                        self.aCoefs[currTest-1][0, 0] == 0)):
+                    aCoefsToPrint = dontExistMessage
+                else:
+                    aCoefsToPrint = self.aCoefs[currTest-1]
 
-                    if (self.bCoefs[currTest-1].size == 1 and
-                            self.bCoefs[currTest-1][0, 0] == 0):
-                        bCoefsToPrint = dontExistMessage
-                    else:
-                        bCoefsToPrint = self.bCoefs[currTest-1]
+                if (type(self.layersDim[currTest-1]) is float or
+                    (self.bCoefs[currTest-1].size == 1 and
+                        self.bCoefs[currTest-1][0, 0] == 0)):
+                    bCoefsToPrint = dontExistMessage
+                else:
+                    bCoefsToPrint = self.bCoefs[currTest-1]
 
-                    if (self.cCoefs[currTest-1].size == 1 and
-                            self.cCoefs[currTest-1][0, 0] == 0):
-                        cCoefsToPrint = dontExistMessage
-                    else:
-                        cCoefsToPrint = self.cCoefs[currTest-1]
+                if (type(self.layersDim[currTest-1]) is float or
+                    (self.cCoefs[currTest-1].size == 1 and
+                        self.cCoefs[currTest-1][0, 0] == 0)):
+                    cCoefsToPrint = dontExistMessage
+                else:
+                    cCoefsToPrint = self.cCoefs[currTest-1]
 
-                    if not self.magic_c[currTest-1]:
-                        magicCToPrint = dontExistMessage
-                    else:
-                        magicCToPrint = self.magic_c[currTest-1]
+                if not self.magic_c[currTest-1]:
+                    magicCToPrint = dontExistMessage
+                else:
+                    magicCToPrint = self.magic_c[currTest-1]
 
-                if self.loggerType == 'normal':
-                    print("\n\nTest {} Info\n\n"
-                          "Rate:\t\t{}\n"
-                          "Loss:\t\t{}\n"
-                          "Codewords Num.: {}\n"
-                          "Algorithm:\t{}\n"
-                          "Learning rate:\t{}\n"
-                          "Layers Dimentions:\t{}\n"
-                          "Train Runtime: \t{}\n"
-                          "Train Epochs:\t{}\n"
-                          "Logging Time: \t{}\n"
-                          "Note:\t\t{}\n\n"
-                          .format(currTest, self.rate[currTest-1],
-                                  self.loss[currTest-1], codewordNumToPrint,
-                                  algToPrint, learningRateToPrint,
-                                  layersDimToPrint, runtimeToPrint, epochToPrint,
-                                  removeCellFormat(self.logtime[currTest-1]),
-                                  noteToPrint))
-                elif self.loggerType == 'tanh':
-                    print("\n\nTest {} Info\n\n"
-                          "Rate:\t\t{}\n"
-                          "Loss:\t\t{}\n"
-                          "Codewords Num.: {}\n"
-                          "Algorithm:\t{}\n"
-                          "Learning rate:\t{}\n"
-                          "Layers Dim.:\t{}\n"
-                          "Tanh a coeffs:\t{}\n"
-                          "Tanh b coeffs:\t{}\n"
-                          "Tanh c coeffs:\t{}\n"
-                          "MAGIC_C:\t{}\n"
-                          "Train Runtime: \t{}\n"
-                          "Train Epochs:\t{}\n"
-                          "Logging Time: \t{}\n"
-                          "Note:\t\t{}\n\n"
-                          .format(currTest, self.rate[currTest-1],
-                                  self.loss[currTest-1], codewordNumToPrint,
-                                  algToPrint, learningRateToPrint,
-                                  layersDimToPrint, aCoefsToPrint,
-                                  bCoefsToPrint, cCoefsToPrint, magicCToPrint,
-                                  runtimeToPrint, epochToPrint,
-                                  removeCellFormat(self.logtime[currTest-1]),
-                                  noteToPrint))
+                if not self.s_fD[currTest-1]:
+                    s_fDToPrint = dontExistMessage
+                else:
+                    s_fDToPrint = self.s_fD[currTest-1]
+
+                if not self.s_fNt[currTest-1]:
+                    s_fNtToPrint = dontExistMessage
+                else:
+                    s_fNtToPrint = self.s_fNt[currTest-1]
+
+                if not self.s_fNu[currTest-1]:
+                    s_fNuToPrint = dontExistMessage
+                else:
+                    s_fNuToPrint = self.s_fNu[currTest-1]
+
+                if not self.s_fRatio[currTest-1]:
+                    s_fRatioToPrint = dontExistMessage
+                else:
+                    s_fRatioToPrint = self.s_fRatio[currTest-1]
+
+                if not self.s_fT[currTest-1]:
+                    s_fTToPrint = dontExistMessage
+                else:
+                    s_fTToPrint = self.s_fT[currTest-1]
+
+                if not self.s_fTestPower[currTest-1]:
+                    s_fTestPowerToPrint = dontExistMessage
+                else:
+                    s_fTestPowerToPrint = self.s_fTestPower[currTest-1]
+
+                if (type(self.layersDim[currTest-1]) is float or
+                    (self.v_fTrainPower[currTest-1].size == 1 and
+                        self.v_fTrainPower[currTest-1][0, 0] == 0)):
+                    v_fTrainPowerToPrint = dontExistMessage
+                else:
+                    v_fTrainPowerToPrint = self.v_fTrainPower[currTest-1]
+
+                print("\n\nTest {} Info\n\n"
+                      "Rate:\t\t{}\n"
+                      "Loss:\t\t{}\n"
+                      "Codewords Num.: {}\n"
+                      "Algorithm:\t{}\n"
+                      "Learning rate:\t{}\n"
+                      "Layers Dim.:\t{}\n"
+                      "Tanh a coeffs:\t{}\n"
+                      "Tanh b coeffs:\t{}\n"
+                      "Tanh c coeffs:\t{}\n"
+                      "MAGIC_C:\t{}\n"
+                      "Train Runtime: \t{}\n"
+                      "Train Epochs:\t{}\n"
+                      "Logging Time: \t{}\n"
+                      "Note:\t\t{}\n\n"
+                      "Train and test data parameters:\n\n"
+                      "Train set size (s_fT):\t\t{}\n"
+                      "Test set size (s_fD):\t\t{}\n"
+                      "Antennas num. (s_fNt):\t\t{}\n"
+                      "Users num. (s_fNu):\t\t{}\n"
+                      "Ratio (s_fRatio):\t\t{}\n"
+                      "Test power (s_fTestPower):\t{}\n"
+                      "Train power (v_fTrainPower):\t{}\n"
+                      .format(currTest, self.rate[currTest-1],
+                              self.loss[currTest-1], codewordNumToPrint,
+                              algToPrint, learningRateToPrint,
+                              layersDimToPrint, aCoefsToPrint,
+                              bCoefsToPrint, cCoefsToPrint, magicCToPrint,
+                              runtimeToPrint, epochToPrint,
+                              removeCellFormat(self.logtime[currTest-1]),
+                              noteToPrint, s_fTToPrint, s_fDToPrint,
+                              s_fNtToPrint, s_fNuToPrint, s_fRatioToPrint,
+                              s_fTestPowerToPrint, v_fTrainPowerToPrint))
 
                 if ii < len(testNum)-1:
                     print("---------------------------------------------------")
 
             print("\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/")
 
-    def plot(self):
+    def plot(self, theoryDataFile=None):
         '''Plot all results in a testlogger
 
         IMPORTANT!!!
@@ -727,14 +823,24 @@ class testlogger:
         To see all imformation available for a test, use the function
         content()
 
+        Parameters
+        ----------
+            theoryDataFile : str
+                Name of MATLAB .mat file containing the variables 'v_fRate' and
+                'm_fCurves' which provide theoretical bounds for the results.
+                This is a file creted using the generateData.m function.
+                Specify including .mat extention, for example: 'data.mat'
+
         Example
         -------
+        The file 'data.mat' is generated using generateData.m
+
         >>> from testLogger import *
         >>> myLog = testlogger('tanhLog.mat')
         >>> myLog.log(rate=0.3, loss=0.05)
         Created test number 1 	in testlogger: tanhLog.mat
         Logged test number  1 	in testlogger: tanhLog.mat
-        >>> myLog.plot()
+        >>> myLog.plot('data.mat')
         '''
 
         chosenMarkersize = 2
@@ -905,15 +1011,9 @@ class testlogger:
 
             return (ha, va, xOffset, yOffset)
 
-        # Create fill vectors
-        xFill = np.concatenate((self.theoryRate[0],
-                                np.flip(self.theoryRate[0], 0)), axis=0)
-        yFill = np.concatenate((self.theoryLoss[3, :],
-                                np.flip(self.theoryLoss[1, :], 0)), axis=0)
-
         plt.close('all')
 
-        # Create figure and ge axes handle
+        # Create figure and get axes handle
         fig = plt.figure(figsize=sizeOfFigure)
         ax = fig.add_subplot(111)
 
@@ -922,17 +1022,30 @@ class testlogger:
         fig.canvas.mpl_connect('figure_leave_event', lambda event,
                                temp=-1: clearDatatips(event, temp))
 
-        # Plot all theoretical bounds
-        for ii in range(0, self.theoryLoss.shape[0]):
-            if whichToPlot[ii]:
-                ax.plot(self.theoryRate[0], self.theoryLoss[ii, :],
-                        label=labels[ii],
-                        marker=markers[ii], color=linecolors[ii],
-                        linestyle=lineStyles[ii], linewidth=lineWidths[ii],
-                        markersize=markerSizes[ii])
+        if theoryDataFile:
+            theory = sio.loadmat(theoryDataFile)
 
-        # Plot fill
-        ax.fill(xFill, yFill, c=fillColor, alpha=0.3)
+            # Extracting theory data vectors
+            theoryRate = theory['v_fRate']
+            theoryLoss = theory['m_fCurves']
+
+            # Create fill vectors
+            xFill = np.concatenate((theoryRate[0],
+                                    np.flip(theoryRate[0], 0)), axis=0)
+            yFill = np.concatenate((theoryLoss[3, :],
+                                    np.flip(theoryLoss[1, :], 0)), axis=0)
+
+            # Plot all theoretical bounds
+            for ii in range(0, theoryLoss.shape[0]):
+                if whichToPlot[ii]:
+                    ax.plot(theoryRate[0], theoryLoss[ii, :],
+                            label=labels[ii],
+                            marker=markers[ii], color=linecolors[ii],
+                            linestyle=lineStyles[ii], linewidth=lineWidths[ii],
+                            markersize=markerSizes[ii])
+
+            # Plot fill
+            ax.fill(xFill, yFill, c=fillColor, alpha=0.3)
 
         # Plot previous results (the loop is for plotting as separate artists)
         resList = []
@@ -1030,10 +1143,7 @@ class testlogger:
         function in the class testLogger.
         '''
 
-        saveVars = {'loggerType': self.loggerType,
-                    'm_fCurves': self.theoryLoss,
-                    'v_fRate': self.theoryRate,
-                    'rateResults': self.rate,
+        saveVars = {'rateResults': self.rate,
                     'lossResults': self.loss,
                     'codewordNum': self.codewordNum,
                     'learningRate': self.learningRate,
@@ -1042,12 +1152,18 @@ class testlogger:
                     'algorithmName': self.algorithm,
                     'runTime': self.runtime,
                     'trainEpochs': self.epochs,
-                    'notes': self.note}
-        if self.loggerType == 'tanh':
-            saveVars['aCoefs'] = self.aCoefs
-            saveVars['bCoefs'] = self.bCoefs
-            saveVars['cCoefs'] = self.cCoefs
-            saveVars['magic_c'] = self.magic_c
+                    'notes': self.note,
+                    'aCoefs': self.aCoefs,
+                    'bCoefs': self.bCoefs,
+                    'cCoefs': self.cCoefs,
+                    'magic_c': self.magic_c,
+                    's_fD': self.s_fD,
+                    's_fNt': self.s_fNt,
+                    's_fNu': self.s_fNu,
+                    's_fRatio': self.s_fRatio,
+                    's_fT': self.s_fT,
+                    's_fTestPower': self.s_fTestPower,
+                    'v_fTrainPower': self.v_fTrainPower}
 
         sio.savemat(self.filename, saveVars)
 
@@ -1151,7 +1267,7 @@ class testlogger:
                       "is empty. Nothing to plot...")
 
 
-def createMatFile(name, type, theoryRate, theoryLoss):
+def createMatFile(name):
     '''Create a new .mat file that can be handled by the testlogger class
 
     Creates a MATLAB .mat file with all the variables required so it can be
@@ -1161,13 +1277,7 @@ def createMatFile(name, type, theoryRate, theoryLoss):
     Parameters
     ----------
         name : str
-            Name of the mat file, WlTH EXTENTION! For example: "testLog.mat"
-        type : str
-            Type of the testLogger. Available types are: "normal", "tanh"
-        theoryRate : numpy.ndarray
-            Rate vector for the x axis theoretical bounds
-        theoryLoss : numpy.ndarray
-            Loss vector(s) (a matrix) for the y axis theoretical bounds
+            Name of the mat file, with extention! For example: "testLog.mat"
 
     Returns
     -------
@@ -1180,10 +1290,8 @@ def createMatFile(name, type, theoryRate, theoryLoss):
     Example
     -------
     >>> from testLogger import *
-    >>> temp = testlogger("tanhLog.mat")
-    >>> myLog = createMatFile("testLog.mat", "normal", temp.theoryRate,
-    ... temp.theoryLoss)
-    Created new test log testLog.mat of type "normal"
+    >>> myLog = createMatFile("testLog.mat")
+    Created new test log 'testLog.mat'
     >>> myLog
     <testLogger.testlogger object at 0x10890de10>
     '''
@@ -1198,11 +1306,19 @@ def createMatFile(name, type, theoryRate, theoryLoss):
     algorithm = np.empty((0, 1), object)  # MATLAB Cell
     epochs = np.empty((0, 1), float)  # MATLAB Array of doubles
     note = np.empty((0, 1), object)  # MATLAB Cell
+    aCoefs = np.empty((0, 1), object)  # MATLAB Cell
+    bCoefs = np.empty((0, 1), object)  # MATLAB Cell
+    cCoefs = np.empty((0, 1), object)  # MATLAB Cell
+    magic_c = np.empty((0, 1), float)  # MATLAB Array
+    s_fD = np.empty((0, 1), float)  # MATLAB Array
+    s_fNt = np.empty((0, 1), float)  # MATLAB Array
+    s_fNu = np.empty((0, 1), float)  # MATLAB Array
+    s_fRatio = np.empty((0, 1), float)  # MATLAB Array
+    s_fT = np.empty((0, 1), float)  # MATLAB Array
+    s_fTestPower = np.empty((0, 1), float)  # MATLAB Array
+    v_fTrainPower = np.empty((0, 1), object)  # MATLAB Cell
 
-    variables = {'loggerType': type,
-                 'm_fCurves': theoryLoss,
-                 'v_fRate': theoryRate,
-                 'rateResults': rate,
+    variables = {'rateResults': rate,
                  'lossResults': loss,
                  'codewordNum': codewordNum,
                  'learningRate': learningRate,
@@ -1211,19 +1327,24 @@ def createMatFile(name, type, theoryRate, theoryLoss):
                  'algorithmName': algorithm,
                  'runTime': runtime,
                  'trainEpochs': epochs,
-                 'notes': note}
-
-    if type is 'tanh':
-        variables['aCoefs'] = np.empty((0, 1), object)  # MATLAB Cell
-        variables['bCoefs'] = np.empty((0, 1), object)  # MATLAB Cell
-        variables['cCoefs'] = np.empty((0, 1), object)  # MATLAB Cell
-        variables['magic_c'] = np.empty((0, 1), float)  # MATLAB Array
+                 'notes': note,
+                 'aCoefs': aCoefs,
+                 'bCoefs': bCoefs,
+                 'cCoefs': cCoefs,
+                 'magic_c': magic_c,
+                 's_fD': s_fD,
+                 's_fNt': s_fNt,
+                 's_fNu': s_fNu,
+                 's_fRatio': s_fRatio,
+                 's_fT': s_fT,
+                 's_fTestPower': s_fTestPower,
+                 'v_fTrainPower': v_fTrainPower}
 
     if os.path.exists(name):
-        print("Test logger", name, "of type '" + type + "' already exists...")
+        print("Test logger '" + name + "' already exists...")
     else:
         sio.savemat(name, variables)
-        print("Created new test log", name, "of type '" + type + "'")
+        print("Created new test log '" + name + "'")
     return testlogger(name)
 
 

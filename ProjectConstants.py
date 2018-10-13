@@ -2,8 +2,8 @@
 ###                   Training, Testing and Logging Data                     ###
 ################################################################################
 
-DATA_MAT_FILE = 'data_a10_u4_SNR_1_10.mat'
-TEST_LOG_MAT_FILE = 'testLog_a10_u4_SNR_1_10_1.mat'
+DATA_MAT_FILE = ['tempData1.mat', 'tempData2.mat']
+TEST_LOG_MAT_FILE = 'testLog_SNR_1_10.mat'
 
 ################################################################################
 ###                          Models to Activate                              ###
@@ -20,9 +20,9 @@ modelsToActivate = [
 ################################################################################
 
 BATCH_SIZE = 8
-EPOCH_RANGE = [10, ]
+EPOCH_RANGE = [1, ]
 LR_RANGE = [0.2]
-M_RANGE = [6, ]
+M_RANGE = [2, ]
 MAGIC_C_RANGE = [5, ]
 
 
@@ -45,25 +45,49 @@ Specify different combinations of NN architecture using the following rules:
     promised only under those circumstances.
 '''
 ARCHITECTURE = [
-    # ['linear', 5,
-    #  'linear', 0.08,
-    #  'quantization',
-    #  'linear', 10,
-    #  'linear', 0.01],
-
     ['linear', 2,
-     'linear', 2,
-     'linear', 2,
-     'relu',
-     'linear', 0.5,
-     'linear', 0.5,
      'linear', 0.5,
      'quantization',
-     'linear', 5,
      'linear', 2,
-     'relu',
-     'linear', 0.2,
      'linear', 0.5],
+
+    # ['linear', 50,
+    #  'relu',
+    #  'linear', 0.01,
+    #  'quantization',
+    #  'linear', 50,
+    #  'relu',
+    #  'linear', 0.02],
+
+    # ['linear', 10,
+    #  'linear', 5,
+    #  'relu',
+    #  'linear', 0.1,
+    #  'linear', 0.1,
+    #  'quantization',
+    #  'linear', 10,
+    #  'linear', 5,
+    #  'relu',
+    #  'linear', 0.1,
+    #  'linear', 0.2],
+
+    # ['linear', 4,
+    #  'linear', 4,
+    #  'relu',
+    #  'linear', 0.5,
+    #  'linear', 0.5,
+    #  'relu',
+    #  'linear', 0.5,
+    #  'linear', 0.5,
+    #  'quantization',
+    #  'linear', 4,
+    #  'linear', 4,
+    #  'relu',
+    #  'linear', 0.5,
+    #  'linear', 0.5,
+    #  'relu',
+    #  'linear', 0.5,
+    #  'linear', 0.5],
 
     # ['linear', 2,
     #  'linear', 2,
@@ -81,15 +105,15 @@ ARCHITECTURE = [
     #  'linear', 0.5,
     #  'linear', 0.5],
 
-    ['linear', 10,
-     'linear', 0.8,
-     'relu',
-     'linear', 0.625,
-     'linear', 0.0666667,
-     'quantization',
-     'linear', 10,
-     'linear', 0.5,
-     'relu',
-     'linear', 0.4,
-     'linear', 0.5]
+    # ['linear', 10,
+    #  'linear', 10,
+    #  'relu',
+    #  'linear', 0.1,
+    #  'linear', 0.1,
+    #  'quantization',
+    #  'linear', 10,
+    #  'linear', 10,
+    #  'relu',
+    #  'linear', 0.1,
+    #  'linear', 0.1]
 ]

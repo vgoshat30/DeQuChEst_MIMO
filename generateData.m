@@ -93,7 +93,7 @@ function generateData(varargin)
     p = inputParser;
     
     deafultAutosave = 'on';
-    deafultFilename = 'shlezingerMat';
+    deafultFilename = 'data';
     deafultDirectory = pwd;
     
     deafult_s_fTestPower = 4;
@@ -125,13 +125,13 @@ function generateData(varargin)
     parse(p,varargin{:});
     %% Parameters setting
     s_fTestPower = p.Results.TestPower;
-    v_fTrainPower = p.Results.TrainPower;       % Connsiered SNR Range
+    v_fTrainPower = p.Results.TrainPower; % Connsiered SNR Range
     s_fNu = p.Results.Users;
     s_fNt = p.Results.Antennas;
     s_fRatio = p.Results.Ratio;
 
-    s_fT = p.Results.TrainSetSize;
-    s_nPartition = ceil(s_fT / length(v_fTrainPower));
+    s_fT_total = p.Results.TrainSetSize;
+    s_nPartition = ceil(s_fT_total / length(v_fTrainPower));
     s_fT = s_nPartition * length(v_fTrainPower);
     
     s_fD = p.Results.TestSetSize;
@@ -211,7 +211,8 @@ function generateData(varargin)
         shlezMatFile = fullfile(p.Results.Directory, ...
                                 [p.Results.FileName '.mat']);
         if cautionSave(shlezMatFile, dataX, dataS, trainX, trainS, ...
-                       v_fRate, m_fCurves)
+                       v_fRate, m_fCurves, s_fTestPower, v_fTrainPower, ...
+                       s_fNu, s_fNt, s_fRatio, s_fT_total, s_fD)
             return;
         end
     elseif isequal(p.Results.Autosave,'off')
@@ -223,14 +224,17 @@ function generateData(varargin)
         end
         
         if cautionSave(shlezMatFile, dataX, dataS, trainX, trainS, ...
-                       v_fRate, m_fCurves)
+                       v_fRate, m_fCurves, s_fTestPower, v_fTrainPower, ...
+                       s_fNu, s_fNt, s_fRatio, s_fT_total, s_fD)
             return;
         end
     end
 end
 
 function canceled = cautionSave(fileDir,dataX, dataS, trainX, trainS, ...
-                                v_fRate, m_fCurves)
+                                v_fRate, m_fCurves, s_fTestPower, ...
+                                v_fTrainPower, s_fNu, s_fNt, s_fRatio, ...
+                                s_fT, s_fD)
     % Check if file exists and display a question dialog if so
     % Saving the variables to .mat file
     canceled = false;
@@ -243,12 +247,16 @@ function canceled = cautionSave(fileDir,dataX, dataS, trainX, trainS, ...
         switch answer
             case 'Replace'
                 save(fileDir,'dataX', 'dataS', 'trainX', 'trainS', ...
-                     'v_fRate', 'm_fCurves');
+                     'v_fRate', 'm_fCurves', 's_fTestPower', ...
+                     'v_fTrainPower', 's_fNu', 's_fNt', 's_fRatio', ...
+                     's_fT', 's_fD');
             case 'Cancel'
                 canceled = true;
         end
     else
         save(fileDir,'dataX', 'dataS', 'trainX', 'trainS', ...
-                     'v_fRate', 'm_fCurves');
+                     'v_fRate', 'm_fCurves', 's_fTestPower', ...
+                     'v_fTrainPower', 's_fNu', 's_fNt', 's_fRatio', ...
+                     's_fT', 's_fD');
     end
 end
