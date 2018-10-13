@@ -55,15 +55,15 @@ _**Note!**_
 
 
 
-Generally speaking, the only two file you will interact with (before inspecting the NN results) main.py and the only one you will have to edit: ProjectConstants.py. This file consists of three small parts:
+Generally speaking, the only two file you will interact with (before inspecting the NN results) main.py and the only one you will have to edit: ProjectConstants.py. In this file you will need to specify lists of constants over which the code will iterate. If you want to specify only one value, still use list syntax, for example: `DATA_MAT_FILE = ['data1.mat', ]`. Only `TEST_LOG_MAT_FILE` and `BATCH_SIZE` are not lists. This file consists of three small parts:
 
 #### Training, Testing and Logging Data
 
 Here you define the names of the .mat file, the code handles. The first one:
 ```
-DATA_MAT_FILE = 'data.mat'
+DATA_MAT_FILE = ['data1.mat', 'data2.mat']
 ```
-Is the file you created in the section [Creating Data](#creating-data) above.
+Is the file you created in the section [Creating Data](#creating-data) above. As you can see, you can create multiple data .mat files with different specifications and specify them in the list DATA_MAT_FILE. The code will iterate over those files and train all the network architectures defined below over each data file.
 
 The second one:
 ```
