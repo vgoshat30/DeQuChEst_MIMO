@@ -119,16 +119,14 @@ Each time a test is finished, you will see its summary in the console which will
 _________________________________
 |	Training Parameters	|
 |				|
-| - Epochs number:	5	|
+| - Epochs number:	10	|
 | - Learning Rate:	0.2	|
-| - Codebook Size:	5	|
-| - MAGIC_C:		8	|
+| - Codebook Size:	6	|
+| - MAGIC_C:		5	|
 |_______________________________|
 
-Rate:	0.7739760316291207
-Average Loss:	0.47106388211250305
-Num. of classifications by word:	[536393. 405070. 117703. 465403. 523431.]
-
+Rate:	0.861654166907052
+Average Loss:	0.16809970140457153
 ====================================================================
 ```
 
