@@ -20,7 +20,7 @@ In order to be able to run all PYTHON code in this project you will need the fol
 
 - [PyTorch](https://pytorch.org/get-started/locally/)
 - [NumPy and SciPy](https://scipy.org/install.html)
-- [SymPy](https://docs.sympy.org/latest/install.html) (Install using `conda install sympy`)
+- [SymPy](https://docs.sympy.org/latest/install.html) (Install using `conda install sympy` or `pip install sympy`)
 - [Matplotlib](https://matplotlib.org) (Should be already installed with PYTHON)
 
 Once you have the packages above installed, you should download the project .zip and unzip it on your system.

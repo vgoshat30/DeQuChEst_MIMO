@@ -2,8 +2,8 @@
 ###                   Training, Testing and Logging Data                     ###
 ################################################################################
 
-DATA_MAT_FILE = ['tempData1.mat', 'tempData2.mat']
-TEST_LOG_MAT_FILE = 'testLog_SNR_1_10.mat'
+DATA_MAT_FILE = ['data_SNR_1_10.mat', ]
+TEST_LOG_MAT_FILE = 'testLog_NonLinear_3.mat'
 
 ################################################################################
 ###                          Models to Activate                              ###
@@ -20,9 +20,9 @@ modelsToActivate = [
 ################################################################################
 
 BATCH_SIZE = 8
-EPOCH_RANGE = [1, ]
+EPOCH_RANGE = [3, ]
 LR_RANGE = [0.2]
-M_RANGE = [2, ]
+M_RANGE = range(3, 21)
 MAGIC_C_RANGE = [5, ]
 
 
@@ -45,49 +45,50 @@ Specify different combinations of NN architecture using the following rules:
     promised only under those circumstances.
 '''
 ARCHITECTURE = [
-    ['linear', 2,
-     'linear', 0.5,
-     'quantization',
-     'linear', 2,
-     'linear', 0.5],
-
-    # ['linear', 50,
-    #  'relu',
-    #  'linear', 0.01,
-    #  'quantization',
-    #  'linear', 50,
-    #  'relu',
-    #  'linear', 0.02],
-
-    # ['linear', 10,
-    #  'linear', 5,
-    #  'relu',
-    #  'linear', 0.1,
-    #  'linear', 0.1,
-    #  'quantization',
-    #  'linear', 10,
-    #  'linear', 5,
-    #  'relu',
-    #  'linear', 0.1,
-    #  'linear', 0.2],
-
-    # ['linear', 4,
-    #  'linear', 4,
-    #  'relu',
+    # ['linear', 2,
     #  'linear', 0.5,
     #  'linear', 0.5,
+    #  'quantization',
+    #  'linear', 2,
+    #  'linear', 0.5],
+
+    # ['linear', 2,
+    #  'relu',
+    #  'linear', 0.5,
+    #  'quantization',
+    #  'linear', 2,
+    #  'relu',
+    #  'linear', 0.5],
+
+    # ['linear', 2,
+    #  'linear', 2,
     #  'relu',
     #  'linear', 0.5,
     #  'linear', 0.5,
     #  'quantization',
-    #  'linear', 4,
-    #  'linear', 4,
-    #  'relu',
-    #  'linear', 0.5,
-    #  'linear', 0.5,
+    #  'linear', 2,
+    #  'linear', 2,
     #  'relu',
     #  'linear', 0.5,
     #  'linear', 0.5],
+
+    ['linear', 4,
+     'linear', 4,
+     'relu',
+     'linear', 0.5,
+     'linear', 0.5,
+     'relu',
+     'linear', 0.5,
+     'linear', 0.5,
+     'quantization',
+     'linear', 4,
+     'linear', 4,
+     'relu',
+     'linear', 0.5,
+     'linear', 0.5,
+     'relu',
+     'linear', 0.5,
+     'linear', 0.5],
 
     # ['linear', 2,
     #  'linear', 2,
