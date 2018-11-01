@@ -69,7 +69,8 @@ def plotTanhFunction(testLog, testNumber):
 log = testlogger(TEST_LOG_MAT_FILE)
 
 # # Delete tests
-# log.delete(12345678)
+log.delete([1711, 2054, 2073, 1876, 1877, 2418, 2797, 1898, 1145, 2514,
+            2534, 2514, 2155, 2086, 2123, 2754, 1599, 945], 'except')
 
 # Show content of tests
 # log.content('all')
