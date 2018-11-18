@@ -2,7 +2,7 @@
 ###                   Training, Testing and Logging Data                     ###
 ################################################################################
 
-DATA_MAT_FILE = ['data_SNR_1_10.mat', ]
+DATA_MAT_FILE = ['data_SNR_4.mat', ]
 TEST_LOG_MAT_FILE = 'testLog_NonLinear_SNR_4.mat'
 
 ################################################################################
@@ -53,14 +53,6 @@ ARCHITECTURE = [
      'linear', 0.5],
 
     # ['linear', 2,
-    #  'relu',
-    #  'linear', 0.5,
-    #  'quantization',
-    #  'linear', 2,
-    #  'relu',
-    #  'linear', 0.5],
-
-    # ['linear', 2,
     #  'linear', 2,
     #  'relu',
     #  'linear', 0.5,
@@ -89,20 +81,21 @@ ARCHITECTURE = [
     #  'relu',
     #  'linear', 0.5,
     #  'linear', 0.5],
-
-    # ['linear', 2,
-    #  'linear', 2,
-    #  'linear', 2,
+    # ['linear', 4,
+    #  'linear', 4,
     #  'relu',
     #  'linear', 0.5,
+    #  'linear', 0.5,
+    #  'relu',
     #  'linear', 0.5,
     #  'linear', 0.5,
     #  'quantization',
-    #  'linear', 2,
-    #  'linear', 2,
-    #  'linear', 2,
+    #  'linear', 4,
+    #  'linear', 4,
     #  'relu',
     #  'linear', 0.5,
+    #  'linear', 0.5,
+    #  'relu',
     #  'linear', 0.5,
     #  'linear', 0.5],
 
