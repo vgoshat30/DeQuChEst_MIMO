@@ -25,6 +25,7 @@ def trainMessage(model, dataFile, epoch, lr, codebookSize, architecture,
         if len(dimToPrint) > 1:
             while not(type(architecture[printIndex]) is str):
                 printIndex += 1
+                print('DEBUGGING 1:', printIndex)
                 if architecture[printIndex] is 'relu':
                     print('relu')
                     printIndex += 1

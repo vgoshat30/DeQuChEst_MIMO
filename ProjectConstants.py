@@ -20,8 +20,8 @@ modelsToActivate = [
 ################################################################################
 
 BATCH_SIZE = 8
-EPOCH_RANGE = [1, ]
-LR_RANGE = [0.2]
+EPOCH_RANGE = [5, ]
+LR_RANGE = [0.2, ]
 M_RANGE = [2, ]
 MAGIC_C_RANGE = [5, ]
 
