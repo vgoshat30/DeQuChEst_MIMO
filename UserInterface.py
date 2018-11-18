@@ -28,8 +28,9 @@ def trainMessage(model, dataFile, epoch, lr, codebookSize, architecture,
                 if architecture[printIndex] is 'relu':
                     print('relu')
                     printIndex += 1
-            if architecture[printIndex] is 'quantization':
-                print('quantization')
+                elif architecture[printIndex] is 'quantization':
+                    print('quantization')
+                    printIndex += 1
             else:
                 print(architecture[printIndex], dimToPrint)
             printIndex += 1

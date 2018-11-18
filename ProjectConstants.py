@@ -20,11 +20,10 @@ modelsToActivate = [
 ################################################################################
 
 BATCH_SIZE = 8
-EPOCH_RANGE = range(2, 20)
-LR_RANGE = [0.1, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2, 0.21, 0.22,
-            0.23, 0.24, 0.25, 0.26, 0.27, 0.28, 0.29, 0.3, 0.31, 0.32, 0.33, 0.34, 0.35]
-M_RANGE = range(3, 21)
-MAGIC_C_RANGE = [4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10]
+EPOCH_RANGE = [1, ]
+LR_RANGE = [0.2]
+M_RANGE = [2, ]
+MAGIC_C_RANGE = [5, ]
 
 
 '''Instructions for using ARCHITECTURE constant:
@@ -46,13 +45,11 @@ Specify different combinations of NN architecture using the following rules:
     promised only under those circumstances.
 '''
 ARCHITECTURE = [
-
     ['linear', 2,
-     'relu',
+     'linear', 0.5,
      'linear', 0.5,
      'quantization',
      'linear', 2,
-     'relu',
      'linear', 0.5],
 
     # ['linear', 2,
@@ -84,20 +81,21 @@ ARCHITECTURE = [
     #  'relu',
     #  'linear', 0.5,
     #  'linear', 0.5],
-
-    # ['linear', 2,
-    #  'linear', 2,
-    #  'linear', 2,
+    # ['linear', 4,
+    #  'linear', 4,
     #  'relu',
     #  'linear', 0.5,
+    #  'linear', 0.5,
+    #  'relu',
     #  'linear', 0.5,
     #  'linear', 0.5,
     #  'quantization',
-    #  'linear', 2,
-    #  'linear', 2,
-    #  'linear', 2,
+    #  'linear', 4,
+    #  'linear', 4,
     #  'relu',
     #  'linear', 0.5,
+    #  'linear', 0.5,
+    #  'relu',
     #  'linear', 0.5,
     #  'linear', 0.5],
 
