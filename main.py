@@ -94,24 +94,24 @@ def testSoftToHardQuantization(model, codebookSize, magic_c):
 log = createMatFile(TEST_LOG_MAT_FILE)
 
 
-constantPermutationns = [(dataFile, epoch, lr, codebookSize, magic_c,
-                          architecture)
+constantPermutationns = [(dataFile, lr, magic_c,
+                          architecture, epoch, codebookSize)
                          for dataFile in DATA_MAT_FILE
-                         for epoch in EPOCH_RANGE
                          for lr in LR_RANGE
-                         for codebookSize in M_RANGE
                          for magic_c in MAGIC_C_RANGE
-                         for architecture in ARCHITECTURE]
+                         for architecture in ARCHITECTURE
+                         for epoch in EPOCH_RANGE
+                         for codebookSize in M_RANGE]
 
 # Iterating on all possible remutations of train epochs, learning rate, and
 # codebookSize arrays defined in the ProjectConstants module
 for constPerm in constantPermutationns:
     dataFile = constPerm[0]
-    corrTopEpoch = constPerm[1]
-    lr = constPerm[2]
-    codebookSize = constPerm[3]
-    magic_c = constPerm[4]
-    architecture = constPerm[5]
+    lr = constPerm[1]
+    magic_c = constPerm[2]
+    architecture = constPerm[3]
+    corrTopEpoch = constPerm[4]
+    codebookSize = constPerm[5]
 
     loadedDataFile = sio.loadmat(dataFile)
 

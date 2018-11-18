@@ -69,14 +69,14 @@ def plotTanhFunction(testLog, testNumber):
 log = testlogger(TEST_LOG_MAT_FILE)
 
 # # Delete tests
-# log.delete(12345678)
+log.delete([1711, 2054, 2073, 1876, 1877, 2418, 2797, 1898, 1145, 2514, 2534, 2514, 2155, 2086, 2123, 2754, 1599, 945], 'except')
 
 # Show content of tests
-# log.content('all')
+# log.content()
 
 # Plot test log (the file provided for the theoretical bounds only)
 log.plot(DATA_MAT_FILE[0])
 
 
 # Plot soft and hard quantization functions of specific test
-# plotTanhFunction(log, 4)
+# plotTanhFunction(log, 187)

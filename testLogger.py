@@ -487,6 +487,7 @@ class testlogger:
                     deleteIndex.remove(testIndex)
                 else:
                     for ii in testIndex:
+                        print('DEBUGGING 1:', ii)
                         deleteIndex.remove(ii)
             # If the indexing is 'from', deleteIndex are all the indecies from
             # specified number to the end
