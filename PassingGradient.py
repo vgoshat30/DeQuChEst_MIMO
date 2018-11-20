@@ -1,30 +1,25 @@
 import torch
 import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader
-from torch.autograd import Variable
-import torch.nn.functional as F
+import torch.nn.functional as f
 
-import numpy as np
 import math
 
-from ProjectConstants import *
 import UniformQuantizer
 
 
-class network(nn.Module):
+class Network(nn.Module):
 
-    def __init__(self, modelname, codebook, inputDimention, outputDimention,
+    def __init__(self, modelname, codebook, input_dimension, output_dimension,
                  architecture):
-        super(network, self).__init__()
+        super(Network, self).__init__()
 
         self.modelname = modelname
         self.codebook = codebook
 
         self.layers = []
-        previousInputDimention = inputDimention
-        waitingForLinearLayerValue = False
-        # Find last occurance of integer (linear layer dimention mutiplier)
+        previous_input_dimension = input_dimension
+        waiting_for_linear_layer_value = False
+        # Find last occurrence of integer (linear layer dimension mutiplier)
         # in the architecture list
         lastDimentionEntry = 0
         layerIndex = 1
@@ -35,38 +30,38 @@ class network(nn.Module):
         for archIndex, arcParser in enumerate(architecture):
             # If a linear layer specified, its dimentions multiplier should
             # follow
-            if waitingForLinearLayerValue:
+            if waiting_for_linear_layer_value:
                 # If its the last linear layer, making shure that its output
-                # dimention is the outout dimention of the module
+                # dimension is the outout dimension of the module
                 if archIndex == lastDimentionEntry:
-                    layerOutDim = outputDimention
+                    layerOutDim = output_dimension
                 # If the next layer is the quantization layer, forcing the
                 # output of the linear layer to be outputDimention
                 elif architecture[archIndex + 1] is 'quantization':
-                    layerOutDim = outputDimention
+                    layerOutDim = output_dimension
                 else:
                     layerOutDim = math.floor(arcParser *
-                                             previousInputDimention)
+                                             previous_input_dimension)
                 # Adding layer to layers array (for forward implementation)
                 self.layers.append(
-                    nn.Linear(previousInputDimention, layerOutDim))
+                    nn.Linear(previous_input_dimension, layerOutDim))
                 # Asining layer to module
                 self.add_module('l' + str(layerIndex), self.layers[-1])
                 layerIndex += 1
-                previousInputDimention = layerOutDim
-                waitingForLinearLayerValue = False
-            # If requested linear layer, expecting its dimention multiplier in
+                previous_input_dimension = layerOutDim
+                waiting_for_linear_layer_value = False
+            # If requested linear layer, expecting its dimension multiplier in
             # next loop iteration
             elif arcParser is 'linear':
-                waitingForLinearLayerValue = True
+                waiting_for_linear_layer_value = True
             # If requested non linear layer
             elif arcParser is 'relu':
                 # Adding layer to layers array (for forward implementation)
-                self.layers.append(F.relu)
+                self.layers.append(f.relu)
             elif arcParser is 'quantization':
-                # Set the input dimention of the nex linear layer to be as the
+                # Set the input dimension of the nex linear layer to be as the
                 # ouptput of the quantization layer
-                previousInputDimention = outputDimention
+                previous_input_dimension = output_dimension
                 # Adding layer to layers array (for forward implementation)
                 self.layers.append(quantizationLayer.apply)
                 self.quantizationLayerIndex = layerIndex - 1

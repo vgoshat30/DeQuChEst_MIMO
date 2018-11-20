@@ -5,17 +5,7 @@
     -- Soft to Hard Quantization
 """
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader
-from torch.autograd import Variable
-import torch.nn.functional as F
-import scipy.io as sio
-import numpy as np
 import math
-from datetime import datetime
-
 
 import PassingGradient
 import SoftToHardQuantization
@@ -24,13 +14,13 @@ from dataLoader import *
 from ProjectConstants import *
 import UniformQuantizer
 from testLogger import *
-import UserInterface as UI
+import UserInterface as Ui
 
 
 def train(model, optimizer, epoch, scheduler=None):
     model.train()
     for corrEpoch in range(0, epoch):
-        if scheduler != None:
+        if scheduler is not None:
             scheduler.step()
         for batch_idx, (data, target) in enumerate(trainLoader):
             data, target = Variable(data.float()), Variable(target.float())
@@ -42,11 +32,11 @@ def train(model, optimizer, epoch, scheduler=None):
             optimizer.step()
 
             if batch_idx % 10 == 0:
-                UI.trainIteration(model.modelname, corrEpoch, epoch, batch_idx,
+                Ui.trainIteration(model.modelname, corrEpoch, epoch, batch_idx,
                                   data, trainLoader, loss)
 
 
-def testPassingGradient(model):
+def test_passing_gradient(model):
     model.eval()
     test_loss = 0
 
@@ -55,14 +45,14 @@ def testPassingGradient(model):
         output = model(data)
         # sum up batch loss
         test_loss += criterion(output.view(-1, 1), target.view(-1, 1))
-        UI.testIteration(model.modelname, batch_idx, data, testLoader)
+        Ui.testIteration(model.modelname, batch_idx, data, testLoader)
 
     test_loss /= (len(testLoader.dataset)/BATCH_SIZE)
 
     return test_loss.detach().numpy()
 
 
-def testSoftToHardQuantization(model, codebookSize, magic_c):
+def test_soft_to_hard_quantization(model, magic_c):
     a, b, q = SoftToHardQuantization.getParameters(model, magic_c)
     log.log(a=a, b=b)
 
@@ -82,30 +72,28 @@ def testSoftToHardQuantization(model, codebookSize, magic_c):
                 output = layer(output)
         # sum up batch loss
         test_loss += criterion(output.view(-1, 1), target.view(-1, 1))
-        UI.testIteration(model.modelname, batch_idx, data, testLoader)
+        Ui.testIteration(model.modelname, batch_idx, data, testLoader)
 
     test_loss /= (len(testLoader.dataset)/BATCH_SIZE)
     return test_loss.detach().numpy()
 
 
-
-# Trying to create a new test log mat file for the case that such one does
-# not exist
+# Trying to create a new test log mat file for the case that such one does not exist
 log = createMatFile(TEST_LOG_MAT_FILE)
 
 
-constantPermutationns = [(dataFile, lr, magic_c,
-                          architecture, epoch, codebookSize)
-                         for dataFile in DATA_MAT_FILE
-                         for lr in LR_RANGE
-                         for magic_c in MAGIC_C_RANGE
-                         for architecture in ARCHITECTURE
-                         for epoch in EPOCH_RANGE
-                         for codebookSize in M_RANGE]
+constantPermutations = [(dataFile, lr, magic_c,
+                         architecture, epoch, codebookSize)
+                        for dataFile in DATA_MAT_FILE
+                        for lr in LR_RANGE
+                        for magic_c in MAGIC_C_RANGE
+                        for architecture in ARCHITECTURE
+                        for epoch in EPOCH_RANGE
+                        for codebookSize in M_RANGE]
 
-# Iterating on all possible remutations of train epochs, learning rate, and
+# Iterating on all possible permutations of train epochs, learning rate, and
 # codebookSize arrays defined in the ProjectConstants module
-for constPerm in constantPermutationns:
+for constPerm in constantPermutations:
     dataFile = constPerm[0]
     lr = constPerm[1]
     magic_c = constPerm[2]
@@ -142,7 +130,7 @@ for constPerm in constantPermutationns:
     criterion = nn.MSELoss()
 
     ########################################################################
-    ###               Training and testing all networks                  ###
+    # ##               Training and testing all networks                ## #
     ########################################################################
 
     # ------------------------------------------------
@@ -152,8 +140,8 @@ for constPerm in constantPermutationns:
     if 'Passing Gradient' in modelsToActivate:
         modelname = 'Passing Gradient'
 
-        # Defining the 'Passing Gradinet' model, as described in the paper.
-        passingGradient_model = PassingGradient.network(modelname, S_codebook,
+        # Defining the 'Passing Gradient' model, as described in the paper.
+        passingGradient_model = PassingGradient.Network(modelname, S_codebook,
                                                         trainData.inputDim,
                                                         trainData.outputDim,
                                                         architecture)
@@ -166,7 +154,7 @@ for constPerm in constantPermutationns:
             passingGradient_optimizer, gamma=0.7, last_epoch=-1)
 
         # Training 'Passing Gradient':
-        UI.trainMessage(passingGradient_model, dataFile, corrTopEpoch, lr,
+        Ui.trainMessage(passingGradient_model, dataFile, corrTopEpoch, lr,
                         codebookSize, architecture)
         model_linUniformQunat_runtime = datetime.now()
         train(passingGradient_model, passingGradient_optimizer, corrTopEpoch,
@@ -175,9 +163,9 @@ for constPerm in constantPermutationns:
             model_linUniformQunat_runtime
 
         # Testing 'Passing Gradient':
-        UI.testMessage(modelname)
-        model_linUniformQunat_loss = testPassingGradient(passingGradient_model)
-        UI.testResults(modelname, corrTopEpoch, lr, codebookSize,
+        Ui.testMessage(modelname)
+        model_linUniformQunat_loss = test_passing_gradient(passingGradient_model)
+        Ui.testResults(modelname, corrTopEpoch, lr, codebookSize,
                        QUANTIZATION_RATE,
                        model_linUniformQunat_loss)
         log.log(rate=QUANTIZATION_RATE, loss=model_linUniformQunat_loss,
@@ -209,7 +197,7 @@ for constPerm in constantPermutationns:
             softToHardQuantization_optimizer, gamma=0.7, last_epoch=-1)
 
         # Training 'Soft to Hard Quantization':
-        UI.trainMessage(softToHardQuantization_model, dataFile, corrTopEpoch,
+        Ui.trainMessage(softToHardQuantization_model, dataFile, corrTopEpoch,
                         lr, codebookSize, architecture, magic_c)
         model_tanhQuantize_runtime = datetime.now()
         train(softToHardQuantization_model, softToHardQuantization_optimizer,
@@ -217,12 +205,11 @@ for constPerm in constantPermutationns:
         model_tanhQuantize_runtime = datetime.now() - model_tanhQuantize_runtime
 
         # Testing 'Soft to Hard Quantization':
-        UI.testMessage(modelname)
+        Ui.testMessage(modelname)
         model_tanhQuantize_loss = \
-            testSoftToHardQuantization(softToHardQuantization_model,
-                                       codebookSize, magic_c)
+            test_soft_to_hard_quantization(softToHardQuantization_model, magic_c)
 
-        UI.testResults(modelname, corrTopEpoch, lr, codebookSize,
+        Ui.testResults(modelname, corrTopEpoch, lr, codebookSize,
                        QUANTIZATION_RATE, model_tanhQuantize_loss, magic_c)
         log.log('last', rate=QUANTIZATION_RATE, loss=model_tanhQuantize_loss,
                 algorithm=modelname,
