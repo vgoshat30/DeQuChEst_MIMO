@@ -3,9 +3,18 @@
     <words>
       <w>codebook</w>
       <w>codebooks</w>
+      <w>coefs</w>
       <w>dataloader</w>
+      <w>lambdified</w>
+      <w>logtime</w>
+      <w>matlab</w>
       <w>modelname</w>
+      <w>ndarray</w>
+      <w>quantizer</w>
       <w>qunat</w>
+      <w>relu</w>
+      <w>sympy</w>
+      <w>tanh</w>
     </words>
   </dictionary>
 </component>

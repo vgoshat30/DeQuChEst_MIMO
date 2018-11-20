@@ -163,7 +163,7 @@ log.plot()
 Plot the soft and hard quantization layer of **one** of the runs (relevant only for Soft to Hard Quantization method):
 
 ```
-plotTanhFunction(log, 1)
+plot_tanh_function(log, 1)
 ```
 
 

@@ -1,11 +1,10 @@
 import sympy as sym
-import matplotlib.pyplot as plt
 
 from testLogger import *
 from ProjectConstants import *
 
 
-def plotTanhFunction(testLog, testNumber):
+def plot_tanh_function(test_log, test_number):
     def quantize(input, a, b, q):
         """Get the result of the hard quantization function derived from the
         soft one (the meaning of the name 'SoftToHardQuantization') and the
@@ -25,7 +24,7 @@ def plotTanhFunction(testLog, testNumber):
             quantizedValue : int
                 The output of the quantizer
             codeword : int
-                The index of the coresponding codeword
+                The index of the corresponding codeword
         """
         output = np.empty([input.size, 2])
         for inputIndex in range(input.size):
@@ -36,23 +35,23 @@ def plotTanhFunction(testLog, testNumber):
                 output[inputIndex, 0] = sum(a)
                 output[inputIndex, 1] = len(b)
             for ii in range(len(b)-1):
-                if b[ii] < input[inputIndex] and input[inputIndex] <= b[ii + 1]:
+                if b[ii] < input[inputIndex] <= b[ii + 1]:
                     output[inputIndex, 0] = q((b[ii] + b[ii+1])/2)
                     output[inputIndex, 1] = ii + 1
         return output
 
-    a = testLog.aCoefs[testNumber-1][0]
-    b = testLog.bCoefs[testNumber-1][0]
-    magic_c = testLog.magic_c[testNumber-1]
+    a = test_log.aCoefs[test_number - 1][0]
+    b = test_log.bCoefs[test_number - 1][0]
+    magic_c = test_log.magic_c[test_number - 1]
 
     # Create symbolic variable x
-    symX = sym.symbols('x')
+    sym_x = sym.symbols('x')
 
-    sym_tanh = a[0] * sym.tanh(magic_c*(symX + b[0]))
+    sym_tanh = a[0] * sym.tanh(magic_c*(sym_x + b[0]))
     for ii in range(1, len(b)):
-        sym_tanh = sym_tanh + a[ii] * sym.tanh(magic_c*(symX + b[ii]))
+        sym_tanh = sym_tanh + a[ii] * sym.tanh(magic_c*(sym_x + b[ii]))
     # Convert the symbolic functions to numpy friendly (for substitution)
-    q = sym.lambdify(symX, sym_tanh, "numpy")
+    q = sym.lambdify(sym_x, sym_tanh, "numpy")
 
     space = 5
 
@@ -66,10 +65,10 @@ def plotTanhFunction(testLog, testNumber):
 
 
 # Set the test log
-log = testlogger(TEST_LOG_MAT_FILE)
+log = TestLogger(TEST_LOG_MAT_FILE)
 
 # # Delete tests
-log.delete(12345678910)
+# log.delete(12345678910)
 
 # Show content of tests
 # log.content()
@@ -79,4 +78,4 @@ log.plot(DATA_MAT_FILE[0])
 
 
 # Plot soft and hard quantization functions of specific test
-# plotTanhFunction(log, 187)
+# plot_tanh_function(log, 187)

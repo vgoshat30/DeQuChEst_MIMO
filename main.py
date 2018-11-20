@@ -53,7 +53,7 @@ def test_passing_gradient(model):
 
 
 def test_soft_to_hard_quantization(model, magic_c):
-    a, b, q = SoftToHardQuantization.getParameters(model, magic_c)
+    a, b, q = SoftToHardQuantization.get_parameters(model, magic_c)
     log.log(a=a, b=b)
 
     test_loss = 0
@@ -130,7 +130,7 @@ for constPerm in constantPermutations:
     criterion = nn.MSELoss()
 
     ########################################################################
-    # ##               Training and testing all networks                ## #
+    #                  Training and testing all networks                   #
     ########################################################################
 
     # ------------------------------------------------
@@ -186,7 +186,7 @@ for constPerm in constantPermutations:
 
         # Defining the 'Soft to Hard Quantization' model, as described in the
         # paper.
-        softToHardQuantization_model = SoftToHardQuantization.network(
+        softToHardQuantization_model = SoftToHardQuantization.Network(
             modelname, codebookSize, trainData.inputDim, trainData.outputDim,
             magic_c, architecture)
 

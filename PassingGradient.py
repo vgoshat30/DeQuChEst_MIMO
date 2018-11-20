@@ -19,36 +19,35 @@ class Network(nn.Module):
         self.layers = []
         previous_input_dimension = input_dimension
         waiting_for_linear_layer_value = False
-        # Find last occurrence of integer (linear layer dimension mutiplier)
+        # Find last occurrence of integer (linear layer dimension multiplier)
         # in the architecture list
-        lastDimentionEntry = 0
-        layerIndex = 1
+        last_dimension_entry = 0
+        layer_index = 1
         for index, arcParser in enumerate(architecture):
             if isinstance(arcParser, int) or isinstance(arcParser, float):
-                lastDimentionEntry = index
-        # Construct the array of layesr.
+                last_dimension_entry = index
+        # Construct the array of layers.
         for archIndex, arcParser in enumerate(architecture):
-            # If a linear layer specified, its dimentions multiplier should
+            # If a linear layer specified, its dimensions multiplier should
             # follow
             if waiting_for_linear_layer_value:
-                # If its the last linear layer, making shure that its output
-                # dimension is the outout dimension of the module
-                if archIndex == lastDimentionEntry:
-                    layerOutDim = output_dimension
+                # If its the last linear layer, making sure that its output
+                # dimension is the output dimension of the module
+                if archIndex == last_dimension_entry:
+                    layer_out_dim = output_dimension
                 # If the next layer is the quantization layer, forcing the
-                # output of the linear layer to be outputDimention
+                # output of the linear layer to be outputDimension
                 elif architecture[archIndex + 1] is 'quantization':
-                    layerOutDim = output_dimension
+                    layer_out_dim = output_dimension
                 else:
-                    layerOutDim = math.floor(arcParser *
-                                             previous_input_dimension)
+                    layer_out_dim = math.floor(arcParser * previous_input_dimension)
                 # Adding layer to layers array (for forward implementation)
                 self.layers.append(
-                    nn.Linear(previous_input_dimension, layerOutDim))
-                # Asining layer to module
-                self.add_module('l' + str(layerIndex), self.layers[-1])
-                layerIndex += 1
-                previous_input_dimension = layerOutDim
+                    nn.Linear(previous_input_dimension, layer_out_dim))
+                # Assigning layer to module
+                self.add_module('l' + str(layer_index), self.layers[-1])
+                layer_index += 1
+                previous_input_dimension = layer_out_dim
                 waiting_for_linear_layer_value = False
             # If requested linear layer, expecting its dimension multiplier in
             # next loop iteration
@@ -60,26 +59,25 @@ class Network(nn.Module):
                 self.layers.append(f.relu)
             elif arcParser is 'quantization':
                 # Set the input dimension of the nex linear layer to be as the
-                # ouptput of the quantization layer
+                # output of the quantization layer
                 previous_input_dimension = output_dimension
                 # Adding layer to layers array (for forward implementation)
-                self.layers.append(quantizationLayer.apply)
-                self.quantizationLayerIndex = layerIndex - 1
-                layerIndex += 1
+                self.layers.append(QuantizationLayer.apply)
+                self.quantizationLayerIndex = layer_index - 1
+                layer_index += 1
             else:
                 raise ValueError('Invalid layer type: ' + arcParser)
-                return
 
     def forward(self, x):
-        for correntLayerIndex, correntLayer in enumerate(self.layers):
-            if correntLayerIndex == self.quantizationLayerIndex:
-                x = correntLayer(x, self.codebook)
+        for currentLayerIndex, currentLayer in enumerate(self.layers):
+            if currentLayerIndex == self.quantizationLayerIndex:
+                x = currentLayer(x, self.codebook)
             else:
-                x = correntLayer(x)
-        return(x)
+                x = currentLayer(x)
+        return x
 
 
-class quantizationLayer(torch.autograd.Function):
+class QuantizationLayer(torch.autograd.Function):
     """Applies a quantization process to the incoming data.
         Can be integrated as activation layer of NN, therefore useful for cases
         we want to check the performance while keeping the whole system as one
@@ -91,7 +89,7 @@ class quantizationLayer(torch.autograd.Function):
         Input
             To be filled...
         Output
-            qunatized_input
+            quantized_input
                 the quantized input formed using codebook. The quantized input
                 is the closest codeword avaliable in codeword.
 
@@ -102,23 +100,23 @@ class quantizationLayer(torch.autograd.Function):
             which will construct the quantized input
 
     """
-    # Note that both forward and backward are @staticmethods
+    # Note that both forward and backward are @staticmethod
     @staticmethod
     # bias is an optional argument
-    def forward(ctx, input, codebook):
-        ctx.save_for_backward(input)
-        input_data = input.data
+    def forward(ctx, x, codebook):
+        ctx.save_for_backward(x)
+        input_data = x.data
         input_numpy = input_data.numpy()
-        qunatized_input = torch.zeros(input.size())
+        quantized_input = torch.zeros(x.size())
         for ii in range(0, input_data.size(0)):
             for jj in range(0, input_data.size(1)):
-                qunatized_input[ii, jj], __ = UniformQuantizer.get_optimal_word(
+                quantized_input[ii, jj], __ = UniformQuantizer.get_optimal_word(
                     input_numpy[ii, jj], codebook)
-        return qunatized_input
+        return quantized_input
 
     # This function has only a single output, so it gets only one gradient
     @staticmethod
     def backward(ctx, grad_output):
-        input = ctx.saved_tensors
+        # input = ctx.saved_tensors
         grad_input = grad_output.clone()
         return grad_input, None

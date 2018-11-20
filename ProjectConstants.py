@@ -1,12 +1,12 @@
 ################################################################################
-###                   Training, Testing and Logging Data                     ###
+#                     Training, Testing and Logging Data                       #
 ################################################################################
 
 DATA_MAT_FILE = ['data_SNR_4.mat', ]
 TEST_LOG_MAT_FILE = 'testLog_NonLinear_SNR_4.mat'
 
 ################################################################################
-###                          Models to Activate                              ###
+#                            Models to Activate                                #
 ################################################################################
 
 # Only uncommented models will be trained and tested
@@ -16,7 +16,7 @@ modelsToActivate = [
 ]
 
 ################################################################################
-###                       Neural Network constants                           ###
+#                         Neural Network constants                             #
 ################################################################################
 
 BATCH_SIZE = 8
@@ -34,7 +34,7 @@ Specify different combinations of NN architecture using the following rules:
 -   There are only three types of layer available:
     -   linear: specified using the string 'linear' and afterwards (in the next
         place in the list), the multiplication factor between the input
-        dimention and the output dimention of the layer.
+        dimension and the output dimension of the layer.
     -   quantization: specified using the string 'quantization' (nothing else)
 
         NOTE that the quantization layer MUST be between two linear layers!

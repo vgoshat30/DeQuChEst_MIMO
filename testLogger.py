@@ -1,21 +1,3 @@
-'''Test Logger
-
-This module deals with logging simulation test into a MATLAB .mat file and can:
-    -   Create .mat file ready to be handled by the testLogger class
-    -   Edit a suitable .mat file (including creating, editing and deleting)
-    -   Display the content of a certain testLogger, by printing to the command
-        promt or by plotting results on a figure, in respective to theoretical
-        bounds.
-An intuition on the usage of this module will be as follows:
-    1.  Create a .mat file which will be the log. All inforamtion on your
-        simulation results will be saved there. Be sure to use createMatFile().
-    2.  Once you have a .mat file with correct specifications to serve as a test
-        log, "connect" it to a python variable, using testlogger().
-        This will create a testLogger class object.
-    3.  Modify the testLogger class object using its available properties.
-        It will automatically update the .mat file.
-'''
-
 import scipy.io as sio
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,10 +5,27 @@ from datetime import datetime
 import os.path
 
 
-class testlogger:
+class TestLogger:
+    """Test Logger
+
+    This module deals with logging simulation test into a MATLAB .mat file and can:
+        -   Create .mat file ready to be handled by the testLogger class
+        -   Edit a suitable .mat file (including creating, editing and deleting)
+        -   Display the content of a certain testLogger, by printing to the command
+            prompt or by plotting results on a figure, in respective to theoretical
+            bounds.
+    An intuition on the usage of this module will be as follows:
+        1.  Create a .mat file which will be the log. All information on your
+            simulation results will be saved there. Be sure to use createMatFile().
+        2.  Once you have a .mat file with correct specifications to serve as a test
+            log, "connect" it to a python variable, using TestLogger().
+            This will create a testLogger class object.
+        3.  Modify the testLogger class object using its available properties.
+            It will automatically update the .mat file.
+    """
 
     def __init__(self, name):
-        '''Connect between a .mat file and a python variable
+        """Connect between a .mat file and a python variable
 
         When called, the __init__ function reads the specified .mat file and
         creates all the fields relevant for manipulating this .mat file.
@@ -42,72 +41,71 @@ class testlogger:
 
         Returns
         -------
-        class 'testLogger.testlogger'
+        class 'TestLogger.TestLogger'
             A variable containing all the fields created.
 
         Example
         -------
-        >>> from testLogger import *
-        >>> myLog = testlogger('tanhLog.mat')
-        >>> myLog
-        <testLogger.testlogger object at 0x101f1c748>
-        '''
+        from testLogger import *
+        myLog = TestLogger('tanhLog.mat')
+        myLog
+        """
         # mat. file name
         self.filename = name
 
         try:
             # Load data from file
-            pythonMatFile = sio.loadmat(self.filename)
-        except:
+            python_mat_file = sio.loadmat(self.filename)
+        except IOError:
             raise IOError("File '" + self.filename + "' does not exist.")
 
         # Resulted rate of the test
-        self.rate = pythonMatFile['rateResults']
+        self.rate = python_mat_file['rateResults']
         # Resulted loss of the test
-        self.loss = pythonMatFile['lossResults']
+        self.loss = python_mat_file['lossResults']
         # Number of codewords
-        self.codewordNum = pythonMatFile['codewordNum']
+        self.codewordNum = python_mat_file['codewordNum']
         # Learning rate multiplier in the learning algorithm
-        self.learningRate = pythonMatFile['learningRate']
-        # Dimention rations of the NN layers
-        self.layersDim = pythonMatFile['layersDim']
+        self.learningRate = python_mat_file['learningRate']
+        # Dimension rations of the NN layers
+        self.layersDim = python_mat_file['layersDim']
         # Training runtime
-        self.runtime = pythonMatFile['runTime']
+        self.runtime = python_mat_file['runTime']
         # The time the logging was performed
-        self.logtime = pythonMatFile['time']
+        self.logtime = python_mat_file['time']
         # Name of the used algorithm
-        self.algorithm = pythonMatFile['algorithmName']
+        self.algorithm = python_mat_file['algorithmName']
         # Number of training epochs
-        self.epochs = pythonMatFile['trainEpochs']
+        self.epochs = python_mat_file['trainEpochs']
         # A note about the test
-        self.note = pythonMatFile['notes']
+        self.note = python_mat_file['notes']
         # Amplitudes of sum of tanh function (a coefficients)
-        self.aCoefs = pythonMatFile['aCoefs']
+        self.aCoefs = python_mat_file['aCoefs']
         # Shifts of sum of tanh function (b coefficients)
-        self.bCoefs = pythonMatFile['bCoefs']
+        self.bCoefs = python_mat_file['bCoefs']
         # "Slopes" of sum of tanh function (c coefficients)
-        self.cCoefs = pythonMatFile['cCoefs']
+        self.cCoefs = python_mat_file['cCoefs']
         # Multiplier of the tanh argument
-        self.magic_c = pythonMatFile['magic_c']
+        self.magic_c = python_mat_file['magic_c']
 
         # Training and testing data parameters:
 
         # Test set size
-        self.s_fD = pythonMatFile['s_fD']
+        self.s_fD = python_mat_file['s_fD']
         # Number of antennas
-        self.s_fNt = pythonMatFile['s_fNt']
+        self.s_fNt = python_mat_file['s_fNt']
         # Number of users
-        self.s_fNu = pythonMatFile['s_fNu']
+        self.s_fNu = python_mat_file['s_fNu']
         # Ratio
-        self.s_fRatio = pythonMatFile['s_fRatio']
+        self.s_fRatio = python_mat_file['s_fRatio']
         # Train set size
-        self.s_fT = pythonMatFile['s_fT']
+        self.s_fT = python_mat_file['s_fT']
         # Test power
-        self.s_fTestPower = pythonMatFile['s_fTestPower']
+        self.s_fTestPower = python_mat_file['s_fTestPower']
         # Train powers
-        self.v_fTrainPower = pythonMatFile['v_fTrainPower']
+        self.v_fTrainPower = python_mat_file['v_fTrainPower']
 
-        # If the test log is not empty, reducing the dimentions of all
+        # If the test log is not empty, reducing the dimensions of all
         # parameters to one
         if self.rate.shape[0]:
             self.rate = self.rate[0]
@@ -132,8 +130,8 @@ class testlogger:
             self.s_fTestPower = self.s_fTestPower[0]
             self.v_fTrainPower = self.v_fTrainPower[0]
 
-    def addEmptyTest(self):
-        '''Append empty elements to all log fields
+    def add_empty_test(self):
+        """Append empty elements to all log fields
 
         The function appends an empty element to each field of the testLogger,
         and to special fields if needed (according to self.loggerType).
@@ -144,12 +142,11 @@ class testlogger:
         -------
         (Additional function __init__() and content() were used in the example)
 
-        >>> from testLogger import *
-        >>> myLog = testlogger('tanhLog.mat')
-        >>> myLog.content()
-        The testlogger 'tanhLog.mat' contains 0 tests.
-        >>> myLog.addEmptyTest()
-        >>> myLog.content('all')
+        from testLogger import *
+        myLog = TestLogger('tanhLog.mat')
+        myLog.content()
+        myLog.add_empty_test()
+        myLog.content('all')
 
         \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 
@@ -187,20 +184,20 @@ class testlogger:
         Train power (v_fTrainPower):	________________
 
         \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
-        '''
+        """
         # Append only if there is no empty test at the end of the log already
         if self.rate.all():
-            # Apend 0 to rate results
+            # Append 0 to rate results
             self.rate = np.append(self.rate, 0)
-            # Apend empty ndarray of float to loss
+            # Append empty ndarray of float to loss
             self.loss = np.append(self.loss, np.empty((1, 1), float))
-            # Apend empty ndarray of float to codewordNum
+            # Append empty ndarray of float to codewordNum
             self.codewordNum = np.append(self.codewordNum,
                                          np.empty((1, 1), float))
-            # Apend empty ndarray of float to learningRate
+            # Append empty ndarray of float to learningRate
             self.learningRate = np.append(self.learningRate,
                                           np.empty((1, 1), float))
-            # Apend empty ndarray of float to layersDim
+            # Append empty ndarray of float to layersDim
             self.layersDim = np.append(self.layersDim, np.empty((1, 1), float))
             # Append empty string to runtime
             self.runtime = np.append(self.runtime, '')
@@ -208,40 +205,40 @@ class testlogger:
             self.logtime = np.append(self.logtime, str(datetime.now()))
             # Append empty string to algorithm name
             self.algorithm = np.append(self.algorithm, '')
-            # Apend empty ndarray of float to number of training epochs
+            # Append empty ndarray of float to number of training epochs
             self.epochs = np.append(self.epochs, np.empty((1, 1), float))
             # Append empty string to note
             self.note = np.append(self.note, '')
-            # Apend empty ndarray of float
+            # Append empty ndarray of float
             self.aCoefs = np.append(self.aCoefs, np.empty((1, 1), float))
-            # Apend empty ndarray of float
+            # Append empty ndarray of float
             self.bCoefs = np.append(self.bCoefs, np.empty((1, 1), float))
-            # Apend empty ndarray of float
+            # Append empty ndarray of float
             self.cCoefs = np.append(self.cCoefs, np.empty((1, 1), float))
-            # Apend empty ndarray of float
+            # Append empty ndarray of float
             self.magic_c = np.append(self.magic_c, np.empty((1, 1), float))
-            # Apend empty ndarray of float
+            # Append empty ndarray of float
             self.s_fD = np.append(self.s_fD, np.empty((1, 1), float))
-            # Apend empty ndarray of float
+            # Append empty ndarray of float
             self.s_fNt = np.append(self.s_fNt, np.empty((1, 1), float))
-            # Apend empty ndarray of float
+            # Append empty ndarray of float
             self.s_fNu = np.append(self.s_fNu, np.empty((1, 1), float))
-            # Apend empty ndarray of float
+            # Append empty ndarray of float
             self.s_fRatio = np.append(self.s_fRatio, np.empty((1, 1), float))
-            # Apend empty ndarray of float
+            # Append empty ndarray of float
             self.s_fT = np.append(self.s_fT, np.empty((1, 1), float))
-            # Apend empty ndarray of float
+            # Append empty ndarray of float
             self.s_fTestPower = np.append(self.s_fTestPower,
                                           np.empty((1, 1), float))
-            # Apend empty ndarray of float
+            # Append empty ndarray of float
             self.v_fTrainPower = np.append(self.v_fTrainPower,
                                            np.empty((1, 1), float))
 
     def log(self, test=None, **kwargs):
-        '''Manipulate content of a log element
+        """Manipulate content of a log element
 
         Use this function to add a new test or edit an existing one. Also can be
-        used with the addEmptyTest() function to create an empty test and edit
+        used with the add_empty_test() function to create an empty test and edit
         it later on.
 
         Parameters
@@ -262,7 +259,7 @@ class testlogger:
                 learningRate : float
                     The learning rate of the learning algorithm
                 layersDim: list
-                    Dimention ratios between layers of the NN
+                    Dimension ratios between layers of the NN
                 runtime : datetime.timedelta
                     Time spent on the learning proccess
                 algorithm : str
@@ -291,54 +288,47 @@ class testlogger:
 
         Example
         -------
-        >>> from testLogger import *
-        >>> from datetime import datetime
-        >>> before = datetime.now()
-        >>> after = datetime.now() - before
-        >>> myLog = testlogger('tanhLog.mat')
-        >>> myLog.log(rate=0.3, loss=0.05, runtime=after)
-        Created test number 1 	in testlogger: tanhLog.mat
-        Logged test number  1 	in testlogger: tanhLog.mat
-        >>> myLog.log(rate=0.4, loss=0.03, codewordNum=8, epochs=3)
-        Created test number 2 	in testlogger: tanhLog.mat
-        Logged test number  2 	in testlogger: tanhLog.mat
-        >>> myLog.log('last', runtime=after, a=[-1.53, 0.24, 2.42],
-        ...           b=[-2.12, -0.97, 3.01])
-        Logged test number  2 	in testlogger: tanhLog.mat
-        >>> myLog.log(1, note='Didnt perform quantization correctly')
-        Logged test number  1 	in testlogger: tanhLog.mat
-        '''
+        from testLogger import *
+        from datetime import datetime
+        before = datetime.now()
+        after = datetime.now() - before
+        myLog = TestLogger('tanhLog.mat')
+        myLog.log(rate=0.3, loss=0.05, runtime=after)
+        myLog.log(rate=0.4, loss=0.03, codewordNum=8, epochs=3)
+        myLog.log('last', runtime=after, a=[-1.53, 0.24, 2.42], b=[-2.12, -0.97, 3.01])
+        myLog.log(1, note='Didnt perform quantization correctly')
+        """
 
         # If no parameters to log were specified
-        if not(kwargs):
+        if not kwargs:
             self.exception('log', 'ValueError')
             return
 
         # If test number not specified, creating new empty test
-        if not(test):
+        if not test:
             # Add empty slot if needed
-            self.addEmptyTest()
+            self.add_empty_test()
             # Setting test index to the last index in the test log
-            testIndex = len(self.rate) - 1
-            print("Created test number", testIndex+1,
+            test_index = len(self.rate) - 1
+            print("Created test number", test_index+1,
                   "\tin testlogger:", self.filename)
         # If requested to log to the last test
         elif test is 'last':
-            testIndex = len(self.rate) - 1
+            test_index = len(self.rate) - 1
         # If specified test number
         elif type(test) is int:
             # Setting test index to the index specified by 'test'
-            testIndex = test - 1
+            test_index = test - 1
 
             # If test number is larger than existing number of tests by exactly
             # one, creating new empty test and logging to it
-            if testIndex is len(self.rate):
-                self.addEmptyTest()
-                print("Created test number", testIndex+1,
+            if test_index is len(self.rate):
+                self.add_empty_test()
+                print("Created test number", test_index+1,
                       "\tin testlogger:", self.filename)
             # If test number is larger than existing number of tests by more
             # than one, returning.
-            elif testIndex > len(self.rate):
+            elif test_index > len(self.rate):
                 self.exception('log', 'IndexError', test)
                 return
         # If test is not a known codeword or not an integer, returning
@@ -350,45 +340,45 @@ class testlogger:
         for key in kwargs:
             # Check if rate provided
             if key is 'rate':
-                self.rate[testIndex] = kwargs[key]
+                self.rate[test_index] = kwargs[key]
             if key is 'loss':
-                self.loss[testIndex] = kwargs[key]
+                self.loss[test_index] = kwargs[key]
             if key is 'codewordNum':
-                self.codewordNum[testIndex] = kwargs[key]
+                self.codewordNum[test_index] = kwargs[key]
             if key is 'learningRate':
-                self.learningRate[testIndex] = kwargs[key]
+                self.learningRate[test_index] = kwargs[key]
             if key is 'layersDim':
-                self.layersDim[testIndex] = kwargs[key]
+                self.layersDim[test_index] = kwargs[key]
             if key is 'runtime':
-                self.runtime[testIndex] = str(kwargs[key])
+                self.runtime[test_index] = str(kwargs[key])
             if key is 'algorithm':
-                self.algorithm[testIndex] = kwargs[key]
+                self.algorithm[test_index] = kwargs[key]
             if key is 'epochs':
-                self.epochs[testIndex] = kwargs[key]
+                self.epochs[test_index] = kwargs[key]
             if key is 'note':
-                self.note[testIndex] = kwargs[key]
+                self.note[test_index] = kwargs[key]
             if key is 'a':
-                self.aCoefs[testIndex] = kwargs[key]
+                self.aCoefs[test_index] = kwargs[key]
             if key is 'b':
-                self.bCoefs[testIndex] = kwargs[key]
+                self.bCoefs[test_index] = kwargs[key]
             if key is 'c':
-                self.cCoefs[testIndex] = kwargs[key]
+                self.cCoefs[test_index] = kwargs[key]
             if key is 'magic_c':
-                self.magic_c[testIndex] = kwargs[key]
+                self.magic_c[test_index] = kwargs[key]
             if key is 'dataFile':
                 # Getting train and test data parameters from the data .mat file
                 pythonDataFile = sio.loadmat(kwargs[key])
 
-                self.s_fD[testIndex] = pythonDataFile['s_fD']
-                self.s_fNt[testIndex] = pythonDataFile['s_fNt']
-                self.s_fNu[testIndex] = pythonDataFile['s_fNu']
-                self.s_fRatio[testIndex] = pythonDataFile['s_fRatio']
-                self.s_fT[testIndex] = pythonDataFile['s_fT']
-                self.s_fTestPower[testIndex] = pythonDataFile['s_fTestPower']
-                self.v_fTrainPower[testIndex] = pythonDataFile['v_fTrainPower']
+                self.s_fD[test_index] = pythonDataFile['s_fD']
+                self.s_fNt[test_index] = pythonDataFile['s_fNt']
+                self.s_fNu[test_index] = pythonDataFile['s_fNu']
+                self.s_fRatio[test_index] = pythonDataFile['s_fRatio']
+                self.s_fT[test_index] = pythonDataFile['s_fT']
+                self.s_fTestPower[test_index] = pythonDataFile['s_fTestPower']
+                self.v_fTrainPower[test_index] = pythonDataFile['v_fTrainPower']
 
         self.save()
-        print("Logged test number ", testIndex+1,
+        print("Logged test number ", test_index+1,
               "\tin testlogger:", self.filename)
 
     def delete(self, test=None, indexing=None):
@@ -421,7 +411,7 @@ class testlogger:
         Example
         -------
         >>> from testLogger import *
-        >>> myLog = testlogger('tanhLog.mat')
+        >>> myLog = TestLogger('tanhLog.mat')
         >>> for ii in range(1, 11):
         ...     myLog.log(rate=0.1*ii, loss=0.01*ii)
         ...
@@ -579,7 +569,7 @@ class testlogger:
         >>> from datetime import datetime
         >>> before = datetime.now()
         >>> after = datetime.now() - before
-        >>> myLog = testlogger('tanhLog.mat')
+        >>> myLog = TestLogger('tanhLog.mat')
         >>> myLog.log(rate=0.3, loss=0.05, runtime=after)
         Created test number 1 	in testlogger: tanhLog.mat
         Logged test number  1 	in testlogger: tanhLog.mat
@@ -837,7 +827,7 @@ class testlogger:
         The file 'data.mat' is generated using generateData.m
 
         >>> from testLogger import *
-        >>> myLog = testlogger('tanhLog.mat')
+        >>> myLog = TestLogger('tanhLog.mat')
         >>> myLog.log(rate=0.3, loss=0.05)
         Created test number 1 	in testlogger: tanhLog.mat
         Logged test number  1 	in testlogger: tanhLog.mat
@@ -1346,7 +1336,7 @@ def createMatFile(name):
     else:
         sio.savemat(name, variables)
         print("Created new test log '" + name + "'")
-    return testlogger(name)
+    return TestLogger(name)
 
 
 def removeCellFormat(formatted):

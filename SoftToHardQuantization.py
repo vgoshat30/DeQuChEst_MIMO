@@ -3,187 +3,186 @@ import torch.nn as nn
 from torch.nn.parameter import Parameter
 from torch.nn.modules.module import Module
 from torch.autograd import Variable
-import torch.nn.functional as F
+import torch.nn.functional as f
 
 import math
 import numpy
 import sympy as sym
 
-from ProjectConstants import *
-import UserInterface as UI
 
+class Network(nn.Module):
 
-class network(nn.Module):
-
-    def __init__(self, modelname, codebookSize, inputDimention, outputDimention,
+    def __init__(self, modelname, codebook_size, input_dimension, output_dimension,
                  magic_c, architecture):
-        super(network, self).__init__()
+        super(Network, self).__init__()
 
         self.modelname = modelname
 
         self.layers = []
-        previousInputDimention = inputDimention
-        waitingForLinearLayerValue = False
-        layerNameIndex = 1
-        # Find last occurance of integer (linear layer dimention mutiplier)
+        previous_input_dimension = input_dimension
+        waiting_for_linear_layer_value = False
+        layer_name_index = 1
+        # Find last occurrence of integer (linear layer dimension multiplier)
         # in the architecture list
-        lastDimentionEntry = 0
+        last_dimension_entry = 0
         for index, arcParser in enumerate(architecture):
             if isinstance(arcParser, int) or isinstance(arcParser, float):
-                lastDimentionEntry = index
-        # Construct the array of layesr.
+                last_dimension_entry = index
+        # Construct the array of layers.
         for archIndex, arcParser in enumerate(architecture):
-            # If a linear layer specified, its dimentions multiplier should
+            # If a linear layer specified, its dimensions multiplier should
             # follow
-            if waitingForLinearLayerValue:
-                # If its the last linear layer, making shure that its output
-                # dimention is the outout dimention of the module
-                if archIndex == lastDimentionEntry:
-                    layerOutDim = outputDimention
+            if waiting_for_linear_layer_value:
+                # If its the last linear layer, making sure that its output
+                # dimension is the output dimension of the module
+                if archIndex == last_dimension_entry:
+                    layer_out_dim = output_dimension
                 # If the next layer is the quantization layer, forcing the
-                # output of the linear layer to be outputDimention
+                # output of the linear layer to be outputDimension
                 elif architecture[archIndex + 1] is 'quantization':
-                    layerOutDim = outputDimention
+                    layer_out_dim = output_dimension
                 else:
-                    layerOutDim = math.floor(arcParser *
-                                             previousInputDimention)
+                    layer_out_dim = math.floor(arcParser * previous_input_dimension)
                 # Adding layer to layers array (for forward implementation)
                 self.layers.append(
-                    nn.Linear(previousInputDimention, layerOutDim))
-                # Asining layer to module
-                self.add_module('l' + str(layerNameIndex), self.layers[-1])
-                layerNameIndex += 1
-                previousInputDimention = layerOutDim
-                waitingForLinearLayerValue = False
-            # If requested linear layer, expecting its dimention multiplier in
+                    nn.Linear(previous_input_dimension, layer_out_dim))
+                # Assigning layer to module
+                self.add_module('l' + str(layer_name_index), self.layers[-1])
+                layer_name_index += 1
+                previous_input_dimension = layer_out_dim
+                waiting_for_linear_layer_value = False
+            # If requested linear layer, expecting its dimension multiplier in
             # next loop iteration
             elif arcParser is 'linear':
-                waitingForLinearLayerValue = True
+                waiting_for_linear_layer_value = True
             # If requested non linear layer
             elif arcParser is 'relu':
                 # Adding layer to layers array (for forward implementation)
-                self.layers.append(F.relu)
+                self.layers.append(f.relu)
             elif arcParser is 'quantization':
-                # Set the input dimention of the nex linear layer to be as the
-                # ouptput of the quantization layer
-                previousInputDimention = outputDimention
+                # Set the input dimension of the nex linear layer to be as the
+                # output of the quantization layer
+                previous_input_dimension = output_dimension
                 # Adding layer to layers array (for forward implementation)
-                self.layers.append(quantizationLayer(outputDimention,
-                                                     outputDimention,
-                                                     codebookSize, magic_c))
-                # Asining layer to module
-                self.add_module('l' + str(layerNameIndex), self.layers[-1])
-                self.quantizationLayerNameIndex = layerNameIndex
+                self.layers.append(QuantizationLayer(output_dimension,
+                                                     output_dimension,
+                                                     codebook_size, magic_c))
+                # Assigning layer to module
+                self.add_module('l' + str(layer_name_index), self.layers[-1])
+                self.quantizationLayerNameIndex = layer_name_index
                 self.quantizationLayerIndex = len(self.layers) - 1
-                layerNameIndex += 1
+                layer_name_index += 1
             else:
                 raise ValueError('Invalid layer type: ' + arcParser)
-                return
 
     def forward(self, x):
-        for correntLayer in self.layers:
-            x = correntLayer(x)
-        return(x)
+        for current_layer in self.layers:
+            x = current_layer(x)
+        return x
 
 
-class quantizationLayer(Module):
-    def __init__(self, in_features, out_features, M, magic_c):
-        super(quantizationLayer, self).__init__()
+class QuantizationLayer(Module):
+    def __init__(self, in_features, out_features, m, magic_c):
+        super(QuantizationLayer, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
-        self.codebookSize = M
+        self.codebookSize = m
         self.magic_c = magic_c
         # There are two group of parameters: {ai, bi}, as described in the paper
         self.weight = Parameter(torch.Tensor(self.codebookSize - 1, 2))
         self.reset_parameters()
 
     def reset_parameters(self):
-        stdv = 1. / math.sqrt(self.weight.numel())
-        self.weight.data.uniform_(-stdv, stdv)
+        std = 1. / math.sqrt(self.weight.numel())
+        self.weight.data.uniform_(-std, std)
 
-    def forward(self, input):
-        ret = Variable(torch.zeros(input.size()), requires_grad=False)
+    def forward(self, x):
+        ret = Variable(torch.zeros(x.size()), requires_grad=False)
 
         for kk in range(0, self.codebookSize - 1):
-            tempVal = torch.add(input, self.weight[kk, 1])
-            tempVal = torch.mul(tempVal, self.magic_c)
-            tempVal = torch.tanh(tempVal)
-            tempVal = torch.mul(tempVal, self.weight[kk, 0])
-            ret = torch.add(ret, tempVal)
+            temp_val = torch.add(x, self.weight[kk, 1])
+            temp_val = torch.mul(temp_val, self.magic_c)
+            temp_val = torch.tanh(temp_val)
+            temp_val = torch.mul(temp_val, self.weight[kk, 0])
+            ret = torch.add(ret, temp_val)
         return ret
 
 
-def getParameters(model, magic_c):
+def get_parameters(model, magic_c):
     """Extract the {ai, bi} coefficients of the soft quantization function
     from the network model, return them sorted by ascending order of the
     bi coefficients, and create a symbolic function which will be used in the
-    hard quantization process (the 'quantize' funtion below)
+    hard quantization process (the 'quantize' function below)
 
     Parameters
     ----------
         model : network (from this module)
             The network instance of the 'Soft to Hard Quantization' model
+        magic_c : float
+            The slope of the hyperbolic tangents
 
     Returns
     -------
         a : list
-            The ai coefficients of the sum of tanh soft qunatization function
+            The ai coefficients of the sum of tanh soft quantization function
         b : list
             The bi coefficients
 
         q : sympy function
-            The soft qunatization symbolic function (sum of tanh)
+            The soft quantization symbolic function (sum of tanh)
     """
-    quantLayer = getattr(model, 'l' + str(model.quantizationLayerNameIndex))
-    parameters = quantLayer.weight.data.numpy()
+    quant_layer = getattr(model, 'l' + str(model.quantizationLayerNameIndex))
+    parameters = quant_layer.weight.data.numpy()
 
     # Coefficients of the tanh
     a = parameters[:, 0]
     b = parameters[:, 1]
 
     # Sort the coefficients by ascending order of the bi-s
-    sortedIndecies = b.argsort()
-    a = a[sortedIndecies]
-    b = b[sortedIndecies]
+    sorted_indexes = b.argsort()
+    a = a[sorted_indexes]
+    b = b[sorted_indexes]
 
     # Create symbolic variable x
-    symX = sym.symbols('x')
+    sym_x = sym.symbols('x')
 
-    sym_tanh = a[0] * sym.tanh(magic_c*(symX + b[0]))
+    sym_tanh = a[0] * sym.tanh(magic_c*(sym_x + b[0]))
     for ii in range(1, len(b)):
-        sym_tanh = sym_tanh + a[ii] * sym.tanh(magic_c*(symX + b[ii]))
+        sym_tanh = sym_tanh + a[ii] * sym.tanh(magic_c*(sym_x + b[ii]))
     # Convert the symbolic functions to numpy friendly (for substitution)
-    q = sym.lambdify(symX, sym_tanh, "numpy")
+    q = sym.lambdify(sym_x, sym_tanh, "numpy")
 
     return a, b, q
 
 
-def quantize(input, a, b, q):
+def quantize(x, a, b, q):
     """Get the result of the hard quantization function derived from the soft
     one (the meaning of the name 'SoftToHardQuantization') and the codeword the
     input was sorted to
 
     Parameters
     ----------
-        input : float
+        x : float
             The quantizer input
         a : numpy.ndarray
             ai coefficients
         b : numpy.ndarray
             bi coefficients
+        q : sympy.FunctionClass
+            Symbolic lambdified quantization function
 
     Returns
     -------
         quantizedValue : int
             The output of the quantizer
         codeword : int
-            The index of the coresponding codeword
+            The index of the corresponding codeword
     """
 
-    if input <= b[0]:
+    if x <= b[0]:
         return -sum(a), 0
-    if input > b[-1]:
+    if x > b[-1]:
         return sum(a), len(b)
     for ii in range(0, len(b)):
-        if b[ii] < input and input <= b[ii + 1]:
+        if b[ii] < x <= b[ii + 1]:
             return q((b[ii] + b[ii+1])/2), ii + 1
