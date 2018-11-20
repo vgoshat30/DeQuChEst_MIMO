@@ -23,7 +23,7 @@ def trainMessage(model, dataFile, epoch, lr, codebookSize, architecture,
         dimToPrint = list(param.size())
         dimToPrint.reverse()
         if len(dimToPrint) > 1:
-            while not(type(architecture[printIndex]) is str):
+            while not (type(architecture[printIndex]) is str):
                 printIndex += 1
                 print('DEBUGGING 1:', printIndex)
                 if architecture[printIndex] is 'relu':
@@ -32,13 +32,12 @@ def trainMessage(model, dataFile, epoch, lr, codebookSize, architecture,
                 elif architecture[printIndex] is 'quantization':
                     print('quantization')
                     printIndex += 1
-            else:
-                print(architecture[printIndex], dimToPrint)
-            printIndex += 1
+                else:
+                    print(architecture[printIndex], dimToPrint)
+                printIndex += 1
 
     print('\n\n'
           '===================================================================')
-
 
 def trainIteration(modelname, corrEpoch, epoch, batch_idx, data, trainLoader,
                    loss):
