@@ -3,7 +3,7 @@
 ################################################################################
 
 DATA_MAT_FILE = ['data_SNR_4.mat', ]
-TEST_LOG_MAT_FILE = 'testLog_NonLinear_SNR_4.mat'
+TEST_LOG_MAT_FILE = 'testLog_SNR_4.mat'
 
 ################################################################################
 #                            Models to Activate                                #

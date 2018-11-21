@@ -1,6 +1,6 @@
 # Ignore Mac DS_Store files
 find . -name .DS_Store -print0 | xargs -0 git rm --ignore-unmatch
-**/.DS_Store
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -60,5 +60,6 @@ docs/_build/
 # PyBuilder
 target/
 
-# Environments
-venv/
+**/.idea/workspace.xml **/.idea/tasks.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/dictionaries/goshatsintsadze.xml

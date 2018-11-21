@@ -1,12 +1,10 @@
-from ProjectConstants import *
-
 ########################################################################
-###                        Training Messages                         ###
+#                          Training Messages                           #
 ########################################################################
 
 
-def trainMessage(model, dataFile, epoch, lr, codebookSize, architecture,
-                 magic_c=None):
+def train_message(model, data_file, epoch, lr, codebook_size, architecture,
+                  magic_c=None):
     print('\n\n'
           '==================================================================='
           '\n\n\tTraining \'{}\' Model\n\n'
@@ -16,60 +14,60 @@ def trainMessage(model, dataFile, epoch, lr, codebookSize, architecture,
           'Codebook Size:\t{}\n'
           'MAGIC_C:\t{}\n\n'
           'Architecture:\n'
-          .format(model.modelname, dataFile, epoch, lr, codebookSize, magic_c))
+          .format(model.modelname, data_file, epoch, lr, codebook_size, magic_c))
 
-    printIndex = 0
+    print_index = 0
     for param in model.parameters():
-        dimToPrint = list(param.size())
-        dimToPrint.reverse()
-        if len(dimToPrint) > 1:
-            while not (type(architecture[printIndex]) is str):
-                printIndex += 1
-                print('DEBUGGING 1:', printIndex)
-                if architecture[printIndex] is 'relu':
+        dim_to_print = list(param.size())
+        dim_to_print.reverse()
+        if len(dim_to_print) > 1:
+            while not (type(architecture[print_index]) is str):
+                print_index += 1
+                print('DEBUGGING 1:', print_index)
+                if architecture[print_index] is 'relu':
                     print('relu')
-                    printIndex += 1
-                elif architecture[printIndex] is 'quantization':
+                    print_index += 1
+                elif architecture[print_index] is 'quantization':
                     print('quantization')
-                    printIndex += 1
+                    print_index += 1
                 else:
-                    print(architecture[printIndex], dimToPrint)
-                printIndex += 1
+                    print(architecture[print_index], dim_to_print)
+                print_index += 1
 
     print('\n\n'
           '===================================================================')
 
-def trainIteration(modelname, corrEpoch, epoch, batch_idx, data, trainLoader,
-                   loss):
+
+def train_iteration(modelname, corr_epoch, epoch, batch_idx, data, train_loader, loss):
     print('Training \'{}\' Model:\tEpoch: {}/{} [{}/{} ({:.0f}%)]\t'
           'Linear Loss: {:.6f}'
-          .format(modelname, corrEpoch+1, epoch, batch_idx * len(data),
-                  len(trainLoader.dataset),
-                  100. * batch_idx / len(trainLoader), loss))
+          .format(modelname, corr_epoch + 1, epoch, batch_idx * len(data),
+                  len(train_loader.dataset),
+                  100. * batch_idx / len(train_loader), loss))
 
 
 ########################################################################
-###                        Testing Messages                          ###
+#                          Testing Messages                            #
 ########################################################################
 
 
-def testMessage(modelName):
+def test_message(model_name):
     print('\n\n'
           '===================================================================='
           '\n\tTesting \'{}\' Model\n'
           '===================================================================='
           '\n\n'
-          .format(modelName))
+          .format(model_name))
 
 
-def testIteration(modelname, batch_idx, data, testLoader):
+def test_iteration(modelname, batch_idx, data, test_loader):
     print('Testing \'{}\' Model:\t[{}/{} ({:.0f}%)]'
           .format(modelname, batch_idx * len(data),
-                  len(testLoader.dataset),
-                  100. * batch_idx / len(testLoader)))
+                  len(test_loader.dataset),
+                  100. * batch_idx / len(test_loader)))
 
 
-def testResults(modelname, epoch, lr, codebookSize, rate, loss, magic_c=None):
+def test_results(modelname, epoch, lr, codebook_size, rate, loss, magic_c=None):
     print('\n\n'
           '===================================================================='
           '\n\n\tResults of \'{}\' Testing\n\n'
@@ -85,5 +83,5 @@ def testResults(modelname, epoch, lr, codebookSize, rate, loss, magic_c=None):
           'Average Loss:\t{}\n'
           '===================================================================='
           '\n\n'
-          .format(modelname, epoch, lr, codebookSize,
+          .format(modelname, epoch, lr, codebook_size,
                   magic_c, rate, loss))

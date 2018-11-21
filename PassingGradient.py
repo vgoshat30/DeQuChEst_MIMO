@@ -83,30 +83,30 @@ class QuantizationLayer(torch.autograd.Function):
         we want to check the performance while keeping the whole system as one
         neural network. This function is "hidden" to the backpropegation, i.e.,
         it moves backward its input gradient.
-
-    Shape
-    -----
-        Input
-            To be filled...
-        Output
-            quantized_input
-                the quantized input formed using codebook. The quantized input
-                is the closest codeword avaliable in codeword.
-
-    Attributes
-    ----------
-        codebook
-            the fixed codebook of the module of shape `(M x 1)`
-            which will construct the quantized input
-
     """
     # Note that both forward and backward are @staticmethod
     @staticmethod
     # bias is an optional argument
     def forward(ctx, x, codebook):
+        """
+        Parameters
+        ----------
+            x : tensor
+                Input of the forward method
+            codebook : tuple
+                the fixed codebook of the module of shape `(M x 1)`
+                which will construct the quantized input
+
+        Returns
+        -------
+        quantized_input
+                The quantized input formed using codebook. The quantized input
+                is the closest codeword available in codeword.
+        """
         ctx.save_for_backward(x)
         input_data = x.data
         input_numpy = input_data.numpy()
+        # noinspection PyUnresolvedReferences
         quantized_input = torch.zeros(x.size())
         for ii in range(0, input_data.size(0)):
             for jj in range(0, input_data.size(1)):
@@ -117,6 +117,5 @@ class QuantizationLayer(torch.autograd.Function):
     # This function has only a single output, so it gets only one gradient
     @staticmethod
     def backward(ctx, grad_output):
-        # input = ctx.saved_tensors
         grad_input = grad_output.clone()
         return grad_input, None

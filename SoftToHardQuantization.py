@@ -97,13 +97,19 @@ class QuantizationLayer(Module):
         self.weight.data.uniform_(-std, std)
 
     def forward(self, x):
+        # noinspection PyUnresolvedReferences
         ret = Variable(torch.zeros(x.size()), requires_grad=False)
 
         for kk in range(0, self.codebookSize - 1):
+            # noinspection PyUnresolvedReferences
             temp_val = torch.add(x, self.weight[kk, 1])
+            # noinspection PyUnresolvedReferences
             temp_val = torch.mul(temp_val, self.magic_c)
+            # noinspection PyUnresolvedReferences
             temp_val = torch.tanh(temp_val)
+            # noinspection PyUnresolvedReferences
             temp_val = torch.mul(temp_val, self.weight[kk, 0])
+            # noinspection PyUnresolvedReferences
             ret = torch.add(ret, temp_val)
         return ret
 
@@ -131,8 +137,8 @@ def get_parameters(model, magic_c):
         q : sympy function
             The soft quantization symbolic function (sum of tanh)
     """
-    quant_layer = getattr(model, 'l' + str(model.quantizationLayerNameIndex))
-    parameters = quant_layer.weight.data.numpy()
+    quantization_layer = getattr(model, 'l' + str(model.quantizationLayerNameIndex))
+    parameters = quantization_layer.weight.data.numpy()
 
     # Coefficients of the tanh
     a = parameters[:, 0]

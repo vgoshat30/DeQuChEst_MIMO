@@ -9,18 +9,18 @@ class TestLogger:
     """Test Logger
 
     This module deals with logging simulation test into a MATLAB .mat file and can:
-        -   Create .mat file ready to be handled by the testLogger class
+        -   Create .mat file ready to be handled by the TestLogger class
         -   Edit a suitable .mat file (including creating, editing and deleting)
-        -   Display the content of a certain testLogger, by printing to the command
+        -   Display the content of a certain TestLogger, by printing to the command
             prompt or by plotting results on a figure, in respective to theoretical
             bounds.
     An intuition on the usage of this module will be as follows:
         1.  Create a .mat file which will be the log. All information on your
-            simulation results will be saved there. Be sure to use createMatFile().
+            simulation results will be saved there. Be sure to use create_mat_file().
         2.  Once you have a .mat file with correct specifications to serve as a test
             log, "connect" it to a python variable, using TestLogger().
-            This will create a testLogger class object.
-        3.  Modify the testLogger class object using its available properties.
+            This will create a TestLogger class object.
+        3.  Modify the TestLogger class object using its available properties.
             It will automatically update the .mat file.
     """
 
@@ -30,8 +30,8 @@ class TestLogger:
         When called, the __init__ function reads the specified .mat file and
         creates all the fields relevant for manipulating this .mat file.
         According to the loggerType (specified in a variable in the .mat
-        file, which is set using the createMatFile() function) additional
-        fields are created (for example, aCoefs, bCoefs, cCoefs for a testlogger
+        file, which is set using the create_mat_file() function) additional
+        fields are created (for example, aCoefs, bCoefs, cCoefs for a TestLogger
         of type 'tanh')
 
         Parameters
@@ -46,7 +46,7 @@ class TestLogger:
 
         Example
         -------
-        from testLogger import *
+        from TestLogger import *
         myLog = TestLogger('tanhLog.mat')
         myLog
         """
@@ -133,16 +133,16 @@ class TestLogger:
     def add_empty_test(self):
         """Append empty elements to all log fields
 
-        The function appends an empty element to each field of the testLogger,
+        The function appends an empty element to each field of the TestLogger,
         and to special fields if needed (according to self.loggerType).
-        If there is already empty test at the end of the testlogger, the
+        If there is already empty test at the end of the TestLogger, the
         function will not add additional one.
 
         Example
         -------
         (Additional function __init__() and content() were used in the example)
 
-        from testLogger import *
+        from TestLogger import *
         myLog = TestLogger('tanhLog.mat')
         myLog.content()
         myLog.add_empty_test()
@@ -150,7 +150,7 @@ class TestLogger:
 
         \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 
-        Content of testlogger 'tempTestLog.mat'
+        Content of TestLogger 'tempTestLog.mat'
 
          _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 
@@ -247,48 +247,48 @@ class TestLogger:
                 if int:
                     Number of test to edit
                 if str:
-                    'last' - to edit last test in the testLogger (empty or not)
+                    'last' - to edit last test in the TestLogger (empty or not)
 
-            **kwargs (for all testlogger types)
-                rate : float
+            **kwargs (for all TestLogger types)
+                'rate' : float
                     The rate used in the test
-                loss : float
+                'loss' : float
                     Resulting loss of the test
-                codewordNum : int
+                'codewordNum' : int
                     Number of quantization codewords
-                learningRate : float
+                'learningRate' : float
                     The learning rate of the learning algorithm
-                layersDim: list
+                'layersDim' : list
                     Dimension ratios between layers of the NN
-                runtime : datetime.timedelta
-                    Time spent on the learning proccess
-                algorithm : str
+                'runtime' : datetime.timedelta
+                    Time spent on the learning process
+                'algorithm' : str
                     Name of the algorithm used
-                epochs : int
+                'epochs' : int
                     Number of train epochs
-                note : str
+                'note' : str
                     A note to the test. Contains anything you think is important
-                a : list
+                'a' : list
                     The amplitude coefficients of the sum of tanh function.
                     Pass as a list even if there is only one element.
                     For example: mylog.log(a=[1, ])
-                b : list
+                'b' : list
                     The shifts of the sum of tanh function.
                     Pass as a list even if there is only one element
                     (see aCoefs above)
-                c : list
+                'c' : list
                     The "slopes" of the sum of tanh function.
                     Pass as a list even if there is only one element
                     (see aCoefs above)
-                magic_c : float
+                'magic_c' : float
                     Multiplier of the argument of the sum of tanh function.
-                dataFile : str
+                'dataFile' : str
                     Name of the data .mat file used for the training and testing
-                    Specify with .mat extention, for example: 'data.mat'
+                    Specify with .mat extension, for example: 'data.mat'
 
         Example
         -------
-        from testLogger import *
+        from TestLogger import *
         from datetime import datetime
         before = datetime.now()
         after = datetime.now() - before
@@ -296,7 +296,7 @@ class TestLogger:
         myLog.log(rate=0.3, loss=0.05, runtime=after)
         myLog.log(rate=0.4, loss=0.03, codewordNum=8, epochs=3)
         myLog.log('last', runtime=after, a=[-1.53, 0.24, 2.42], b=[-2.12, -0.97, 3.01])
-        myLog.log(1, note='Didnt perform quantization correctly')
+        myLog.log(1, note='Did not perform quantization correctly')
         """
 
         # If no parameters to log were specified
@@ -311,7 +311,7 @@ class TestLogger:
             # Setting test index to the last index in the test log
             test_index = len(self.rate) - 1
             print("Created test number", test_index+1,
-                  "\tin testlogger:", self.filename)
+                  "\tin TestLogger:", self.filename)
         # If requested to log to the last test
         elif test is 'last':
             test_index = len(self.rate) - 1
@@ -325,7 +325,7 @@ class TestLogger:
             if test_index is len(self.rate):
                 self.add_empty_test()
                 print("Created test number", test_index+1,
-                      "\tin testlogger:", self.filename)
+                      "\tin TestLogger:", self.filename)
             # If test number is larger than existing number of tests by more
             # than one, returning.
             elif test_index > len(self.rate):
@@ -367,22 +367,22 @@ class TestLogger:
                 self.magic_c[test_index] = kwargs[key]
             if key is 'dataFile':
                 # Getting train and test data parameters from the data .mat file
-                pythonDataFile = sio.loadmat(kwargs[key])
+                python_data_file = sio.loadmat(kwargs[key])
 
-                self.s_fD[test_index] = pythonDataFile['s_fD']
-                self.s_fNt[test_index] = pythonDataFile['s_fNt']
-                self.s_fNu[test_index] = pythonDataFile['s_fNu']
-                self.s_fRatio[test_index] = pythonDataFile['s_fRatio']
-                self.s_fT[test_index] = pythonDataFile['s_fT']
-                self.s_fTestPower[test_index] = pythonDataFile['s_fTestPower']
-                self.v_fTrainPower[test_index] = pythonDataFile['v_fTrainPower']
+                self.s_fD[test_index] = python_data_file['s_fD']
+                self.s_fNt[test_index] = python_data_file['s_fNt']
+                self.s_fNu[test_index] = python_data_file['s_fNu']
+                self.s_fRatio[test_index] = python_data_file['s_fRatio']
+                self.s_fT[test_index] = python_data_file['s_fT']
+                self.s_fTestPower[test_index] = python_data_file['s_fTestPower']
+                self.v_fTrainPower[test_index] = python_data_file['v_fTrainPower']
 
         self.save()
         print("Logged test number ", test_index+1,
-              "\tin testlogger:", self.filename)
+              "\tin TestLogger:", self.filename)
 
     def delete(self, test=None, indexing=None):
-        '''Delete specific test or clear all test log
+        """Delete specific test or clear all test log
 
         Parameters
         ----------
@@ -398,7 +398,7 @@ class TestLogger:
 
             indexing : str
                 'except':
-                    Delete all tests in the testLogger except specified
+                    Delete all tests in the TestLogger except specified
                 'from'
                     Delete all tests from specified test (including)
                     In this case, test MUST be an int.
@@ -406,59 +406,42 @@ class TestLogger:
                     Delete all tests to specified test (including)
                     In this case, test MUST be an int.
                 if empty:
-                    Deleteing test specified by the parameter test
+                    Deleting test specified by the parameter test
 
         Example
         -------
-        >>> from testLogger import *
-        >>> myLog = TestLogger('tanhLog.mat')
-        >>> for ii in range(1, 11):
-        ...     myLog.log(rate=0.1*ii, loss=0.01*ii)
-        ...
-        Created test number 1 	in testlogger: tanhLog.mat
-        Logged test number  1 	in testlogger: tanhLog.mat
-
-        NOT PART OF THE PROMT: same printings until test 10:
-
-        Created test number 10 	in testlogger: tanhLog.mat
-        Logged test number  10 	in testlogger: tanhLog.mat
-        >>> myLog.delete(5)
-        Deleted test(s): 5
-        From testlogger: tanhLog.mat
-        >>> myLog.delete(7, 'from')
-        Deleted test(s): [7 8 9]
-        From testlogger: tanhLog.mat
-        >>> myLog.delete(3, 'to')
-        Deleted test(s): [1 2 3]
-        From testlogger: tanhLog.mat
-        >>> myLog.delete([1, 3], 'except')
-        Deleted test(s): [2]
-        From testlogger: tanhLog.mat
-        >>> myLog.delete()
-        Cleared testlogger: tanhLog.mat
-        '''
+        from TestLogger import *
+        myLog = TestLogger('tanhLog.mat')
+        for ii in range(1, 11):
+            myLog.log(rate=0.1*ii, loss=0.01*ii)
+        myLog.delete(5)
+        myLog.delete(7, 'from')
+        myLog.delete(3, 'to')
+        myLog.delete([1, 3], 'except')
+        myLog.delete()
+        """
 
         # If specified number of test(s)
         if not(test is None):
             # If specified few tests
             if type(test) is list:
-                testIndex = []
+                test_index = []
                 for ii in test:
                     # If test number is too large
                     if ii > len(self.rate):
                         self.exception('delete', 'IndexError', ii)
                         return
-                    testIndex.append(ii-1)
+                    test_index.append(ii-1)
             # If specified only one test
             elif type(test) is int:
                 # If test number is too large
                 if test > len(self.rate):
                     self.exception('delete', 'IndexError', test)
                     return
-                testIndex = test - 1
+                test_index = test - 1
             elif type(test) is str:
                 if test is 'last':
-                    testIndex = len(self.rate)-1
+                    test_index = len(self.rate)-1
                 else:
                     self.exception('delete', 'TypeErrorBadStr', test)
                     return
@@ -467,55 +450,54 @@ class TestLogger:
                 return
 
             # If no special kind of indexing specified
-            if indexing is None:
-                deleteIndex = testIndex
-            # If the indexing is 'except', deleteIndex are all the indecies in
+            delete_index = test_index
+            # If the indexing is 'except', delete_index are all the indices in
             # self.rate except the specified ones
-            elif indexing is 'except':
-                deleteIndex = list(range(0, len(self.rate)))
-                if type(testIndex) is int:
-                    deleteIndex.remove(testIndex)
+            if indexing is 'except':
+                delete_index = list(range(0, len(self.rate)))
+                if type(test_index) is int:
+                    delete_index.remove(test_index)
                 else:
-                    for ii in testIndex:
+                    for ii in test_index:
                         print('DEBUGGING 1:', ii)
-                        deleteIndex.remove(ii)
-            # If the indexing is 'from', deleteIndex are all the indecies from
+                        delete_index.remove(ii)
+            # If the indexing is 'from', delete_index are all the indices from
             # specified number to the end
             elif indexing is 'from':
                 if type(test) is not int:
                     self.exception('delete', 'TypeErrorFrom', test)
                     return
-                deleteIndex = range(test-1, len(self.rate))
+                delete_index = range(test-1, len(self.rate))
             elif indexing is 'to':
                 if type(test) is not int:
                     self.exception('delete', 'TypeErrorTo', test)
                     return
-                deleteIndex = range(0, test)
+                delete_index = range(0, test)
 
-            self.rate = np.delete(self.rate, deleteIndex, 0)
-            self.loss = np.delete(self.loss, deleteIndex, 0)
-            self.codewordNum = np.delete(self.codewordNum, deleteIndex, 0)
-            self.learningRate = np.delete(self.learningRate, deleteIndex, 0)
-            self.layersDim = np.delete(self.layersDim, deleteIndex, 0)
-            self.runtime = np.delete(self.runtime, deleteIndex, 0)
-            self.logtime = np.delete(self.logtime, deleteIndex, 0)
-            self.algorithm = np.delete(self.algorithm, deleteIndex, 0)
-            self.epochs = np.delete(self.epochs, deleteIndex, 0)
-            self.note = np.delete(self.note, deleteIndex, 0)
-            self.aCoefs = np.delete(self.aCoefs, deleteIndex, 0)
-            self.bCoefs = np.delete(self.bCoefs, deleteIndex, 0)
-            self.cCoefs = np.delete(self.cCoefs, deleteIndex, 0)
-            self.magic_c = np.delete(self.magic_c, deleteIndex, 0)
-            self.s_fD = np.delete(self.s_fD, deleteIndex, 0)
-            self.s_fNt = np.delete(self.s_fNt, deleteIndex, 0)
-            self.s_fNu = np.delete(self.s_fNu, deleteIndex, 0)
-            self.s_fRatio = np.delete(self.s_fRatio, deleteIndex, 0)
-            self.s_fT = np.delete(self.s_fT, deleteIndex, 0)
-            self.s_fTestPower = np.delete(self.s_fTestPower, deleteIndex, 0)
-            self.v_fTrainPower = np.delete(self.v_fTrainPower, deleteIndex, 0)
+            self.rate = np.delete(self.rate, delete_index, 0)
+            self.loss = np.delete(self.loss, delete_index, 0)
+            self.codewordNum = np.delete(self.codewordNum, delete_index, 0)
+            self.learningRate = np.delete(self.learningRate, delete_index, 0)
+            self.layersDim = np.delete(self.layersDim, delete_index, 0)
+            self.runtime = np.delete(self.runtime, delete_index, 0)
+            self.logtime = np.delete(self.logtime, delete_index, 0)
+            self.algorithm = np.delete(self.algorithm, delete_index, 0)
+            self.epochs = np.delete(self.epochs, delete_index, 0)
+            self.note = np.delete(self.note, delete_index, 0)
+            self.aCoefs = np.delete(self.aCoefs, delete_index, 0)
+            self.bCoefs = np.delete(self.bCoefs, delete_index, 0)
+            self.cCoefs = np.delete(self.cCoefs, delete_index, 0)
+            self.magic_c = np.delete(self.magic_c, delete_index, 0)
+            self.s_fD = np.delete(self.s_fD, delete_index, 0)
+            self.s_fNt = np.delete(self.s_fNt, delete_index, 0)
+            self.s_fNu = np.delete(self.s_fNu, delete_index, 0)
+            self.s_fRatio = np.delete(self.s_fRatio, delete_index, 0)
+            self.s_fT = np.delete(self.s_fT, delete_index, 0)
+            self.s_fTestPower = np.delete(self.s_fTestPower, delete_index, 0)
+            self.v_fTrainPower = np.delete(self.v_fTrainPower, delete_index, 0)
 
-            print('Deleted test(s):', np.array(deleteIndex) + 1,
-                  "\nFrom testlogger:", self.filename)
+            print('Deleted test(s):', np.array(delete_index) + 1,
+                  "\nFrom TestLogger:", self.filename)
         else:
             self.rate = np.empty((0, 1), float)  # MATLAB Array of doubles
             self.loss = np.empty((0, 1), float)  # MATLAB Array of doubles
@@ -539,15 +521,15 @@ class TestLogger:
             self.s_fTestPower = np.empty((0, 1), float)  # MATLAB Array
             self.v_fTrainPower = np.empty((0, 1), object)  # MATLAB Cell
 
-            print('Cleared testlogger:', self.filename)
+            print('Cleared TestLogger:', self.filename)
 
         self.save()
 
     def content(self, test=None):
-        '''Show the content of the testlogger
+        """Show the content of the TestLogger
 
         Prints all information available for a certain test, multiple tests or
-        all the tests in a testlogger.
+        all the tests in a TestLogger.
 
         Parameters
         ----------
@@ -560,95 +542,52 @@ class TestLogger:
                     'all'  - Printing content of all tests
                     'last' - Printing content of last logged test
                 if empty:
-                    Printing short info about the testlogger itself
-                    (filename, number of logged tests and testlogger type)
+                    Printing short info about the TestLogger itself
+                    (filename, number of logged tests and TestLogger type)
 
         Example
         -------
-        >>> from testLogger import *
-        >>> from datetime import datetime
-        >>> before = datetime.now()
-        >>> after = datetime.now() - before
-        >>> myLog = TestLogger('tanhLog.mat')
-        >>> myLog.log(rate=0.3, loss=0.05, runtime=after)
-        Created test number 1 	in testlogger: tanhLog.mat
-        Logged test number  1 	in testlogger: tanhLog.mat
-        >>> myLog.log(runtime=after, a=[-1.53, 0.24, 2.42],
-        ...           b=[-2.12, -0.97, 3.01])
-        Created test number 2 	in testlogger: tanhLog.mat
-        Logged test number  2 	in testlogger: tanhLog.mat
-        >>> myLog.log('last', rate=0.2, loss=0.03, note='Content example')
-        Logged test number  2 	in testlogger: tanhLog.mat
-        >>> myLog.content()
-        The testlogger 'tanhLog.mat' contains 2 tests.
-        >>> myLog.content(2)
-        \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+        from TestLogger import *
+        from datetime import datetime
+        before = datetime.now()
+        after = datetime.now() - before
+        myLog = TestLogger('tanhLog.mat')
+        myLog.log(rate=0.3, loss=0.05, runtime=after)
+        myLog.log(runtime=after, a=[-1.53, 0.24, 2.42], b=[-2.12, -0.97, 3.01])
+        myLog.log('last', rate=0.2, loss=0.03, note='Content example')
+        myLog.content()
+        myLog.content(2)
+        """
 
-        Content of testlogger 'tempTestLog.mat'
-
-         _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-
-
-
-        Test 2 Info
-
-        Rate:		    0.2
-        Loss:		    0.03
-        Codewords Num.: 0.05
-        Algorithm:	    ________________
-        Learning rate:	________________
-        Layers Dim.:	________________
-        Tanh a coeffs:	________________
-        Tanh b coeffs:	________________
-        Tanh c coeffs:	________________
-        MAGIC_C:	    ________________
-        Train Runtime: 	0:00:00.000011
-        Train Epochs:	________________
-        Logging Time: 	2018-10-13 16:38:40.383540
-        Note:		    Content example
-
-        Train and test data parameters:
-
-        Train set size (s_fT):		    ________________
-        Test set size (s_fD):		    ________________
-        Antennas num. (s_fNt):		    ________________
-        Users num. (s_fNu):		        ________________
-        Ratio (s_fRatio):		        ________________
-        Test power (s_fTestPower):	    ________________
-        Train power (v_fTrainPower):	________________
-
-        \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
-        '''
-
-        dontExistMessage = '________________'
+        do_not_exist_message = '________________'
 
         if test is None:
-            print("The testlogger '" + self.filename +
+            print("The TestLogger '" + self.filename +
                   "' contains", len(self.rate), "tests.")
         else:
             if type(test) is int:
                 if test > len(self.rate):
                     self.exception('content', 'IndexError', test)
                     return
-                testNum = [test, ]
+                test_num = [test, ]
             elif type(test) is list:
                 for ii in test:
                     if ii > len(self.rate):
                         self.exception('content', 'IndexError', ii)
                         return
-                testNum = test
+                test_num = test
             elif type(test) is str:
                 if test is 'all':
                     if len(self.rate):
-                        testNum = range(1, len(self.rate)+1)
+                        test_num = range(1, len(self.rate)+1)
                     else:
-                        print("The testlogger", self.filename, "is empty.")
+                        print("The TestLogger", self.filename, "is empty.")
                         return
                 elif test is 'last':
                     if len(self.rate):
-                        testNum = [len(self.rate), ]
+                        test_num = [len(self.rate), ]
                     else:
-                        print("The testlogger", self.filename, "is empty.")
+                        print("The TestLogger", self.filename, "is empty.")
                         return
                 else:
                     self.exception('content', 'TypeError', test)
@@ -658,108 +597,108 @@ class TestLogger:
                 return
 
             print("\n\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/"
-                  "\n\nContent of testlogger '" + self.filename + "'\n\n",
+                  "\n\nContent of TestLogger '" + self.filename + "'\n\n",
                   "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_\n")
-            for ii, currTest in enumerate(testNum):
+            for ii, currTest in enumerate(test_num):
                 if not self.codewordNum[currTest-1]:
-                    codewordNumToPrint = dontExistMessage
+                    codeword_num_to_print = do_not_exist_message
                 else:
-                    codewordNumToPrint = self.codewordNum[currTest-1]
+                    codeword_num_to_print = self.codewordNum[currTest-1]
 
                 if not self.algorithm[currTest-1]:
-                    algToPrint = dontExistMessage
+                    alg_to_print = do_not_exist_message
                 else:
-                    algToPrint = removeCellFormat(self.algorithm[currTest-1])
+                    alg_to_print = remove_cell_format(self.algorithm[currTest - 1])
 
                 if not self.learningRate[currTest-1]:
-                    learningRateToPrint = dontExistMessage
+                    learning_rate_to_print = do_not_exist_message
                 else:
-                    learningRateToPrint = self.learningRate[currTest-1]
+                    learning_rate_to_print = self.learningRate[currTest-1]
 
                 if (type(self.layersDim[currTest-1]) is float or
                     (len(self.layersDim[currTest-1]) == 1 and
                         self.layersDim[currTest-1][0, 0] == 0)):
-                    layersDimToPrint = dontExistMessage
+                    layers_dim_to_print = do_not_exist_message
                 else:
-                    layersDimToPrint = self.layersDim[currTest-1]
+                    layers_dim_to_print = self.layersDim[currTest-1]
 
                 if not self.runtime[currTest-1]:
-                    runtimeToPrint = dontExistMessage
+                    runtime_to_print = do_not_exist_message
                 else:
-                    runtimeToPrint = removeCellFormat(self.runtime[currTest-1])
+                    runtime_to_print = remove_cell_format(self.runtime[currTest - 1])
 
                 if not self.epochs[currTest-1]:
-                    epochToPrint = dontExistMessage
+                    epoch_to_print = do_not_exist_message
                 else:
-                    epochToPrint = self.epochs[currTest-1]
+                    epoch_to_print = self.epochs[currTest-1]
 
                 if not self.note[currTest-1]:
-                    noteToPrint = dontExistMessage
+                    note_to_print = do_not_exist_message
                 else:
-                    noteToPrint = removeCellFormat(self.note[currTest-1])
+                    note_to_print = remove_cell_format(self.note[currTest - 1])
 
                 if (type(self.layersDim[currTest-1]) is float or
                     (self.aCoefs[currTest-1].size == 1 and
                         self.aCoefs[currTest-1][0, 0] == 0)):
-                    aCoefsToPrint = dontExistMessage
+                    a_coefs_to_print = do_not_exist_message
                 else:
-                    aCoefsToPrint = self.aCoefs[currTest-1]
+                    a_coefs_to_print = self.aCoefs[currTest-1]
 
                 if (type(self.layersDim[currTest-1]) is float or
                     (self.bCoefs[currTest-1].size == 1 and
                         self.bCoefs[currTest-1][0, 0] == 0)):
-                    bCoefsToPrint = dontExistMessage
+                    b_coefs_to_print = do_not_exist_message
                 else:
-                    bCoefsToPrint = self.bCoefs[currTest-1]
+                    b_coefs_to_print = self.bCoefs[currTest-1]
 
                 if (type(self.layersDim[currTest-1]) is float or
                     (self.cCoefs[currTest-1].size == 1 and
                         self.cCoefs[currTest-1][0, 0] == 0)):
-                    cCoefsToPrint = dontExistMessage
+                    c_coefs_to_print = do_not_exist_message
                 else:
-                    cCoefsToPrint = self.cCoefs[currTest-1]
+                    c_coefs_to_print = self.cCoefs[currTest-1]
 
                 if not self.magic_c[currTest-1]:
-                    magicCToPrint = dontExistMessage
+                    magic_c_to_print = do_not_exist_message
                 else:
-                    magicCToPrint = self.magic_c[currTest-1]
+                    magic_c_to_print = self.magic_c[currTest-1]
 
                 if not self.s_fD[currTest-1]:
-                    s_fDToPrint = dontExistMessage
+                    s_f_d_to_print = do_not_exist_message
                 else:
-                    s_fDToPrint = self.s_fD[currTest-1]
+                    s_f_d_to_print = self.s_fD[currTest-1]
 
                 if not self.s_fNt[currTest-1]:
-                    s_fNtToPrint = dontExistMessage
+                    s_f_nt_to_print = do_not_exist_message
                 else:
-                    s_fNtToPrint = self.s_fNt[currTest-1]
+                    s_f_nt_to_print = self.s_fNt[currTest-1]
 
                 if not self.s_fNu[currTest-1]:
-                    s_fNuToPrint = dontExistMessage
+                    s_f_nu_to_print = do_not_exist_message
                 else:
-                    s_fNuToPrint = self.s_fNu[currTest-1]
+                    s_f_nu_to_print = self.s_fNu[currTest-1]
 
                 if not self.s_fRatio[currTest-1]:
-                    s_fRatioToPrint = dontExistMessage
+                    s_f_ratio_to_print = do_not_exist_message
                 else:
-                    s_fRatioToPrint = self.s_fRatio[currTest-1]
+                    s_f_ratio_to_print = self.s_fRatio[currTest-1]
 
                 if not self.s_fT[currTest-1]:
-                    s_fTToPrint = dontExistMessage
+                    s_f_t_to_print = do_not_exist_message
                 else:
-                    s_fTToPrint = self.s_fT[currTest-1]
+                    s_f_t_to_print = self.s_fT[currTest-1]
 
                 if not self.s_fTestPower[currTest-1]:
-                    s_fTestPowerToPrint = dontExistMessage
+                    s_f_test_power_to_print = do_not_exist_message
                 else:
-                    s_fTestPowerToPrint = self.s_fTestPower[currTest-1]
+                    s_f_test_power_to_print = self.s_fTestPower[currTest-1]
 
                 if (type(self.layersDim[currTest-1]) is float or
                     (self.v_fTrainPower[currTest-1].size == 1 and
                         self.v_fTrainPower[currTest-1][0, 0] == 0)):
-                    v_fTrainPowerToPrint = dontExistMessage
+                    v_f_train_power_to_print = do_not_exist_message
                 else:
-                    v_fTrainPowerToPrint = self.v_fTrainPower[currTest-1]
+                    v_f_train_power_to_print = self.v_fTrainPower[currTest-1]
 
                 print("\n\nTest {} Info\n\n"
                       "Rate:\t\t{}\n"
@@ -785,23 +724,23 @@ class TestLogger:
                       "Test power (s_fTestPower):\t{}\n"
                       "Train power (v_fTrainPower):\t{}\n"
                       .format(currTest, self.rate[currTest-1],
-                              self.loss[currTest-1], codewordNumToPrint,
-                              algToPrint, learningRateToPrint,
-                              layersDimToPrint, aCoefsToPrint,
-                              bCoefsToPrint, cCoefsToPrint, magicCToPrint,
-                              runtimeToPrint, epochToPrint,
-                              removeCellFormat(self.logtime[currTest-1]),
-                              noteToPrint, s_fTToPrint, s_fDToPrint,
-                              s_fNtToPrint, s_fNuToPrint, s_fRatioToPrint,
-                              s_fTestPowerToPrint, v_fTrainPowerToPrint))
+                              self.loss[currTest-1], codeword_num_to_print,
+                              alg_to_print, learning_rate_to_print,
+                              layers_dim_to_print, a_coefs_to_print,
+                              b_coefs_to_print, c_coefs_to_print, magic_c_to_print,
+                              runtime_to_print, epoch_to_print,
+                              remove_cell_format(self.logtime[currTest - 1]),
+                              note_to_print, s_f_t_to_print, s_f_d_to_print,
+                              s_f_nt_to_print, s_f_nu_to_print, s_f_ratio_to_print,
+                              s_f_test_power_to_print, v_f_train_power_to_print))
 
-                if ii < len(testNum)-1:
+                if ii < len(test_num)-1:
                     print("---------------------------------------------------")
 
             print("\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/")
 
-    def plot(self, theoryDataFile=None):
-        '''Plot all results in a testlogger
+    def plot(self, theory_data_file=None):
+        """Plot all results in a TestLogger
 
         IMPORTANT!!!
             The function opens a figure which will pause all your code until
@@ -810,46 +749,44 @@ class TestLogger:
         Opens a new figure, plots all the theoretical bounds and all
         previously logged tests.
         The points are enumerated according to their logging order.
-        Click any datapoint to open a tooltip with additional imformation.
-        To see all imformation available for a test, use the function
+        Click any data point to open a tooltip with additional information.
+        To see all information available for a test, use the function
         content()
 
         Parameters
         ----------
-            theoryDataFile : str
+            theory_data_file : str
                 Name of MATLAB .mat file containing the variables 'v_fRate' and
                 'm_fCurves' which provide theoretical bounds for the results.
-                This is a file creted using the generateData.m function.
-                Specify including .mat extention, for example: 'data.mat'
+                This is a file created using the generateData.m function.
+                Specify including .mat extension, for example: 'data.mat'
 
         Example
         -------
         The file 'data.mat' is generated using generateData.m
 
-        >>> from testLogger import *
-        >>> myLog = TestLogger('tanhLog.mat')
-        >>> myLog.log(rate=0.3, loss=0.05)
-        Created test number 1 	in testlogger: tanhLog.mat
-        Logged test number  1 	in testlogger: tanhLog.mat
-        >>> myLog.plot('data.mat')
-        '''
+        from TestLogger import *
+        myLog = TestLogger('tanhLog.mat')
+        myLog.log(rate=0.3, loss=0.05)
+        myLog.plot('data.mat')
+        """
 
-        chosenMarkersize = 2
-        regMarkerSize = 7
-        indexAlpha = 0.5
-        datatipAlpha = 1
-        dataTipFontsize = 6
-        legendFontsize = 7
-        textboxAlpha = 0.8
-        textOffset = 0.0005
-        tickOffset = 0.001
-        sizeOfFigure = (8, 5)  # in inches
+        chosen_marker_size = 2
+        reg_marker_size = 7
+        index_alpha = 0.5
+        data_tip_alpha = 1
+        data_tip_font_size = 6
+        legend_font_size = 7
+        textbox_alpha = 0.8
+        text_offset = 0.0005
+        tick_offset = 0.001
+        size_of_figure = (8, 5)  # in inches
 
         # Define which lines to plot
-        whichToPlot = [1,  # No quantization
-                       1,  # Asymptotic optimal task-based
-                       1,  # Asymptotic optimal task-ignorant
-                       1]  # Hardware limited upper bound
+        which_to_plot = [1,  # No quantization
+                         1,  # Asymptotic optimal task-based
+                         1,  # Asymptotic optimal task-ignorant
+                         1]  # Hardware limited upper bound
 
         # Set the legend labels
         labels = ['No quantization',
@@ -858,104 +795,101 @@ class TestLogger:
                   'Hardware limited upper bound']
 
         markers = ['', '', '', '']
-        lineStyles = [':', '--', '--', '--']
-        linecolors = ['black', 'red', 'blue', 'lime']
-        lineWidths = [1, 1, 1, 1.5]
-        markerSizes = [4, 1, 1, 1]
-        markerLinewidths = [1, 1, 1, 1]
-        pointMarker = 'x'
-        pointsColor = 'orange'
-        chosenMarker = 'o'
-        chosenColor = 'red'
-        tooltipBoxStyle = 'round'
-        tooltipBoxColor = 'wheat'
-        fillColor = 'c'
+        line_styles = [':', '--', '--', '--']
+        line_colors = ['black', 'red', 'blue', 'lime']
+        line_widths = [1, 1, 1, 1.5]
+        marker_sizes = [4, 1, 1, 1]
+        point_marker = 'x'
+        points_color = 'orange'
+        chosen_marker = 'o'
+        chosen_color = 'red'
+        tooltip_box_style = 'round'
+        tooltip_box_color = 'wheat'
+        fill_color = 'c'
 
-        enumerateTests = True
+        enumerate_tests = True
 
         def pick_handler(event):
-            '''Handles the choosing of plotted results
+            """Handles the choosing of plotted results
 
             Note
             ----
             This function is not intended for the user and is used only by other
-            function in the class testLogger.
-            '''
+            function in the class TestLogger.
+            """
             # Get the pressed artist
             artist = event.artist
 
             # If the clicked point was already chosen, clear all tooltips and return
-            if artist.get_marker() is chosenMarker:
-                clearDatatips(event, -1)
+            if artist.get_marker() is chosen_marker:
+                clear_data_tips(-1)
                 return
 
             # Mark the chosen point
-            artist.set(marker=chosenMarker, markersize=chosenMarkersize,
-                       color=chosenColor)
+            artist.set(marker=chosen_marker, markersize=chosen_marker_size,
+                       color=chosen_color)
 
             # Get the index of the clicked point in the test log
-            chosenIndex = resList.index(artist)
+            chosen_index = res_list.index(artist)
             # Hide current result index
-            indexText[chosenIndex].set(alpha=0)
-            # Show chosen texbox
-            textBoxes[chosenIndex] = dict(boxstyle=tooltipBoxStyle,
-                                          facecolor=tooltipBoxColor,
-                                          alpha=textboxAlpha)
+            index_text[chosen_index].set(alpha=0)
+            # Show chosen text box
+            text_boxes[chosen_index] = dict(boxstyle=tooltip_box_style,
+                                            facecolor=tooltip_box_color,
+                                            alpha=textbox_alpha)
             # Show chosen tooltip
-            tooltips[chosenIndex].set(alpha=datatipAlpha,
-                                      bbox=textBoxes[chosenIndex])
+            tooltips[chosen_index].set(alpha=data_tip_alpha,
+                                       bbox=text_boxes[chosen_index])
 
             # Clear other tooltips
-            clearDatatips(event, chosenIndex)
+            clear_data_tips(chosen_index)
 
             # Update figure
             fig.canvas.draw()
             fig.canvas.flush_events()
 
-        def clearDatatips(event, exeptInex):
-            '''Clears tooltips
+        def clear_data_tips(except_index):
+            """Clears tooltips
 
             Parameters
             ----------
-            event : matplotlib.backend_bases.PickEvent
-                Callback pick event
-            exeptInex : int
-                Dont clear the tooltip of the point at the specified index
+            except_index : int
+                Do not clear the tooltip of the point at the specified index
                 Pass -1 to clear all tooltips
 
             Note
             ----
             This function is not intended for the user and is used only by other
-            function in the class testLogger.
-            '''
+            function in the class TestLogger.
+            """
 
-            for ii in range(0, len(resList)):
-                if ii is exeptInex:
+            for i in range(0, len(res_list)):
+                if i is except_index:
                     continue
                 # Unmark all other points
-                resList[ii].set(marker=pointMarker, markersize=regMarkerSize,
-                                color=pointsColor)
-                # Show all result indecies
-                indexText[ii].set(alpha=indexAlpha)
-                # Hide all textBoxes
-                textBoxes[ii] = dict(boxstyle=tooltipBoxStyle,
-                                     facecolor=tooltipBoxColor,
+                res_list[i].set(marker=point_marker, markersize=reg_marker_size,
+                                color=points_color)
+                # Show all result indices
+                index_text[i].set(alpha=index_alpha)
+                # Hide all text_boxes
+                text_boxes[i] = dict(boxstyle=tooltip_box_style,
+                                     facecolor=tooltip_box_color,
                                      alpha=0)
                 # Hide all result tooltips
-                tooltips[ii].set(alpha=0, bbox=textBoxes[ii])
+                tooltips[i].set(alpha=0, bbox=text_boxes[i])
 
             # Update figure
             fig.canvas.draw()
             fig.canvas.flush_events()
 
-        def getTextAlignment(x, y, textOffset):
-            '''Set tooltip textbox alignment and its offset from the
+        def get_text_alignment(x, y, text_shift):
+            """Set tooltip textbox alignment and its offset from the
             corresponding point on the graph
 
             Note
             ----
             This function is not intended for the user and is used only by other
-            function in the class testLogger.
+            function in the class TestLogger.
 
             Parameters
             ----------
@@ -963,12 +897,12 @@ class TestLogger:
                 X position of a test log (rate)
             y : numpy.ndarray
                 Y position of a test log (average loss)
-            textOffset : float
+            text_shift : float
                 The absolute value of the offset of the tooltip from the point
 
             Returns
             -------
-            (ha, va, xOffset, yOffset) : tuple
+            (ha, va, x_offset, y_offset) : tuple
                 ha : str
                     Horizontal alignment as accepted by the text property:
                     horizontalalignment of the matplotlib.
@@ -977,359 +911,358 @@ class TestLogger:
                     Vertical alignment as accepted by the text property:
                     verticalalignment of the matplotlib.
                     Possible values: [ 'top' | 'bottom' ]
-                xOffset : float
+                x_offset : float
                     The X axis offset of the textbox
-                yOffset : float
+                y_offset : float
                     The Y axis offset of the textbox
-            '''
+            """
             axs = plt.gca()
-            xlim = axs.get_xlim()
-            ylim = axs.get_ylim()
+            x_lim = axs.get_xlim()
+            y_lim = axs.get_ylim()
 
-            if x < xlim[1] / 2:
+            if x < x_lim[1] / 2:
                 ha = 'left'
-                xOffset = textOffset
+                x_offset = text_shift
             else:
                 ha = 'right'
-                xOffset = -textOffset
+                x_offset = -text_shift
 
-            if y < ylim[1]/2:
+            if y < y_lim[1]/2:
                 va = 'bottom'
-                yOffset = textOffset
+                y_offset = text_shift
             else:
                 va = 'top'
-                yOffset = -textOffset
+                y_offset = -text_shift
 
-            return (ha, va, xOffset, yOffset)
+            return ha, va, x_offset, y_offset
 
         plt.close('all')
 
         # Create figure and get axes handle
-        fig = plt.figure(figsize=sizeOfFigure)
+        fig = plt.figure(figsize=size_of_figure)
         ax = fig.add_subplot(111)
 
         # Connect figure to callback
         fig.canvas.mpl_connect('pick_event', pick_handler)
         fig.canvas.mpl_connect('figure_leave_event', lambda event,
-                               temp=-1: clearDatatips(event, temp))
+                               temp=-1: clear_data_tips(temp))
 
-        if theoryDataFile:
-            theory = sio.loadmat(theoryDataFile)
+        if theory_data_file:
+            theory = sio.loadmat(theory_data_file)
 
             # Extracting theory data vectors
-            theoryRate = theory['v_fRate']
-            theoryLoss = theory['m_fCurves']
+            theory_rate = theory['v_fRate']
+            theory_loss = theory['m_fCurves']
 
             # Create fill vectors
-            xFill = np.concatenate((theoryRate[0],
-                                    np.flip(theoryRate[0], 0)), axis=0)
-            yFill = np.concatenate((theoryLoss[3, :],
-                                    np.flip(theoryLoss[1, :], 0)), axis=0)
+            x_fill = np.concatenate((theory_rate[0],
+                                    np.flip(theory_rate[0], 0)), axis=0)
+            y_fill = np.concatenate((theory_loss[3, :],
+                                    np.flip(theory_loss[1, :], 0)), axis=0)
 
             # Plot all theoretical bounds
-            for ii in range(0, theoryLoss.shape[0]):
-                if whichToPlot[ii]:
-                    ax.plot(theoryRate[0], theoryLoss[ii, :],
+            for ii in range(0, theory_loss.shape[0]):
+                if which_to_plot[ii]:
+                    ax.plot(theory_rate[0], theory_loss[ii, :],
                             label=labels[ii],
-                            marker=markers[ii], color=linecolors[ii],
-                            linestyle=lineStyles[ii], linewidth=lineWidths[ii],
-                            markersize=markerSizes[ii])
+                            marker=markers[ii], color=line_colors[ii],
+                            linestyle=line_styles[ii], linewidth=line_widths[ii],
+                            markersize=marker_sizes[ii])
 
             # Plot fill
-            ax.fill(xFill, yFill, c=fillColor, alpha=0.3)
+            ax.fill(x_fill, y_fill, c=fill_color, alpha=0.3)
 
         # Plot previous results (the loop is for plotting as separate artists)
-        resList = []
+        res_list = []
         for ii in range(0, len(self.rate)-1):
             if self.rate[ii]:
-                resList += ax.plot(self.rate[ii], self.loss[ii], marker='x',
-                                   markersize=regMarkerSize,
-                                   color=pointsColor, picker=5)
+                res_list += ax.plot(self.rate[ii], self.loss[ii], marker='x',
+                                    markersize=reg_marker_size,
+                                    color=points_color, picker=5)
 
         # Plot result (not plotting in the for loop above only to set the label
         # to 'Results' without affecting all result points)
         try:
             if self.rate[-1]:
-                resList += ax.plot(self.rate[-1], self.loss[-1], marker='x',
-                                   markersize=regMarkerSize, color=pointsColor,
-                                   label='Results', picker=5)
+                res_list += ax.plot(self.rate[-1], self.loss[-1], marker='x',
+                                    markersize=reg_marker_size, color=points_color,
+                                    label='Results', picker=5)
         except IndexError:
             self.exception('plot', 'EmptyLog')
 
-        indexText = []
+        index_text = []
         tooltips = []
-        textBoxes = []
+        text_boxes = []
         for ii in range(0, len(self.rate)):
             # If the current iterated test is not empty
             if self.rate[ii]:
                 # Enumerate result points in the figure
-                if enumerateTests:
-                    indexText.append(ax.text(self.rate[ii] + tickOffset,
-                                             self.loss[ii] + tickOffset,
-                                             ii+1, fontsize=8, alpha=indexAlpha,
-                                             verticalalignment='center',
-                                             horizontalalignment='center'))
-                # Create all textboxes and dont display them
-                textBoxes.append(dict(boxstyle='round', facecolor='wheat',
-                                      alpha=0))
+                if enumerate_tests:
+                    index_text.append(ax.text(self.rate[ii] + tick_offset,
+                                              self.loss[ii] + tick_offset,
+                                              str(ii+1), fontsize=8, alpha=index_alpha,
+                                              verticalalignment='center',
+                                              horizontalalignment='center'))
+                # Create all text boxes and do not display them
+                text_boxes.append(dict(boxstyle='round', facecolor='wheat',
+                                       alpha=0))
 
-                # Create all data tooltip and dont display them
-                currIterDateTime = datetime.strptime(
-                    removeCellFormat(self.logtime[ii]), '%Y-%m-%d %H:%M:%S.%f')
+                # Create all data tooltip and do not display them
+                curr_iter_date_time = datetime.strptime(
+                    remove_cell_format(self.logtime[ii]), '%Y-%m-%d %H:%M:%S.%f')
                 if self.runtime[ii]:
-                    currRuntime = datetime.strptime(removeCellFormat(
-                        self.runtime[ii]),
-                        '%H:%M:%S.%f')
-                if self.algorithm[ii] and self.runtime[ii]:
-                    textToDisplay = 'Rate: ' + str(self.rate[ii]) + \
-                        '\nAvg. Distortion: ' + str(self.loss[ii]) + \
-                        '\nAlgorithm:\n' + \
-                        removeCellFormat(self.algorithm[ii]) + \
-                        '\nRuntime: ' + currRuntime.strftime('%H:%M:%S.%f') + \
-                        '\nDate: ' + currIterDateTime.strftime('%d/%m/%y') + \
-                        '\nTime: ' + currIterDateTime.strftime('%H:%M:%S')
-                elif self.algorithm[ii] and not(self.runtime[ii]):
-                    textToDisplay = 'Rate: ' + str(self.rate[ii]) + \
-                        '\nAvg. Distortion: ' + str(self.loss[ii]) + \
-                        '\nAlgorithm:\n' + \
-                        removeCellFormat(self.algorithm[ii]) + \
-                        '\nDate: ' + currIterDateTime.strftime('%d/%m/%y') + \
-                        '\nTime: ' + currIterDateTime.strftime('%H:%M:%S')
-                elif not(self.algorithm[ii]) and self.runtime[ii]:
-                    textToDisplay = 'Rate: ' + str(self.rate[ii]) + \
-                        '\nAvg. Distortion: ' + str(self.loss[ii]) + \
-                        '\nRuntime: ' + currRuntime.strftime('%H:%M:%S.%f') + \
-                        '\nDate: ' + currIterDateTime.strftime('%d/%m/%y') + \
-                        '\nTime: ' + currIterDateTime.strftime('%H:%M:%S')
+                    curr_runtime = datetime.strptime(remove_cell_format(self.runtime[ii]),
+                                                     '%H:%M:%S.%f')
                 else:
-                    textToDisplay = 'Rate: ' + str(self.rate[ii]) + \
+                    curr_runtime = ''
+                if self.algorithm[ii] and self.runtime[ii]:
+                    text_to_display = 'Rate: ' + str(self.rate[ii]) + \
                         '\nAvg. Distortion: ' + str(self.loss[ii]) + \
-                        '\nDate: ' + currIterDateTime.strftime('%d/%m/%y') + \
-                        '\nTime: ' + currIterDateTime.strftime('%H:%M:%S')
-                textAlign = getTextAlignment(self.rate[ii],
-                                             self.loss[ii],
-                                             textOffset)
-                tooltips.append(ax.text(self.rate[ii]+textAlign[2],
-                                        self.loss[ii]+textAlign[3],
-                                        textToDisplay,
-                                        alpha=0, fontsize=dataTipFontsize,
-                                        bbox=textBoxes[ii],
-                                        ha=textAlign[0], va=textAlign[1]))
+                        '\nAlgorithm:\n' + \
+                                      remove_cell_format(self.algorithm[ii]) + \
+                        '\nRuntime: ' + curr_runtime.strftime('%H:%M:%S.%f') + \
+                        '\nDate: ' + curr_iter_date_time.strftime('%d/%m/%y') + \
+                        '\nTime: ' + curr_iter_date_time.strftime('%H:%M:%S')
+                elif self.algorithm[ii] and not(self.runtime[ii]):
+                    text_to_display = 'Rate: ' + str(self.rate[ii]) + \
+                        '\nAvg. Distortion: ' + str(self.loss[ii]) + \
+                        '\nAlgorithm:\n' + \
+                                      remove_cell_format(self.algorithm[ii]) + \
+                        '\nDate: ' + curr_iter_date_time.strftime('%d/%m/%y') + \
+                        '\nTime: ' + curr_iter_date_time.strftime('%H:%M:%S')
+                elif not(self.algorithm[ii]) and self.runtime[ii]:
+                    text_to_display = 'Rate: ' + str(self.rate[ii]) + \
+                        '\nAvg. Distortion: ' + str(self.loss[ii]) + \
+                        '\nRuntime: ' + curr_runtime.strftime('%H:%M:%S.%f') + \
+                        '\nDate: ' + curr_iter_date_time.strftime('%d/%m/%y') + \
+                        '\nTime: ' + curr_iter_date_time.strftime('%H:%M:%S')
+                else:
+                    text_to_display = 'Rate: ' + str(self.rate[ii]) + \
+                        '\nAvg. Distortion: ' + str(self.loss[ii]) + \
+                        '\nDate: ' + curr_iter_date_time.strftime('%d/%m/%y') + \
+                        '\nTime: ' + curr_iter_date_time.strftime('%H:%M:%S')
+                text_align = get_text_alignment(self.rate[ii],
+                                                self.loss[ii],
+                                                text_offset)
+                tooltips.append(ax.text(self.rate[ii]+text_align[2],
+                                        self.loss[ii]+text_align[3],
+                                        text_to_display,
+                                        alpha=0, fontsize=data_tip_font_size,
+                                        bbox=text_boxes[ii],
+                                        ha=text_align[0], va=text_align[1]))
 
         # Labeling and graph appearance
         plt.xlabel('Rate', fontsize=18, fontname='Times New Roman')
         plt.ylabel('Average Distortion', fontsize=18,
                    fontname='Times New Roman')
-        ax.legend(fontsize=legendFontsize)
+        ax.legend(fontsize=legend_font_size)
         ax.autoscale(enable=True, axis='x', tight=True)
         # Show figure
         plt.show()
 
     def save(self):
-        '''Save a testLogger
+        """Save a TestLogger
 
         Note
         ----
         This function is not intended for the user and is used only by other
-        function in the class testLogger.
-        '''
+        function in the class TestLogger.
+        """
 
-        saveVars = {'rateResults': self.rate,
-                    'lossResults': self.loss,
-                    'codewordNum': self.codewordNum,
-                    'learningRate': self.learningRate,
-                    'layersDim': self.layersDim,
-                    'time': self.logtime,
-                    'algorithmName': self.algorithm,
-                    'runTime': self.runtime,
-                    'trainEpochs': self.epochs,
-                    'notes': self.note,
-                    'aCoefs': self.aCoefs,
-                    'bCoefs': self.bCoefs,
-                    'cCoefs': self.cCoefs,
-                    'magic_c': self.magic_c,
-                    's_fD': self.s_fD,
-                    's_fNt': self.s_fNt,
-                    's_fNu': self.s_fNu,
-                    's_fRatio': self.s_fRatio,
-                    's_fT': self.s_fT,
-                    's_fTestPower': self.s_fTestPower,
-                    'v_fTrainPower': self.v_fTrainPower}
+        save_vars = {'rateResults': self.rate,
+                     'lossResults': self.loss,
+                     'codewordNum': self.codewordNum,
+                     'learningRate': self.learningRate,
+                     'layersDim': self.layersDim,
+                     'time': self.logtime,
+                     'algorithmName': self.algorithm,
+                     'runTime': self.runtime,
+                     'trainEpochs': self.epochs,
+                     'notes': self.note,
+                     'aCoefs': self.aCoefs,
+                     'bCoefs': self.bCoefs,
+                     'cCoefs': self.cCoefs,
+                     'magic_c': self.magic_c,
+                     's_fD': self.s_fD,
+                     's_fNt': self.s_fNt,
+                     's_fNu': self.s_fNu,
+                     's_fRatio': self.s_fRatio,
+                     's_fT': self.s_fT,
+                     's_fTestPower': self.s_fTestPower,
+                     'v_fTrainPower': self.v_fTrainPower}
 
-        sio.savemat(self.filename, saveVars)
+        sio.savemat(self.filename, save_vars)
 
-    def exception(self, property, excepType, *test):
-        '''Print an exception
+    def exception(self, property_name, except_type, *test):
+        """Print an exception
 
-        Because the testlogger class is used in long simulations, you dont want
-        any little mistake to throw an error and stop ypur code.
+        Because the TestLogger class is used in long simulations, you do not want
+        any little mistake to throw an error and stop your code.
         Exceptions in this function are more informative than python exceptions
-        and were easier to use in this particullar code.
+        and were easier to use in this particular code.
 
         Note
         ----
         This function is not intended for the user and is used only by other
-        function in the class testLogger.
-        '''
+        function in the class TestLogger.
+        """
 
         if test:
             test = test[0]
 
-        if property is 'log':
-            if excepType is 'IndexError':
-                print("Error in testlogger", self.filename + ":",
+        if property_name is 'log':
+            if except_type is 'IndexError':
+                print("Error in TestLogger", self.filename + ":",
                       "\n\tType:\tIndexError in the property log()",
-                      "\n\tCause:\tTest numer", test,
+                      "\n\tCause:\tTest number", test,
                       "does not exist,",  "there are only",
                       len(self.rate), "tests.")
-            if excepType is 'TypeError':
+            if except_type is 'TypeError':
                 if type(test) is str:
-                    print("Error in testlogger", self.filename + ":",
+                    print("Error in TestLogger", self.filename + ":",
                           "\n\tType:\tTypeError in the property log()",
                           "\n\tCause:\tTest argument can only be an integer",
                           "or the string 'last', but was the string",
                           "'" + test + "'")
                 else:
-                    print("Error in testlogger", self.filename + ":",
+                    print("Error in TestLogger", self.filename + ":",
                           "\n\tType:\tTypeError in the property log()",
                           "\n\tCause:\tTest argument can only be an integer",
                           "or the string 'last', but was of type", type(test))
-            if excepType is 'ValueError':
-                print("Error in testlogger", self.filename + ":",
+            if except_type is 'ValueError':
+                print("Error in TestLogger", self.filename + ":",
                       "\n\tType:\tValueError in the property log()",
                       "\n\tCause:\tThere are no input arguments to log()")
 
-        if property is 'delete':
-            if excepType is 'IndexError':
-                print("Error in testlogger", self.filename + ":",
+        if property_name is 'delete':
+            if except_type is 'IndexError':
+                print("Error in TestLogger", self.filename + ":",
                       "\n\tType:\tIndexError in the property delete()",
-                      "\n\tCause:\tTest numer", test, "does not exist,",
+                      "\n\tCause:\tTest number", test, "does not exist,",
                       "there are only", len(self.rate), "tests.")
-            if excepType is 'TypeErrorBadStr':
-                print("Error in testlogger", self.filename + ":",
+            if except_type is 'TypeErrorBadStr':
+                print("Error in TestLogger", self.filename + ":",
                       "\n\tType:\tTypeError in the property delete()",
                       "\n\tCause:\tTest argument can only be an integer,",
                       "a list or the string 'last', but was the string '" +
                       test + "'")
-            if excepType is 'TypeErrorNotInt':
-                print("Error in testlogger", self.filename + ":",
+            if except_type is 'TypeErrorNotInt':
+                print("Error in TestLogger", self.filename + ":",
                       "\n\tType:\tTypeError in the property delete()",
                       "\n\tCause:\tTest argument can only be an integer",
                       "or a list, but was of type", type(test))
-            if excepType is 'TypeErrorFrom':
-                print("Error in testlogger", self.filename + ":",
+            if except_type is 'TypeErrorFrom':
+                print("Error in TestLogger", self.filename + ":",
                       "\n\tType:\tTypeError in the property delete()",
                       "\n\tCause:\tTo delete tests 'from' certain test,",
                       "it needs to be an integer.",
                       "Instead was of type", type(test))
-            if excepType is 'TypeErrorTo':
-                print("Error in testlogger", self.filename + ":",
+            if except_type is 'TypeErrorTo':
+                print("Error in TestLogger", self.filename + ":",
                       "\n\tType:\tTypeError in the property delete()",
                       "\n\tCause:\tTo delete tests 'to' certain test,",
                       "it needs to be an integer.",
                       "Instead was of type", type(test))
 
-        if property is 'content':
-            if excepType is 'TypeError':
+        if property_name is 'content':
+            if except_type is 'TypeError':
                 if type(test) is str:
-                    print("Error in testlogger", self.filename + ":",
+                    print("Error in TestLogger", self.filename + ":",
                           "\n\tType:\tTypeError in the property content()",
                           "\n\tCause:\tTest argument can only be an integer,",
                           "a list or the strings 'all' or 'last', but was the",
                           "string '" + test + "'")
                 else:
-                    print("Error in testlogger", self.filename + ":",
+                    print("Error in TestLogger", self.filename + ":",
                           "\n\tType:\tTypeError in the property content()",
                           "\n\tCause:\tTest argument can only be an integer,",
                           "a list or the string 'all', but was of type",
                           type(test))
-            if excepType is 'IndexError':
-                print("Error in testlogger", self.filename + ":",
+            if except_type is 'IndexError':
+                print("Error in TestLogger", self.filename + ":",
                       "\n\tType:\tIndexError in the property content()",
-                      "\n\tCause:\tTest numer", test,
+                      "\n\tCause:\tTest number", test,
                       "does not exist,",  "there are only",
                       len(self.rate), "tests.")
 
-        if property is 'plot':
-            if excepType is 'EmptyLog':
-                print("Warning in testlogger", self.filename + ":",
+        if property_name is 'plot':
+            if except_type is 'EmptyLog':
+                print("Warning in TestLogger", self.filename + ":",
                       "\n\tType:\tEmptyLog in the property plot()",
-                      "\n\tCause:\tTestlogger:", self.filename,
+                      "\n\tCause:\tTestLogger:", self.filename,
                       "is empty. Nothing to plot...")
 
 
-def createMatFile(name):
-    '''Create a new .mat file that can be handled by the testlogger class
+def create_mat_file(name):
+    """Create a new .mat file that can be handled by the TestLogger class
 
     Creates a MATLAB .mat file with all the variables required so it can be
-    properly "connected" to the python class testlogger.
-    Spetial variables are added, if needed, according to the type parameter.
+    properly "connected" to the python class TestLogger.
+    Special variables are added, if needed, according to the type parameter.
 
     Parameters
     ----------
         name : str
-            Name of the mat file, with extention! For example: "testLog.mat"
+            Name of the mat file, with extension! For example: "testLog.mat"
 
     Returns
     -------
-        testLogger.testLogger
-            The created file is connected to the testLogger class using
-            testLogger() at the end of the function createMatFile().
+        TestLogger.TestLogger
+            The created file is connected to the TestLogger class using
+            TestLogger() at the end of the function createMatFile().
             One can alternatively call createMatFile() without using its output
-            and then call testLogger() later
+            and then call TestLogger() later
 
     Example
     -------
-    >>> from testLogger import *
-    >>> myLog = createMatFile("testLog.mat")
-    Created new test log 'testLog.mat'
-    >>> myLog
-    <testLogger.testlogger object at 0x10890de10>
-    '''
+    from TestLogger import *
+    myLog = create_mat_file("testLog.mat")
+    myLog
+    """
 
     rate = np.empty((0, 1), float)  # MATLAB Array of doubles
     loss = np.empty((0, 1), float)  # MATLAB Array of doubles
-    codewordNum = np.empty((0, 1), float)  # MATLAB Array of doubles
-    learningRate = np.empty((0, 1), float)  # MATLAB Array of doubles
-    layersDim = np.empty((0, 1), object)  # MATLAB Cell
+    codeword_num = np.empty((0, 1), float)  # MATLAB Array of doubles
+    learning_rate = np.empty((0, 1), float)  # MATLAB Array of doubles
+    layers_dim = np.empty((0, 1), object)  # MATLAB Cell
     runtime = np.empty((0, 1), object)  # MATLAB Cell
     logtime = np.empty((0, 1), object)  # MATLAB Cell
     algorithm = np.empty((0, 1), object)  # MATLAB Cell
     epochs = np.empty((0, 1), float)  # MATLAB Array of doubles
     note = np.empty((0, 1), object)  # MATLAB Cell
-    aCoefs = np.empty((0, 1), object)  # MATLAB Cell
-    bCoefs = np.empty((0, 1), object)  # MATLAB Cell
-    cCoefs = np.empty((0, 1), object)  # MATLAB Cell
+    a_coefs = np.empty((0, 1), object)  # MATLAB Cell
+    b_coefs = np.empty((0, 1), object)  # MATLAB Cell
+    c_coefs = np.empty((0, 1), object)  # MATLAB Cell
     magic_c = np.empty((0, 1), float)  # MATLAB Array
-    s_fD = np.empty((0, 1), float)  # MATLAB Array
-    s_fNt = np.empty((0, 1), float)  # MATLAB Array
-    s_fNu = np.empty((0, 1), float)  # MATLAB Array
-    s_fRatio = np.empty((0, 1), float)  # MATLAB Array
-    s_fT = np.empty((0, 1), float)  # MATLAB Array
-    s_fTestPower = np.empty((0, 1), float)  # MATLAB Array
-    v_fTrainPower = np.empty((0, 1), object)  # MATLAB Cell
+    s_fd = np.empty((0, 1), float)  # MATLAB Array
+    s_fnt = np.empty((0, 1), float)  # MATLAB Array
+    s_fnu = np.empty((0, 1), float)  # MATLAB Array
+    s_f_ratio = np.empty((0, 1), float)  # MATLAB Array
+    s_ft = np.empty((0, 1), float)  # MATLAB Array
+    s_f_test_power = np.empty((0, 1), float)  # MATLAB Array
+    v_f_train_power = np.empty((0, 1), object)  # MATLAB Cell
 
     variables = {'rateResults': rate,
                  'lossResults': loss,
-                 'codewordNum': codewordNum,
-                 'learningRate': learningRate,
-                 'layersDim': layersDim,
+                 'codeword_num': codeword_num,
+                 'learning_rate': learning_rate,
+                 'layers_dim': layers_dim,
                  'time': logtime,
                  'algorithmName': algorithm,
                  'runTime': runtime,
                  'trainEpochs': epochs,
                  'notes': note,
-                 'aCoefs': aCoefs,
-                 'bCoefs': bCoefs,
-                 'cCoefs': cCoefs,
+                 'a_coefs': a_coefs,
+                 'b_coefs': b_coefs,
+                 'c_coefs': c_coefs,
                  'magic_c': magic_c,
-                 's_fD': s_fD,
-                 's_fNt': s_fNt,
-                 's_fNu': s_fNu,
-                 's_fRatio': s_fRatio,
-                 's_fT': s_fT,
-                 's_fTestPower': s_fTestPower,
-                 'v_fTrainPower': v_fTrainPower}
+                 's_fd': s_fd,
+                 's_fnt': s_fnt,
+                 's_fnu': s_fnu,
+                 's_f_ratio': s_f_ratio,
+                 's_ft': s_ft,
+                 's_f_test_power': s_f_test_power,
+                 'v_f_train_power': v_f_train_power}
 
     if os.path.exists(name):
         print("Test logger '" + name + "' already exists...")
@@ -1339,14 +1272,14 @@ def createMatFile(name):
     return TestLogger(name)
 
 
-def removeCellFormat(formatted):
-    '''Clear a string formatting caused by saving as cell in mat file
+def remove_cell_format(formatted):
+    """Clear a string formatting caused by saving as cell in mat file
 
     Note
     ----
     This function is not intended for the user and is used only by other
-    function in the class testLogger.
-    '''
+    function in the class TestLogger.
+    """
     unformatted = str(formatted).replace("[", "")
     unformatted = unformatted.replace("]", "")
     unformatted = unformatted.replace("'", "")

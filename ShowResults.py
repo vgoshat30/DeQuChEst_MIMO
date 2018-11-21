@@ -5,19 +5,21 @@ from ProjectConstants import *
 
 
 def plot_tanh_function(test_log, test_number):
-    def quantize(input, a, b, q):
+    def quantize(input_value, a_values, b_values, quantization_function):
         """Get the result of the hard quantization function derived from the
         soft one (the meaning of the name 'SoftToHardQuantization') and the
         codeword the input was sorted to
 
         Parameters
         ----------
-            input : float
+            input_value : ndarray
                 The quantizer input
-            a : numpy.ndarray
+            a_values : numpy.ndarray
                 ai coefficients
-            b : numpy.ndarray
+            b_values : numpy.ndarray
                 bi coefficients
+            quantization_function : sympy.FunctionClass
+                Lambdified quantization function
 
         Returns
         -------
@@ -26,18 +28,18 @@ def plot_tanh_function(test_log, test_number):
             codeword : int
                 The index of the corresponding codeword
         """
-        output = np.empty([input.size, 2])
-        for inputIndex in range(input.size):
-            if input[inputIndex] <= b[0]:
-                output[inputIndex, 0] = - sum(a)
+        output = np.empty([input_value.size, 2])
+        for inputIndex in range(input_value.size):
+            if input_value[inputIndex] <= b_values[0]:
+                output[inputIndex, 0] = - sum(a_values)
                 output[inputIndex, 1] = 0
-            if input[inputIndex] > b[-1]:
-                output[inputIndex, 0] = sum(a)
-                output[inputIndex, 1] = len(b)
-            for ii in range(len(b)-1):
-                if b[ii] < input[inputIndex] <= b[ii + 1]:
-                    output[inputIndex, 0] = q((b[ii] + b[ii+1])/2)
-                    output[inputIndex, 1] = ii + 1
+            if input_value[inputIndex] > b_values[-1]:
+                output[inputIndex, 0] = sum(a_values)
+                output[inputIndex, 1] = len(b_values)
+            for jj in range(len(b_values) - 1):
+                if b_values[jj] < input_value[inputIndex] <= b_values[jj + 1]:
+                    output[inputIndex, 0] = quantization_function((b_values[jj] + b_values[jj + 1]) / 2)
+                    output[inputIndex, 1] = jj + 1
         return output
 
     a = test_log.aCoefs[test_number - 1][0]
