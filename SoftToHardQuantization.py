@@ -13,12 +13,16 @@ import sympy as sym
 class Network(nn.Module):
 
     def __init__(self, modelname, codebook_size, input_dimension, output_dimension,
-                 magic_c, architecture):
+                 initial_c, architecture):
         super(Network, self).__init__()
 
         self.modelname = modelname
 
         self.layers = []
+        self.quantization_layer = QuantizationLayer(output_dimension,
+                                                    output_dimension,
+                                                    codebook_size, initial_c)
+
         previous_input_dimension = input_dimension
         waiting_for_linear_layer_value = False
         layer_name_index = 1
@@ -64,12 +68,10 @@ class Network(nn.Module):
                 # output of the quantization layer
                 previous_input_dimension = output_dimension
                 # Adding layer to layers array (for forward implementation)
-                self.layers.append(QuantizationLayer(output_dimension,
-                                                     output_dimension,
-                                                     codebook_size, magic_c))
+                self.layers.append(self.quantization_layer)
                 # Assigning layer to module
                 self.add_module('l' + str(layer_name_index), self.layers[-1])
-                self.quantizationLayerNameIndex = layer_name_index
+                # self.quantizationLayerNameIndex = layer_name_index
                 self.quantizationLayerIndex = len(self.layers) - 1
                 layer_name_index += 1
             else:
@@ -82,12 +84,12 @@ class Network(nn.Module):
 
 
 class QuantizationLayer(Module):
-    def __init__(self, in_features, out_features, m, magic_c):
+    def __init__(self, in_features, out_features, m, ci):
         super(QuantizationLayer, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
         self.codebookSize = m
-        self.magic_c = magic_c
+        self.c = ci
         # There are two group of parameters: {ai, bi}, as described in the paper
         self.weight = Parameter(torch.Tensor(self.codebookSize - 1, 2))
         self.reset_parameters()
@@ -104,7 +106,7 @@ class QuantizationLayer(Module):
             # noinspection PyUnresolvedReferences
             temp_val = torch.add(x, self.weight[kk, 1])
             # noinspection PyUnresolvedReferences
-            temp_val = torch.mul(temp_val, self.magic_c)
+            temp_val = torch.mul(temp_val, self.c)
             # noinspection PyUnresolvedReferences
             temp_val = torch.tanh(temp_val)
             # noinspection PyUnresolvedReferences
@@ -114,7 +116,7 @@ class QuantizationLayer(Module):
         return ret
 
 
-def get_parameters(model, magic_c):
+def get_parameters(model):
     """Extract the {ai, bi} coefficients of the soft quantization function
     from the network model, return them sorted by ascending order of the
     bi coefficients, and create a symbolic function which will be used in the
@@ -137,12 +139,14 @@ def get_parameters(model, magic_c):
         q : sympy function
             The soft quantization symbolic function (sum of tanh)
     """
-    quantization_layer = getattr(model, 'l' + str(model.quantizationLayerNameIndex))
-    parameters = quantization_layer.weight.data.numpy()
+    # quantization_layer = getattr(model, 'l' + str(model.quantizationLayerNameIndex))
+
+    parameters = model.quantization_layer.weight.data.numpy()
 
     # Coefficients of the tanh
     a = parameters[:, 0]
     b = parameters[:, 1]
+    c = model.quantization_layer.c
 
     # Sort the coefficients by ascending order of the bi-s
     sorted_indexes = b.argsort()
@@ -152,13 +156,13 @@ def get_parameters(model, magic_c):
     # Create symbolic variable x
     sym_x = sym.symbols('x')
 
-    sym_tanh = a[0] * sym.tanh(magic_c*(sym_x + b[0]))
+    sym_tanh = a[0] * sym.tanh(c*(sym_x + b[0]))
     for ii in range(1, len(b)):
-        sym_tanh = sym_tanh + a[ii] * sym.tanh(magic_c*(sym_x + b[ii]))
+        sym_tanh = sym_tanh + a[ii] * sym.tanh(c*(sym_x + b[ii]))
     # Convert the symbolic functions to numpy friendly (for substitution)
     q = sym.lambdify(sym_x, sym_tanh, "numpy")
 
-    return a, b, q
+    return a, b, c, q
 
 
 def quantize(x, a, b, q):

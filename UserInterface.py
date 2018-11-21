@@ -4,7 +4,7 @@
 
 
 def train_message(model, data_file, epoch, lr, codebook_size, architecture,
-                  magic_c=None):
+                  c_range=None):
     print('\n\n'
           '==================================================================='
           '\n\n\tTraining \'{}\' Model\n\n'
@@ -12,9 +12,9 @@ def train_message(model, data_file, epoch, lr, codebook_size, architecture,
           'Epochs number:\t{}\n'
           'Learning rate:\t{}\n'
           'Codebook Size:\t{}\n'
-          'MAGIC_C:\t{}\n\n'
+          'Ci range:\t{}\n\n'
           'Architecture:\n'
-          .format(model.modelname, data_file, epoch, lr, codebook_size, magic_c))
+          .format(model.modelname, data_file, epoch, lr, codebook_size, c_range))
 
     print_index = 0
     for param in model.parameters():
@@ -38,12 +38,21 @@ def train_message(model, data_file, epoch, lr, codebook_size, architecture,
           '===================================================================')
 
 
-def train_iteration(modelname, corr_epoch, epoch, batch_idx, data, train_loader, loss):
-    print('Training \'{}\' Model:\tEpoch: {}/{} [{}/{} ({:.0f}%)]\t'
-          'Linear Loss: {:.6f}'
-          .format(modelname, corr_epoch + 1, epoch, batch_idx * len(data),
-                  len(train_loader.dataset),
-                  100. * batch_idx / len(train_loader), loss))
+def train_iteration(model, corr_epoch, epoch, batch_idx, data, train_loader, loss,
+                    c_scope=None):
+    if c_scope is None:
+        print('Training \'{}\' Model:\tEpoch: {}/{} [{}/{} ({:.0f}%)]\t'
+              'Linear Loss: {:.6f}'
+              .format(model.modelname, corr_epoch + 1, epoch, batch_idx * len(data),
+                      len(train_loader.dataset),
+                      100. * batch_idx / len(train_loader), loss))
+    else:
+        print('Training \'{}\' Model:\tEpoch: {}/{} [{}/{} ({:.0f}%)]\t'
+              'Linear Loss: {:.6f}\tCi: {}'
+              .format(model.modelname, corr_epoch + 1, epoch, batch_idx * len(data),
+                      len(train_loader.dataset),
+                      100. * batch_idx / len(train_loader), loss,
+                      model.quantization_layer.c))
 
 
 ########################################################################

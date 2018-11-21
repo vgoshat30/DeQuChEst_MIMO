@@ -23,12 +23,17 @@ import torch.nn as nn
 import torch.optim as optim
 
 
-def train(model, optimizer, epoch, scheduler=None):
+def train(model, optimizer, epoch, train_loader, scheduler=None, c_confines=None):
     model.train()
+
+    if c_confines is not None:
+        c_step_size = (c_confines[1] / c_confines[0]) ** (1.0 / C_STEPS_AMOUNT)
+        when_to_step = math.floor(len(train_loader) / C_STEPS_AMOUNT)
+
     for corrEpoch in range(0, epoch):
         if scheduler is not None:
             scheduler.step()
-        for batch_idx, (data, target) in enumerate(trainLoader):
+        for batch_idx, (data, target) in enumerate(train_loader):
             data, target = Variable(data.float()), Variable(target.float())
 
             optimizer.zero_grad()
@@ -37,9 +42,13 @@ def train(model, optimizer, epoch, scheduler=None):
             loss.backward()
             optimizer.step()
 
+            if c_confines is not None and batch_idx % when_to_step == 0:
+                if model.quantization_layer.c * c_step_size < c_confines[1]:
+                    model.quantization_layer.c *= c_step_size
+
             if batch_idx % 10 == 0:
-                Ui.train_iteration(model.modelname, corrEpoch, epoch, batch_idx,
-                                   data, trainLoader, loss)
+                    Ui.train_iteration(model, corrEpoch, epoch, batch_idx,  data,
+                                       train_loader, loss, c_confines)
 
 
 def test_passing_gradient(model):
@@ -58,9 +67,9 @@ def test_passing_gradient(model):
     return test_loss.detach().numpy()
 
 
-def test_soft_to_hard_quantization(model, magic_c):
-    a, b, q = SoftToHardQuantization.get_parameters(model, magic_c)
-    log.log(a=a, b=b)
+def test_soft_to_hard_quantization(model):
+    a, b, c, q = SoftToHardQuantization.get_parameters(model)
+    log.log(a=a, b=b, c=c)
 
     test_loss = 0
     for batch_idx, (data, target) in enumerate(testLoader):
@@ -88,21 +97,21 @@ def test_soft_to_hard_quantization(model, magic_c):
 log = create_mat_file(TEST_LOG_MAT_FILE)
 
 
-constantPermutations = [(dataFile, lr, magic_c,
+constantPermutations = [(dataFile, lr, c_range,
                          architecture, epoch, codebookSize)
                         for dataFile in DATA_MAT_FILE
                         for lr in LR_RANGE
-                        for magic_c in MAGIC_C_RANGE
+                        for c_range in C_INCREMENT_RANGE
                         for architecture in ARCHITECTURE
                         for epoch in EPOCH_RANGE
                         for codebookSize in M_RANGE]
 
-# Iterating on all possible permutations of train epochs, learning rate, and
+# Iterating over all possible permutations of train epochs, learning rate, and
 # codebookSize arrays defined in the ProjectConstants module
 for constPerm in constantPermutations:
     dataFile = constPerm[0]
     lr = constPerm[1]
-    magic_c = constPerm[2]
+    c_bounds = constPerm[2]
     architecture = constPerm[3]
     corrTopEpoch = constPerm[4]
     codebookSize = constPerm[5]
@@ -164,7 +173,7 @@ for constPerm in constantPermutations:
                          codebookSize, architecture)
         model_linUniformQunat_runtime = datetime.now()
         train(passingGradient_model, passingGradient_optimizer, corrTopEpoch,
-              passingGradient_scheduler)
+              trainLoader, passingGradient_scheduler)
         model_linUniformQunat_runtime = datetime.now() - \
             model_linUniformQunat_runtime
 
@@ -194,7 +203,7 @@ for constPerm in constantPermutations:
         # paper.
         softToHardQuantization_model = SoftToHardQuantization.Network(
             modelname, codebookSize, trainData.inputDim, trainData.outputDim,
-            magic_c, architecture)
+            c_bounds[0], architecture)
 
         softToHardQuantization_optimizer = optim.SGD(
             softToHardQuantization_model.parameters(), lr=lr, momentum=0.5)
@@ -204,25 +213,24 @@ for constPerm in constantPermutations:
 
         # Training 'Soft to Hard Quantization':
         Ui.train_message(softToHardQuantization_model, dataFile, corrTopEpoch,
-                         lr, codebookSize, architecture, magic_c)
+                         lr, codebookSize, architecture, c_bounds)
         model_tanhQuantize_runtime = datetime.now()
         train(softToHardQuantization_model, softToHardQuantization_optimizer,
-              corrTopEpoch, softToHardQuantization_scheduler)
+              corrTopEpoch, trainLoader, softToHardQuantization_scheduler, c_bounds)
         model_tanhQuantize_runtime = datetime.now() - model_tanhQuantize_runtime
 
         # Testing 'Soft to Hard Quantization':
         Ui.test_message(modelname)
         model_tanhQuantize_loss = \
-            test_soft_to_hard_quantization(softToHardQuantization_model, magic_c)
+            test_soft_to_hard_quantization(softToHardQuantization_model)
 
         Ui.test_results(modelname, corrTopEpoch, lr, codebookSize,
-                        QUANTIZATION_RATE, model_tanhQuantize_loss, magic_c)
+                        QUANTIZATION_RATE, model_tanhQuantize_loss, c_bounds)
         log.log('last', rate=QUANTIZATION_RATE, loss=model_tanhQuantize_loss,
                 algorithm=modelname,
                 codewordNum=codebookSize,
                 learningRate=lr,
                 layersDim=architecture,
                 epochs=corrTopEpoch,
-                magic_c=magic_c,
                 runtime=model_tanhQuantize_runtime,
                 dataFile=dataFile)

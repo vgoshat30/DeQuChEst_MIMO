@@ -44,14 +44,14 @@ def plot_tanh_function(test_log, test_number):
 
     a = test_log.aCoefs[test_number - 1][0]
     b = test_log.bCoefs[test_number - 1][0]
-    magic_c = test_log.magic_c[test_number - 1]
+    c = test_log.cCoefs[test_number - 1][0][0]
 
     # Create symbolic variable x
     sym_x = sym.symbols('x')
 
-    sym_tanh = a[0] * sym.tanh(magic_c*(sym_x + b[0]))
+    sym_tanh = a[0] * sym.tanh(c*(sym_x + b[0]))
     for ii in range(1, len(b)):
-        sym_tanh = sym_tanh + a[ii] * sym.tanh(magic_c*(sym_x + b[ii]))
+        sym_tanh = sym_tanh + a[ii] * sym.tanh(c*(sym_x + b[ii]))
     # Convert the symbolic functions to numpy friendly (for substitution)
     q = sym.lambdify(sym_x, sym_tanh, "numpy")
 
@@ -70,7 +70,7 @@ def plot_tanh_function(test_log, test_number):
 log = TestLogger(TEST_LOG_MAT_FILE)
 
 # # Delete tests
-# log.delete(12345678910)
+# log.delete(1234567890)
 
 # Show content of tests
 # log.content()
@@ -80,4 +80,4 @@ log.plot(DATA_MAT_FILE[0])
 
 
 # Plot soft and hard quantization functions of specific test
-# plot_tanh_function(log, 187)
+# plot_tanh_function(log, 1)
