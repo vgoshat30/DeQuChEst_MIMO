@@ -20,11 +20,13 @@ modelsToActivate = [
 ################################################################################
 
 BATCH_SIZE = 8
-EPOCH_RANGE = [1, ]
-LR_RANGE = [0.2, ]
-M_RANGE = [50, ]
-C_INCREMENT_RANGE = [[1, 100],
-                     [10, 1000]]
+EPOCH_RANGE = [5, 10]
+LR_RANGE = [0.1, 0.2]
+M_RANGE = range(10, 50)
+C_INCREMENT_RANGE = [[1, 5],
+                     [1, 10],
+                     [10, 30],
+                     [50, 100]]
 C_STEPS_AMOUNT = 2000
 
 ARCHITECTURE = [
