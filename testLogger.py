@@ -24,6 +24,31 @@ class TestLogger:
             It will automatically update the .mat file.
     """
 
+    # Keys are names used in this code and values are names of the variables
+    # in the MATLAB code. DO NOT CHANGE PYTHON VARIABLE NAMES!
+    #                   PYTHON      :     MATLAB
+    field_names = {'rate_results'   : 'rateResults',
+                   'loss_results'   : 'lossResults',
+                   'codeword_num'   : 'codewordNum',
+                   'learning_rate'  : 'learningRate',
+                   'layers_dim'     : 'layersDim',
+                   'run_time'       : 'runTime',
+                   'time'           : 'time',
+                   'algorithm_name' : 'algorithmName',
+                   'train_epochs'   : 'trainEpochs',
+                   'notes'          : 'testNotes',
+                   'a_coefs'        : 'aCoefs',
+                   'b_coefs'        : 'bCoefs',
+                   'c_coefs'        : 'cCoefs',
+                   'c_bounds'       : 'cBounds',
+                   's_fD'           : 's_fD',
+                   's_fNt'          : 's_fNt',
+                   's_fNu'          : 's_fNu',
+                   's_fRatio'       : 's_fRatio',
+                   's_fT'           : 's_fT',
+                   's_fTestPower'   : 's_fTestPower',
+                   'v_fTrainPower'  : 'v_fTrainPower'}
+
     def __init__(self, name):
         """Connect between a .mat file and a python variable
 
@@ -60,50 +85,50 @@ class TestLogger:
             raise IOError("File '" + self.filename + "' does not exist.")
 
         # Resulted rate of the test
-        self.rate = python_mat_file['rateResults']
+        self.rate = python_mat_file[TestLogger.field_names['rate_results']]
         # Resulted loss of the test
-        self.loss = python_mat_file['lossResults']
+        self.loss = python_mat_file[TestLogger.field_names['loss_results']]
         # Number of codewords
-        self.codewordNum = python_mat_file['codewordNum']
+        self.codewordNum = python_mat_file[TestLogger.field_names['codeword_num']]
         # Learning rate multiplier in the learning algorithm
-        self.learningRate = python_mat_file['learningRate']
+        self.learningRate = python_mat_file[TestLogger.field_names['learning_rate']]
         # Dimension rations of the NN layers
-        self.layersDim = python_mat_file['layersDim']
+        self.layersDim = python_mat_file[TestLogger.field_names['layers_dim']]
         # Training runtime
-        self.runtime = python_mat_file['runTime']
+        self.runtime = python_mat_file[TestLogger.field_names['run_time']]
         # The time the logging was performed
-        self.logtime = python_mat_file['time']
+        self.logtime = python_mat_file[TestLogger.field_names['time']]
         # Name of the used algorithm
-        self.algorithm = python_mat_file['algorithmName']
+        self.algorithm = python_mat_file[TestLogger.field_names['algorithm_name']]
         # Number of training epochs
-        self.epochs = python_mat_file['trainEpochs']
+        self.epochs = python_mat_file[TestLogger.field_names['train_epochs']]
         # A note about the test
-        self.note = python_mat_file['notes']
+        self.note = python_mat_file[TestLogger.field_names['notes']]
         # Amplitudes of sum of tanh function (a coefficients)
-        self.aCoefs = python_mat_file['aCoefs']
+        self.aCoefs = python_mat_file[TestLogger.field_names['a_coefs']]
         # Shifts of sum of tanh function (b coefficients)
-        self.bCoefs = python_mat_file['bCoefs']
+        self.bCoefs = python_mat_file[TestLogger.field_names['b_coefs']]
         # "Slopes" of sum of tanh function (c coefficients)
-        self.cCoefs = python_mat_file['cCoefs']
+        self.cCoefs = python_mat_file[TestLogger.field_names['c_coefs']]
         # Multiplier of the tanh argument
-        self.magic_c = python_mat_file['magic_c']
+        self.magic_c = python_mat_file[TestLogger.field_names['c_bounds']]
 
         # Training and testing data parameters:
 
         # Test set size
-        self.s_fD = python_mat_file['s_fD']
+        self.s_fD = python_mat_file[TestLogger.field_names['s_fD']]
         # Number of antennas
-        self.s_fNt = python_mat_file['s_fNt']
+        self.s_fNt = python_mat_file[TestLogger.field_names['s_fNt']]
         # Number of users
-        self.s_fNu = python_mat_file['s_fNu']
+        self.s_fNu = python_mat_file[TestLogger.field_names['s_fNu']]
         # Ratio
-        self.s_fRatio = python_mat_file['s_fRatio']
+        self.s_fRatio = python_mat_file[TestLogger.field_names['s_fRatio']]
         # Train set size
-        self.s_fT = python_mat_file['s_fT']
+        self.s_fT = python_mat_file[TestLogger.field_names['s_fT']]
         # Test power
-        self.s_fTestPower = python_mat_file['s_fTestPower']
+        self.s_fTestPower = python_mat_file[TestLogger.field_names['s_fTestPower']]
         # Train powers
-        self.v_fTrainPower = python_mat_file['v_fTrainPower']
+        self.v_fTrainPower = python_mat_file[TestLogger.field_names['v_fTrainPower']]
 
         # If the test log is not empty, reducing the dimensions of all
         # parameters to one
@@ -369,13 +394,13 @@ class TestLogger:
                 # Getting train and test data parameters from the data .mat file
                 python_data_file = sio.loadmat(kwargs[key])
 
-                self.s_fD[test_index] = python_data_file['s_fD']
-                self.s_fNt[test_index] = python_data_file['s_fNt']
-                self.s_fNu[test_index] = python_data_file['s_fNu']
-                self.s_fRatio[test_index] = python_data_file['s_fRatio']
-                self.s_fT[test_index] = python_data_file['s_fT']
-                self.s_fTestPower[test_index] = python_data_file['s_fTestPower']
-                self.v_fTrainPower[test_index] = python_data_file['v_fTrainPower']
+                self.s_fD[test_index] = python_data_file[TestLogger.field_names['s_fD']]
+                self.s_fNt[test_index] = python_data_file[TestLogger.field_names['s_fNt']]
+                self.s_fNu[test_index] = python_data_file[TestLogger.field_names['s_fNu']]
+                self.s_fRatio[test_index] = python_data_file[TestLogger.field_names['s_fRatio']]
+                self.s_fT[test_index] = python_data_file[TestLogger.field_names['s_fT']]
+                self.s_fTestPower[test_index] = python_data_file[TestLogger.field_names['s_fTestPower']]
+                self.v_fTrainPower[test_index] = python_data_file[TestLogger.field_names['v_fTrainPower']]
 
         self.save()
         print("Logged test number ", test_index+1,
@@ -1069,27 +1094,27 @@ class TestLogger:
         function in the class TestLogger.
         """
 
-        save_vars = {'rateResults': self.rate,
-                     'lossResults': self.loss,
-                     'codewordNum': self.codewordNum,
-                     'learningRate': self.learningRate,
-                     'layersDim': self.layersDim,
-                     'time': self.logtime,
-                     'algorithmName': self.algorithm,
-                     'runTime': self.runtime,
-                     'trainEpochs': self.epochs,
-                     'notes': self.note,
-                     'aCoefs': self.aCoefs,
-                     'bCoefs': self.bCoefs,
-                     'cCoefs': self.cCoefs,
-                     'magic_c': self.magic_c,
-                     's_fD': self.s_fD,
-                     's_fNt': self.s_fNt,
-                     's_fNu': self.s_fNu,
-                     's_fRatio': self.s_fRatio,
-                     's_fT': self.s_fT,
-                     's_fTestPower': self.s_fTestPower,
-                     'v_fTrainPower': self.v_fTrainPower}
+        save_vars = {TestLogger.field_names['rate_results']: self.rate,
+                     TestLogger.field_names['loss_results']: self.loss,
+                     TestLogger.field_names['codeword_num']: self.codewordNum,
+                     TestLogger.field_names['learning_rate']: self.learningRate,
+                     TestLogger.field_names['layers_dim']: self.layersDim,
+                     TestLogger.field_names['run_time']: self.runtime,
+                     TestLogger.field_names['time']: self.logtime,
+                     TestLogger.field_names['algorithm_name']: self.algorithm,
+                     TestLogger.field_names['train_epochs']: self.epochs,
+                     TestLogger.field_names['notes']: self.note,
+                     TestLogger.field_names['a_coefs']: self.aCoefs,
+                     TestLogger.field_names['b_coefs']: self.bCoefs,
+                     TestLogger.field_names['c_coefs']: self.cCoefs,
+                     TestLogger.field_names['c_bounds']: self.magic_c,
+                     TestLogger.field_names['s_fD']: self.s_fD,
+                     TestLogger.field_names['s_fNt']: self.s_fNt,
+                     TestLogger.field_names['s_fNu']: self.s_fNu,
+                     TestLogger.field_names['s_fRatio']: self.s_fRatio,
+                     TestLogger.field_names['s_fT']: self.s_fT,
+                     TestLogger.field_names['s_fTestPower']: self.s_fTestPower,
+                     TestLogger.field_names['v_fTrainPower']: self.v_fTrainPower}
 
         sio.savemat(self.filename, save_vars)
 
@@ -1242,27 +1267,27 @@ def create_mat_file(name):
     s_f_test_power = np.empty((0, 1), float)  # MATLAB Array
     v_f_train_power = np.empty((0, 1), object)  # MATLAB Cell
 
-    variables = {'rateResults': rate,
-                 'lossResults': loss,
-                 'codeword_num': codeword_num,
-                 'learning_rate': learning_rate,
-                 'layers_dim': layers_dim,
-                 'time': logtime,
-                 'algorithmName': algorithm,
-                 'runTime': runtime,
-                 'trainEpochs': epochs,
-                 'notes': note,
-                 'a_coefs': a_coefs,
-                 'b_coefs': b_coefs,
-                 'c_coefs': c_coefs,
-                 'magic_c': magic_c,
-                 's_fd': s_fd,
-                 's_fnt': s_fnt,
-                 's_fnu': s_fnu,
-                 's_f_ratio': s_f_ratio,
-                 's_ft': s_ft,
-                 's_f_test_power': s_f_test_power,
-                 'v_f_train_power': v_f_train_power}
+    variables = {TestLogger.field_names['rate_results']: rate,
+                 TestLogger.field_names['loss_results']: loss,
+                 TestLogger.field_names['codeword_num']: codeword_num,
+                 TestLogger.field_names['learning_rate']: learning_rate,
+                 TestLogger.field_names['layers_dim']: layers_dim,
+                 TestLogger.field_names['run_time']: runtime,
+                 TestLogger.field_names['time']: logtime,
+                 TestLogger.field_names['algorithm_name']: algorithm,
+                 TestLogger.field_names['train_epochs']: epochs,
+                 TestLogger.field_names['notes']: note,
+                 TestLogger.field_names['a_coefs']: a_coefs,
+                 TestLogger.field_names['b_coefs']: b_coefs,
+                 TestLogger.field_names['c_coefs']: c_coefs,
+                 TestLogger.field_names['c_bounds']: magic_c,
+                 TestLogger.field_names['s_fD']: s_fd,
+                 TestLogger.field_names['s_fNt']: s_fnt,
+                 TestLogger.field_names['s_fNu']: s_fnu,
+                 TestLogger.field_names['s_fRatio']: s_f_ratio,
+                 TestLogger.field_names['s_fT']: s_ft,
+                 TestLogger.field_names['s_fTestPower']: s_f_test_power,
+                 TestLogger.field_names['v_fTrainPower']: v_f_train_power}
 
     if os.path.exists(name):
         print("Test logger '" + name + "' already exists...")

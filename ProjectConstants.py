@@ -2,8 +2,8 @@
 #                     Training, Testing and Logging Data                       #
 ################################################################################
 
-DATA_MAT_FILE = ['data_SNR_4.mat', ]
-TEST_LOG_MAT_FILE = 'testLog_SNR_4.mat'
+DATA_MAT_FILE = ['data_SNR4.mat', ]
+TEST_LOG_MAT_FILE = 'testLog_SNR4.mat'
 
 ################################################################################
 #                            Models to Activate                                #
@@ -21,8 +21,8 @@ modelsToActivate = [
 
 BATCH_SIZE = 8
 EPOCH_RANGE = [5, 10]
-LR_RANGE = [0.1, 0.2]
-M_RANGE = range(10, 50)
+LR_RANGE = [0.2, 0.18, 0.22]
+M_RANGE = range(20, 50)
 C_INCREMENT_RANGE = [[1, 5],
                      [1, 10],
                      [10, 30],

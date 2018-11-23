@@ -73,7 +73,7 @@ log = TestLogger(TEST_LOG_MAT_FILE)
 # log.delete(1234567890)
 
 # Show content of tests
-# log.content()
+log.content()
 
 # Plot test log (the file provided for the theoretical bounds only)
 log.plot(DATA_MAT_FILE[0])
