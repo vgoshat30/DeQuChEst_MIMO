@@ -31,6 +31,7 @@ def train(model, optimizer, epoch, train_loader, scheduler=None, c_confines=None
         when_to_step = math.floor(len(train_loader) / C_STEPS_AMOUNT)
 
     for corrEpoch in range(0, epoch):
+        model.quantization_layer.c = c_confines[0]
         if scheduler is not None:
             scheduler.step()
         for batch_idx, (data, target) in enumerate(train_loader):
@@ -97,24 +98,23 @@ def test_soft_to_hard_quantization(model):
 log = create_mat_file(TEST_LOG_MAT_FILE)
 
 
-constantPermutations = [(dataFile, lr, c_range,
-                         architecture, epoch, codebookSize)
+constantPermutations = [(dataFile, lr, architecture, epoch, codebookSize, c_range)
                         for dataFile in DATA_MAT_FILE
                         for lr in LR_RANGE
-                        for c_range in C_INCREMENT_RANGE
                         for architecture in ARCHITECTURE
                         for epoch in EPOCH_RANGE
-                        for codebookSize in M_RANGE]
+                        for codebookSize in M_RANGE
+                        for c_range in C_INCREMENT_RANGE]
 
 # Iterating over all possible permutations of train epochs, learning rate, and
 # codebookSize arrays defined in the ProjectConstants module
 for constPerm in constantPermutations:
     dataFile = constPerm[0]
     lr = constPerm[1]
-    c_bounds = constPerm[2]
-    architecture = constPerm[3]
-    corrTopEpoch = constPerm[4]
-    codebookSize = constPerm[5]
+    architecture = constPerm[2]
+    corrTopEpoch = constPerm[3]
+    codebookSize = constPerm[4]
+    c_bounds = constPerm[5]
 
     loadedDataFile = sio.loadmat(dataFile)
 
@@ -153,10 +153,10 @@ for constPerm in constantPermutations:
     # ------------------------------------------------
 
     if 'Passing Gradient' in modelsToActivate:
-        modelname = 'Passing Gradient'
+        model_name = 'Passing Gradient'
 
         # Defining the 'Passing Gradient' model, as described in the paper.
-        passingGradient_model = PassingGradient.Network(modelname, S_codebook,
+        passingGradient_model = PassingGradient.Network(model_name, S_codebook,
                                                         trainData.inputDim,
                                                         trainData.outputDim,
                                                         architecture)
@@ -178,13 +178,13 @@ for constPerm in constantPermutations:
             model_linUniformQunat_runtime
 
         # Testing 'Passing Gradient':
-        Ui.test_message(modelname)
+        Ui.test_message(model_name)
         model_linUniformQunat_loss = test_passing_gradient(passingGradient_model)
-        Ui.test_results(modelname, corrTopEpoch, lr, codebookSize,
+        Ui.test_results(model_name, corrTopEpoch, lr, codebookSize,
                         QUANTIZATION_RATE,
                         model_linUniformQunat_loss)
         log.log(rate=QUANTIZATION_RATE, loss=model_linUniformQunat_loss,
-                algorithm=modelname,
+                algorithm=model_name,
                 codewordNum=codebookSize,
                 learningRate=lr,
                 layersDim=architecture,
@@ -197,12 +197,12 @@ for constPerm in constantPermutations:
     # ------------------------------------------------
 
     if 'Soft to Hard Quantization' in modelsToActivate:
-        modelname = 'Soft to Hard Quantization'
+        model_name = 'Soft to Hard Quantization'
 
         # Defining the 'Soft to Hard Quantization' model, as described in the
         # paper.
         softToHardQuantization_model = SoftToHardQuantization.Network(
-            modelname, codebookSize, trainData.inputDim, trainData.outputDim,
+            model_name, codebookSize, trainData.inputDim, trainData.outputDim,
             c_bounds[0], architecture)
 
         softToHardQuantization_optimizer = optim.SGD(
@@ -220,14 +220,14 @@ for constPerm in constantPermutations:
         model_tanhQuantize_runtime = datetime.now() - model_tanhQuantize_runtime
 
         # Testing 'Soft to Hard Quantization':
-        Ui.test_message(modelname)
+        Ui.test_message(model_name)
         model_tanhQuantize_loss = \
             test_soft_to_hard_quantization(softToHardQuantization_model)
 
-        Ui.test_results(modelname, corrTopEpoch, lr, codebookSize,
+        Ui.test_results(model_name, corrTopEpoch, lr, codebookSize,
                         QUANTIZATION_RATE, model_tanhQuantize_loss, c_bounds)
         log.log('last', rate=QUANTIZATION_RATE, loss=model_tanhQuantize_loss,
-                algorithm=modelname,
+                algorithm=model_name,
                 codewordNum=codebookSize,
                 learningRate=lr,
                 layersDim=architecture,
