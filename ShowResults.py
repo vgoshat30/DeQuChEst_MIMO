@@ -70,7 +70,7 @@ def plot_tanh_function(test_log, test_number):
 log = TestLogger(TEST_LOG_MAT_FILE)
 
 # # Delete tests
-# log.delete(123456789)
+# log.delete(1234567890)
 
 # Show content of tests
 log.content()
@@ -79,4 +79,4 @@ log.content()
 log.plot(DATA_MAT_FILE[0])
 
 # Plot soft and hard quantization functions of specific test
-# plot_tanh_function(log, 37)
+# plot_tanh_function(log, 31)

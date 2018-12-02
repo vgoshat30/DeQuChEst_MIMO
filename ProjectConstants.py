@@ -3,7 +3,7 @@
 ################################################################################
 
 DATA_MAT_FILE = ['data_SNR4.mat', ]
-TEST_LOG_MAT_FILE = 'testLog_SNR4.mat'
+TEST_LOG_MAT_FILE = 'testLog_SNR4_bestScenario.mat'
 
 ################################################################################
 #                            Models to Activate                                #
@@ -20,12 +20,11 @@ modelsToActivate = [
 ################################################################################
 
 BATCH_SIZE = 8
-EPOCH_RANGE = [5, 10]
-LR_RANGE = [0.2, 0.18, 0.22]
-M_RANGE = range(25, 50)
-C_INCREMENT_RANGE = [[3,7],
-                     [1,5]]
-C_STEPS_AMOUNT = 2000
+EPOCH_RANGE = [10, 30]
+LR_RANGE = [0.2, 0.208, 0.19]
+M_RANGE = range(23, 100)
+C_INCREMENT_RANGE = [[5, 5]]
+C_STEPS_AMOUNT = 1
 
 ARCHITECTURE = [
     ['linear', 2,
@@ -33,6 +32,12 @@ ARCHITECTURE = [
      'linear', 0.5,
      'quantization',
      'linear', 2,
+     'linear', 0.5],
+
+    ['linear', 2,
+     'linear', 2,
+     'quantization',
+     'linear', 0.5,
      'linear', 0.5],
 
     # ['linear', 2,
