@@ -2,8 +2,8 @@
 #                     Training, Testing and Logging Data                       #
 ################################################################################
 
-DATA_MAT_FILE = ['data_SNR4.mat', ]
-TEST_LOG_MAT_FILE = 'testLog_SNR4_bestScenario.mat'
+DATA_MAT_FILE = ['data_SNR4.mat', 'data_SNR_1_10.mat']
+TEST_LOG_MAT_FILE = 'testLog_SNR4_bestScenario.mat'#'testLog_bestScenario_hanukkah.mat'
 
 ################################################################################
 #                            Models to Activate                                #
@@ -20,10 +20,11 @@ modelsToActivate = [
 ################################################################################
 
 BATCH_SIZE = 8
-EPOCH_RANGE = [10, 30]
-LR_RANGE = [0.2, 0.208, 0.19]
-M_RANGE = range(23, 100)
-C_INCREMENT_RANGE = [[5, 5]]
+EPOCH_RANGE = [10, ]
+LR_RANGE = [0.2, ]
+M_RANGE = range(49, 100)
+C_INCREMENT_RANGE = [[5, 5],
+                     [8, 8]]
 C_STEPS_AMOUNT = 1
 
 ARCHITECTURE = [
@@ -34,11 +35,11 @@ ARCHITECTURE = [
      'linear', 2,
      'linear', 0.5],
 
-    ['linear', 2,
-     'linear', 2,
-     'quantization',
-     'linear', 0.5,
-     'linear', 0.5],
+    # ['linear', 2,
+    #  'linear', 2,
+    #  'quantization',
+    #  'linear', 0.5,
+    #  'linear', 0.5],
 
     # ['linear', 2,
     #  'linear', 2,
