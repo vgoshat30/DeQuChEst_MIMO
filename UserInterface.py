@@ -16,23 +16,8 @@ def train_message(model, data_file, epoch, lr, codebook_size, architecture,
           'Architecture:\n'
           .format(model.modelname, data_file, epoch, lr, codebook_size, c_range))
 
-    print_index = 0
-    for param in model.parameters():
-        dim_to_print = list(param.size())
-        dim_to_print.reverse()
-        if len(dim_to_print) > 1:
-            while not (type(architecture[print_index]) is str):
-                print_index += 1
-                print('DEBUGGING 1:', print_index)
-                if architecture[print_index] is 'relu':
-                    print('relu')
-                    print_index += 1
-                elif architecture[print_index] is 'quantization':
-                    print('quantization')
-                    print_index += 1
-                else:
-                    print(architecture[print_index], dim_to_print)
-                print_index += 1
+    for layer in model.layers:
+        print(layer)
 
     print('\n\n'
           '===================================================================')

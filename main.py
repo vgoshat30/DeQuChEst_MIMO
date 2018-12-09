@@ -201,9 +201,13 @@ for constPerm in constantPermutations:
 
         # Defining the 'Soft to Hard Quantization' model, as described in the
         # paper.
+        if FORCE_QUANTIZATION_DIM:
+            quantization_dimention = trainData.outputDim
+        else:
+            quantization_dimention = None
         softToHardQuantization_model = SoftToHardQuantization.Network(
             model_name, codebookSize, trainData.inputDim, trainData.outputDim,
-            c_bounds[0], architecture)
+            c_bounds[0], architecture, quantization_dimention)
 
         softToHardQuantization_optimizer = optim.SGD(
             softToHardQuantization_model.parameters(), lr=lr, momentum=0.5)

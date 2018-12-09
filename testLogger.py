@@ -808,16 +808,20 @@ class TestLogger:
         size_of_figure = (8, 5)  # in inches
 
         # Define which lines to plot
-        which_to_plot = [1,  # No quantization
+        which_to_plot = [
+                         1,  # No quantization
                          1,  # Asymptotic optimal task-based
                          1,  # Asymptotic optimal task-ignorant
-                         1]  # Hardware limited upper bound
+                         1   # Hardware limited upper bound
+                         ]
 
         # Set the legend labels
-        labels = ['No quantization',
+        labels = [
+                  'No quantization',
                   'Asymptotic optimal task-based',
                   'Asymptotic optimal task-ignorant',
-                  'Hardware limited upper bound']
+                  'Hardware limited upper bound'
+                  ]
 
         markers = ['', '', '', '']
         line_styles = [':', '--', '--', '--']
@@ -979,11 +983,7 @@ class TestLogger:
             theory_rate = theory['v_fRate']
             theory_loss = theory['m_fCurves']
 
-            # Create fill vectors
-            x_fill = np.concatenate((theory_rate[0],
-                                    np.flip(theory_rate[0], 0)), axis=0)
-            y_fill = np.concatenate((theory_loss[3, :],
-                                    np.flip(theory_loss[1, :], 0)), axis=0)
+
 
             # Plot all theoretical bounds
             for ii in range(0, theory_loss.shape[0]):
@@ -994,8 +994,15 @@ class TestLogger:
                             linestyle=line_styles[ii], linewidth=line_widths[ii],
                             markersize=marker_sizes[ii])
 
-            # Plot fill
-            ax.fill(x_fill, y_fill, c=fill_color, alpha=0.3)
+            if theory_loss.shape[0] > 2:
+                # Create fill vectors
+                x_fill = np.concatenate((theory_rate[0],
+                                         np.flip(theory_rate[0], 0)), axis=0)
+                y_fill = np.concatenate((theory_loss[3, :],
+                                         np.flip(theory_loss[1, :], 0)), axis=0)
+
+                # Plot fill
+                ax.fill(x_fill, y_fill, c=fill_color, alpha=0.3)
 
         # Plot previous results (the loop is for plotting as separate artists)
         res_list = []

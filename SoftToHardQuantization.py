@@ -13,17 +13,15 @@ import sympy as sym
 class Network(nn.Module):
 
     def __init__(self, modelname, codebook_size, input_dimension, output_dimension,
-                 initial_c, architecture):
+                 initial_c, architecture, force_quantization_dim=None):
         super(Network, self).__init__()
 
         self.modelname = modelname
 
         self.layers = []
-        self.quantization_layer = QuantizationLayer(output_dimension,
-                                                    output_dimension,
-                                                    codebook_size, initial_c)
 
-        previous_input_dimension = input_dimension
+        quantization_layer_exists = False
+        next_input_dimension = input_dimension
         waiting_for_linear_layer_value = False
         layer_name_index = 1
         # Find last occurrence of integer (linear layer dimension multiplier)
@@ -43,17 +41,18 @@ class Network(nn.Module):
                     layer_out_dim = output_dimension
                 # If the next layer is the quantization layer, forcing the
                 # output of the linear layer to be outputDimension
-                elif architecture[archIndex + 1] is 'quantization':
-                    layer_out_dim = output_dimension
+                elif (architecture[archIndex + 1] is 'quantization' and
+                      force_quantization_dim is not None):
+                    layer_out_dim = force_quantization_dim
                 else:
-                    layer_out_dim = math.floor(arcParser * previous_input_dimension)
+                    layer_out_dim = math.floor(arcParser * next_input_dimension)
                 # Adding layer to layers array (for forward implementation)
                 self.layers.append(
-                    nn.Linear(previous_input_dimension, layer_out_dim))
+                    nn.Linear(next_input_dimension, layer_out_dim))
                 # Assigning layer to module
                 self.add_module('l' + str(layer_name_index), self.layers[-1])
                 layer_name_index += 1
-                previous_input_dimension = layer_out_dim
+                next_input_dimension = layer_out_dim
                 waiting_for_linear_layer_value = False
             # If requested linear layer, expecting its dimension multiplier in
             # next loop iteration
@@ -64,9 +63,17 @@ class Network(nn.Module):
                 # Adding layer to layers array (for forward implementation)
                 self.layers.append(f.relu)
             elif arcParser is 'quantization':
+                if quantization_layer_exists:
+                    raise ValueError('Cant have two quantization layers')
+                quantization_layer_exists = True
                 # Set the input dimension of the nex linear layer to be as the
                 # output of the quantization layer
-                previous_input_dimension = output_dimension
+                if force_quantization_dim is not None:
+                    next_input_dimension = force_quantization_dim
+                # Creating quantization layer
+                self.quantization_layer = QuantizationLayer(next_input_dimension,
+                                                            next_input_dimension,
+                                                            codebook_size, initial_c)
                 # Adding layer to layers array (for forward implementation)
                 self.layers.append(self.quantization_layer)
                 # Assigning layer to module
