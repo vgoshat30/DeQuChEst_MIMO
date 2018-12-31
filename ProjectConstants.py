@@ -20,87 +20,49 @@ modelsToActivate = [
 ################################################################################
 
 BATCH_SIZE = 8
-EPOCH_RANGE = [1, ]
+EPOCH_RANGE = [10, ]
 LR_RANGE = [0.002, ]
-M_RANGE = [20, ]
-C_INCREMENT_RANGE = [[5, 5],
-                     [8, 8]]
+M_RANGE = range(2, 100)
+C_INCREMENT_RANGE = [[8, 8],]
 C_STEPS_AMOUNT = 1
 FORCE_QUANTIZATION_DIM = False
 
 ARCHITECTURE = [
+    # ['linear', 2,
+    #  'linear', 0.5,
+    #  'quantization',
+    #  'linear', 2,
+    #  'linear', 0.5],
+
+    # ['linear', 0.5,
+    #  'linear', 0.5,
+    #  'quantization',
+    #  'linear', 2,
+    #  'linear', 0.5],
+
     ['linear', 2,
+     'linear', 2,
+     'relu',
      'linear', 0.5,
      'linear', 0.5,
      'quantization',
      'linear', 0.5,
      'linear', 0.5,
+     'relu',
+     'linear', 0.5,
      'linear', 0.5],
 
-    # ['linear', 2,
-    #  'linear', 2,
-    #  'quantization',
-    #  'linear', 0.5,
-    #  'linear', 0.5],
-
-    # ['linear', 2,
-    #  'linear', 2,
-    #  'relu',
-    #  'linear', 0.5,
-    #  'linear', 0.5,
-    #  'quantization',
-    #  'linear', 2,
-    #  'linear', 2,
-    #  'relu',
-    #  'linear', 0.5,
-    #  'linear', 0.5],
-
-    # ['linear', 4,
-    #  'linear', 4,
-    #  'relu',
-    #  'linear', 0.5,
-    #  'linear', 0.5,
-    #  'relu',
-    #  'linear', 0.5,
-    #  'linear', 0.5,
-    #  'quantization',
-    #  'linear', 4,
-    #  'linear', 4,
-    #  'relu',
-    #  'linear', 0.5,
-    #  'linear', 0.5,
-    #  'relu',
-    #  'linear', 0.5,
-    #  'linear', 0.5],
-    # ['linear', 4,
-    #  'linear', 4,
-    #  'relu',
-    #  'linear', 0.5,
-    #  'linear', 0.5,
-    #  'relu',
-    #  'linear', 0.5,
-    #  'linear', 0.5,
-    #  'quantization',
-    #  'linear', 4,
-    #  'linear', 4,
-    #  'relu',
-    #  'linear', 0.5,
-    #  'linear', 0.5,
-    #  'relu',
-    #  'linear', 0.5,
-    #  'linear', 0.5],
-
-    # ['linear', 10,
-    #  'linear', 10,
-    #  'relu',
-    #  'linear', 0.1,
-    #  'linear', 0.1,
-    #  'quantization',
-    #  'linear', 10,
-    #  'linear', 10,
-    #  'relu',
-    #  'linear', 0.1,
-    #  'linear', 0.1]
+    ['linear', 2,
+     'linear', 2,
+     'relu',
+     'linear', 2,
+     'linear', 2,
+     'quantization',
+     'linear', 0.5,
+     'linear', 0.25,
+     'relu',
+     'linear', 0.25,
+     'linear', 0.25]
 ]
 
 '''Instructions for using ARCHITECTURE constant:
