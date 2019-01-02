@@ -89,6 +89,7 @@ def test_soft_to_hard_quantization(model):
         # sum up batch loss
         test_loss += criterion(output.view(-1, 1), target.view(-1, 1))
         Ui.test_iteration(model.modelname, batch_idx, data, testLoader)
+    print('DEBUGGING 1: ', test_loss)
 
     test_loss /= (len(testLoader.dataset)/BATCH_SIZE)
     return test_loss.detach().numpy()
@@ -134,9 +135,6 @@ for constPerm in constantPermutations:
     testLoader = DataLoader(dataset=testData, batch_size=BATCH_SIZE,
                             shuffle=True)
 
-    QUANTIZATION_RATE = math.log2(codebookSize) *\
-        trainData.outputDim/trainData.inputDim
-
     # Generate uniform codebooks for the train sets
     S_codebook = UniformQuantizer.codebook_uniform(trainData.S_var,
                                                    codebookSize)
@@ -176,6 +174,10 @@ for constPerm in constantPermutations:
               trainLoader, passingGradient_scheduler)
         model_linUniformQunat_runtime = datetime.now() - \
             model_linUniformQunat_runtime
+
+        QUANTIZATION_RATE = math.log2(codebookSize) * \
+                            passingGradient_model.quantization_layer.out_features / \
+                            trainData.inputDim
 
         # Testing 'Passing Gradient':
         Ui.test_message(model_name)
@@ -227,6 +229,10 @@ for constPerm in constantPermutations:
         Ui.test_message(model_name)
         model_tanhQuantize_loss = \
             test_soft_to_hard_quantization(softToHardQuantization_model)
+
+        QUANTIZATION_RATE = math.log2(codebookSize) * \
+                            softToHardQuantization_model.quantization_layer.out_features / \
+                            trainData.inputDim
 
         Ui.test_results(model_name, corrTopEpoch, lr, codebookSize,
                         QUANTIZATION_RATE, model_tanhQuantize_loss, c_bounds)

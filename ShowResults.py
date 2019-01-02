@@ -70,7 +70,7 @@ def plot_tanh_function(test_log, test_number):
 log = TestLogger(TEST_LOG_MAT_FILE)
 
 # # Delete tests
-# log.delete(1234567890)
+# log.delete(1234567)
 
 # Show content of tests
 log.content()

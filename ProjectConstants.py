@@ -2,8 +2,8 @@
 #                     Training, Testing and Logging Data                       #
 ################################################################################
 
-DATA_MAT_FILE = ['data_Gamma.mat', ]
-TEST_LOG_MAT_FILE = 'testLog_Gamma.mat'
+DATA_MAT_FILE = ['data_channel_test.mat', ]
+TEST_LOG_MAT_FILE = 'testLog_channel_test.mat'
 
 ################################################################################
 #                            Models to Activate                                #
@@ -20,7 +20,7 @@ modelsToActivate = [
 ################################################################################
 
 BATCH_SIZE = 8
-EPOCH_RANGE = [10, ]
+EPOCH_RANGE = [1, ]
 LR_RANGE = [0.002, ]
 M_RANGE = range(2, 100)
 C_INCREMENT_RANGE = [[8, 8],]
@@ -28,11 +28,11 @@ C_STEPS_AMOUNT = 1
 FORCE_QUANTIZATION_DIM = False
 
 ARCHITECTURE = [
-    # ['linear', 2,
-    #  'linear', 0.5,
-    #  'quantization',
-    #  'linear', 2,
-    #  'linear', 0.5],
+    ['linear', 2,
+     'linear', 0.5,
+     'quantization',
+     'linear', 2,
+     'linear', 0.5],
 
     # ['linear', 0.5,
     #  'linear', 0.5,
