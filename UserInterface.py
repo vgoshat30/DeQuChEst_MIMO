@@ -3,8 +3,8 @@
 ########################################################################
 
 
-def train_message(model, data_file, epoch, lr, codebook_size, architecture,
-                  c_range=None):
+def train_message(model, data_file, epoch, lr, codebook_size,
+                  rate, c_range=None):
     print('\n\n'
           '==================================================================='
           '\n\n\tTraining \'{}\' Model\n\n'
@@ -12,9 +12,11 @@ def train_message(model, data_file, epoch, lr, codebook_size, architecture,
           'Epochs number:\t{}\n'
           'Learning rate:\t{}\n'
           'Codebook Size:\t{}\n'
+          'Quantization Rate: {}\n'
           'Ci range:\t{}\n\n'
           'Architecture:\n'
-          .format(model.modelname, data_file, epoch, lr, codebook_size, c_range))
+          .format(model.modelname, data_file, epoch, lr, codebook_size,
+                  rate, c_range))
 
     for layer in model.layers:
         print(layer)
