@@ -3,7 +3,7 @@
 ################################################################################
 
 DATA_MAT_FILE = ['data_Gamma.mat', ]
-TEST_LOG_MAT_FILE = 'testLog_Gamma5.mat'
+TEST_LOG_MAT_FILE = 'testLog_Gamma6.mat'
 
 ################################################################################
 #                            Models to Activate                                #
@@ -79,7 +79,21 @@ ARCHITECTURE = [
      'linear', 0.8,
      'relu',
      'linear', 0.8,
+     'relu',
+     'linear', 0.8,
+     'relu',
+     'linear', 0.8,
+     'relu',
+     'linear', 0.8,
+     'relu',
+     'linear', 0.5,
      'quantization',
+     'linear', 2,
+     'relu',
+     'linear', 2,
+     'relu',
+     'linear', 2,
+     'relu',
      'linear', 2,
      'relu',
      'linear', 2,
