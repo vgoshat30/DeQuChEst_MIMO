@@ -9,22 +9,28 @@ import math
 import numpy
 import sympy as sym
 
+import numpy as np
+
 
 class Network(nn.Module):
 
-    def __init__(self, modelname, codebook_size, input_dimension, output_dimension,
+    def __init__(self, modelname, codebook_size, train_data, a,
                  initial_c, architecture, force_quantization_dim=None):
         super(Network, self).__init__()
 
         self.modelname = modelname
 
         self.layers = []
+        self.quantizationLayerIndex = []
+
+        input_dimension = train_data.inputDim
+        output_dimension = train_data.outputDim
 
         quantization_layer_exists = False
         next_input_dimension = input_dimension
-        waiting_for_linear_layer_value = False
+        waiting_for_linear_layer_ratio = False
         layer_name_index = 1
-        # Find last occurrence of integer (linear layer dimension multiplier)
+        # Find last occurrence of integer (layer dimension multiplier)
         # in the architecture list
         last_dimension_entry = 0
         for index, arcParser in enumerate(architecture):
@@ -32,32 +38,32 @@ class Network(nn.Module):
                 last_dimension_entry = index
         # Construct the array of layers.
         for archIndex, arcParser in enumerate(architecture):
-            # If a linear layer specified, its dimensions multiplier should
-            # follow
-            if waiting_for_linear_layer_value:
-                # If its the last linear layer, making sure that its output
+            # If a scalable layer specified, its dimensions
+            # multiplier should follow
+            if waiting_for_linear_layer_ratio:
+                # If its the last scalable layer, make sure that its output
                 # dimension is the output dimension of the module
                 if archIndex == last_dimension_entry:
                     layer_out_dim = output_dimension
                 # If the next layer is the quantization layer, forcing the
-                # output of the linear layer to be outputDimension
+                # output of the scalable layer to be outputDimension
                 elif (architecture[archIndex + 1] is 'quantization' and
                       force_quantization_dim is not None):
                     layer_out_dim = force_quantization_dim
                 else:
                     layer_out_dim = math.floor(arcParser * next_input_dimension)
                 # Adding layer to layers array (for forward implementation)
-                self.layers.append(
-                    nn.Linear(next_input_dimension, layer_out_dim))
+                if waiting_for_linear_layer_ratio:
+                    self.layers.append(nn.Linear(next_input_dimension, layer_out_dim))
                 # Assigning layer to module
                 self.add_module('l' + str(layer_name_index), self.layers[-1])
                 layer_name_index += 1
                 next_input_dimension = layer_out_dim
-                waiting_for_linear_layer_value = False
+                waiting_for_linear_layer_ratio = False
             # If requested linear layer, expecting its dimension multiplier in
             # next loop iteration
             elif arcParser is 'linear':
-                waiting_for_linear_layer_value = True
+                waiting_for_linear_layer_ratio = True
             # If requested non linear layer
             elif arcParser is 'relu':
                 # Adding layer to layers array (for forward implementation)
@@ -73,7 +79,8 @@ class Network(nn.Module):
                 # Creating quantization layer
                 self.quantization_layer = QuantizationLayer(next_input_dimension,
                                                             next_input_dimension,
-                                                            codebook_size, initial_c)
+                                                            codebook_size, a, initial_c,
+                                                            np.sqrt(train_data.S_var))
                 # Adding layer to layers array (for forward implementation)
                 self.layers.append(self.quantization_layer)
                 # Assigning layer to module
@@ -82,7 +89,7 @@ class Network(nn.Module):
                 self.quantizationLayerIndex = len(self.layers) - 1
                 layer_name_index += 1
             else:
-                raise ValueError('Invalid layer type: ' + arcParser)
+                raise ValueError('Unknown layer type: \'{}\''.format(arcParser))
 
     def forward(self, x):
         for current_layer in self.layers:
@@ -91,19 +98,20 @@ class Network(nn.Module):
 
 
 class QuantizationLayer(Module):
-    def __init__(self, in_features, out_features, m, ci):
+    def __init__(self, in_features, out_features, m, ai, ci, train_std):
         super(QuantizationLayer, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
         self.codebookSize = m
+        self.a = ai
+        self.b = np.linspace(-2, 2, self.codebookSize)
+        # Parameter(torch.Tensor(self.codebookSize - 1))
         self.c = ci
-        # There are two group of parameters: {ai, bi}, as described in the paper
-        self.weight = Parameter(torch.Tensor(self.codebookSize - 1, 2))
-        self.reset_parameters()
+        self.reset_parameters(train_std/2)
 
-    def reset_parameters(self):
-        std = 1. / math.sqrt(self.weight.numel())
-        self.weight.data.uniform_(-std, std)
+    def reset_parameters(self, reset_bounds):
+        return
+        # self.b.data = Parameter(torch.Tensor(np.linspace(-reset_bounds, reset_bounds, self.codebookSize)))
 
     def forward(self, x):
         # noinspection PyUnresolvedReferences
@@ -111,13 +119,13 @@ class QuantizationLayer(Module):
 
         for kk in range(0, self.codebookSize - 1):
             # noinspection PyUnresolvedReferences
-            temp_val = torch.add(x, self.weight[kk, 1])
+            temp_val = torch.sub(x, self.b[kk])
             # noinspection PyUnresolvedReferences
             temp_val = torch.mul(temp_val, self.c)
             # noinspection PyUnresolvedReferences
             temp_val = torch.tanh(temp_val)
             # noinspection PyUnresolvedReferences
-            temp_val = torch.mul(temp_val, self.weight[kk, 0])
+            temp_val = torch.mul(temp_val, self.a)
             # noinspection PyUnresolvedReferences
             ret = torch.add(ret, temp_val)
         return ret
@@ -133,8 +141,6 @@ def get_parameters(model):
     ----------
         model : network (from this module)
             The network instance of the 'Soft to Hard Quantization' model
-        magic_c : float
-            The slope of the hyperbolic tangents
 
     Returns
     -------
@@ -146,26 +152,29 @@ def get_parameters(model):
         q : sympy function
             The soft quantization symbolic function (sum of tanh)
     """
-    # quantization_layer = getattr(model, 'l' + str(model.quantizationLayerNameIndex))
-
-    parameters = model.quantization_layer.weight.data.numpy()
 
     # Coefficients of the tanh
-    a = parameters[:, 0]
-    b = parameters[:, 1]
+    a = model.quantization_layer.a
+    b = model.quantization_layer.b #.data.numpy()
     c = model.quantization_layer.c
 
-    # Sort the coefficients by ascending order of the bi-s
-    sorted_indexes = b.argsort()
-    a = a[sorted_indexes]
-    b = b[sorted_indexes]
+    # # Sort the coefficients by ascending order of the bi-s
+    # sorted_indexes = b.argsort()
+    # # a = a[sorted_indexes]
+    # b = b[sorted_indexes]
 
     # Create symbolic variable x
     sym_x = sym.symbols('x')
 
-    sym_tanh = a[0] * sym.tanh(c*(sym_x + b[0]))
+    # sym_tanh = np.square(a[0]) * sym.tanh(c*(sym_x - b[0]))
+    # for ii in range(1, len(b)):
+    #     sym_tanh = sym_tanh + np.square(a[ii]) * sym.tanh(c*(sym_x - b[ii]))
+    # # Convert the symbolic functions to numpy friendly (for substitution)
+    # q = sym.lambdify(sym_x, sym_tanh, "numpy")
+
+    sym_tanh = a * sym.tanh(c * (sym_x - b[0]))
     for ii in range(1, len(b)):
-        sym_tanh = sym_tanh + a[ii] * sym.tanh(c*(sym_x + b[ii]))
+        sym_tanh = sym_tanh + a * sym.tanh(c * (sym_x - b[ii]))
     # Convert the symbolic functions to numpy friendly (for substitution)
     q = sym.lambdify(sym_x, sym_tanh, "numpy")
 
@@ -196,10 +205,18 @@ def quantize(x, a, b, q):
             The index of the corresponding codeword
     """
 
+    # if x <= b[0]:
+    #     return -sum(np.square(a)), 0
+    # if x > b[-1]:
+    #     return sum(np.square(a)), len(b)
+    # for ii in range(0, len(b)):
+    #     if b[ii] < x <= b[ii + 1]:
+    #         return q((b[ii] + b[ii+1])/2), ii + 1
+
     if x <= b[0]:
-        return -sum(a), 0
+        return -a*b.size, 0
     if x > b[-1]:
-        return sum(a), len(b)
+        return a*b.size, len(b)
     for ii in range(0, len(b)):
         if b[ii] < x <= b[ii + 1]:
             return q((b[ii] + b[ii+1])/2), ii + 1

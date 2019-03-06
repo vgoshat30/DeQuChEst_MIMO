@@ -54,10 +54,6 @@ class TestLogger:
 
         When called, the __init__ function reads the specified .mat file and
         creates all the fields relevant for manipulating this .mat file.
-        According to the loggerType (specified in a variable in the .mat
-        file, which is set using the create_mat_file() function) additional
-        fields are created (for example, aCoefs, bCoefs, cCoefs for a TestLogger
-        of type 'tanh')
 
         Parameters
         ----------

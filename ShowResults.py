@@ -1,4 +1,5 @@
 import sympy as sym
+import numpy as np
 
 from testLogger import *
 from ProjectConstants import *
@@ -31,10 +32,10 @@ def plot_tanh_function(test_log, test_number):
         output = np.empty([input_value.size, 2])
         for inputIndex in range(input_value.size):
             if input_value[inputIndex] <= b_values[0]:
-                output[inputIndex, 0] = - sum(a_values)
+                output[inputIndex, 0] = - a_values*len(b_values)
                 output[inputIndex, 1] = 0
             if input_value[inputIndex] > b_values[-1]:
-                output[inputIndex, 0] = sum(a_values)
+                output[inputIndex, 0] = a_values*len(b_values)
                 output[inputIndex, 1] = len(b_values)
             for jj in range(len(b_values) - 1):
                 if b_values[jj] < input_value[inputIndex] <= b_values[jj + 1]:
@@ -42,16 +43,22 @@ def plot_tanh_function(test_log, test_number):
                     output[inputIndex, 1] = jj + 1
         return output
 
-    a = test_log.aCoefs[test_number - 1][0]
+    a = test_log.aCoefs[test_number - 1][0][0]
     b = test_log.bCoefs[test_number - 1][0]
     c = test_log.cCoefs[test_number - 1][0][0]
 
     # Create symbolic variable x
     sym_x = sym.symbols('x')
 
-    sym_tanh = a[0] * sym.tanh(c*(sym_x + b[0]))
+    # sym_tanh = np.square(a[0]) * sym.tanh(c*(sym_x - b[0]))
+    # for ii in range(1, len(b)):
+    #     sym_tanh = sym_tanh + np.square(a[ii]) * sym.tanh(c*(sym_x - b[ii]))
+    # # Convert the symbolic functions to numpy friendly (for substitution)
+    # q = sym.lambdify(sym_x, sym_tanh, "numpy")
+
+    sym_tanh = a * sym.tanh(c*(sym_x - b[0]))
     for ii in range(1, len(b)):
-        sym_tanh = sym_tanh + a[ii] * sym.tanh(c*(sym_x + b[ii]))
+        sym_tanh = sym_tanh + a * sym.tanh(c*(sym_x - b[ii]))
     # Convert the symbolic functions to numpy friendly (for substitution)
     q = sym.lambdify(sym_x, sym_tanh, "numpy")
 
@@ -73,10 +80,10 @@ log = TestLogger(TEST_LOG_MAT_FILE)
 # log.delete(1234567)
 
 # Show content of tests
-log.content()
+log.content('last')
 
 # Plot test log (the file provided for the theoretical bounds only)
-log.plot(DATA_MAT_FILE[0])
+# log.plot(DATA_MAT_FILE[0])
 
 # Plot soft and hard quantization functions of specific test
-# plot_tanh_function(log, 31)
+plot_tanh_function(log, log.rate.size)

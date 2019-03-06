@@ -39,7 +39,8 @@ def train_iteration(model, corr_epoch, epoch, batch_idx, data, train_loader, los
               .format(model.modelname, corr_epoch + 1, epoch, batch_idx * len(data),
                       len(train_loader.dataset),
                       100. * batch_idx / len(train_loader), loss,
-                      model.quantization_layer.c))
+                      1))
+                      # model.quantization_layer.c))
 
 
 ########################################################################

@@ -29,9 +29,13 @@ def train(model, optimizer, epoch, train_loader, scheduler=None, c_confines=None
     if c_confines is not None:
         c_step_size = (c_confines[1] / c_confines[0]) ** (1.0 / C_STEPS_AMOUNT)
         when_to_step = math.floor(len(train_loader) / C_STEPS_AMOUNT)
+    else:
+        # Set default values so the variables will always be defined
+        c_step_size = 1
+        when_to_step = 1
 
     for corrEpoch in range(0, epoch):
-        model.quantization_layer.c = c_confines[0]
+        # model.quantization_layer.c = c_confines[0]
         if scheduler is not None:
             scheduler.step()
         for batch_idx, (data, target) in enumerate(train_loader):
@@ -43,7 +47,8 @@ def train(model, optimizer, epoch, train_loader, scheduler=None, c_confines=None
             loss.backward()
             optimizer.step()
 
-            if c_confines is not None and batch_idx % when_to_step == 0:
+            if c_confines is not None and batch_idx % when_to_step == 0 \
+               and model.quantizationLayerIndex:
                 if model.quantization_layer.c * c_step_size < c_confines[1]:
                     model.quantization_layer.c *= c_step_size
 
@@ -69,23 +74,37 @@ def test_passing_gradient(model):
 
 
 def test_soft_to_hard_quantization(model):
-    a, b, c, q = SoftToHardQuantization.get_parameters(model)
-    log.log(a=a, b=b, c=c)
+    if model.quantizationLayerIndex:
+        a, b, c, q = SoftToHardQuantization.get_parameters(model)
+        log.log(a=a, b=b, c=c)
 
     test_loss = 0
     for batch_idx, (data, target) in enumerate(testLoader):
         output, target = Variable(data.float()), Variable(target.float())
 
+        # DEBUGGING VARIABLE
+        target_numpy = target.detach().numpy()
+
         for layerIndex, layer in enumerate(model.layers):
             if layerIndex is model.quantizationLayerIndex:
-                output_data = output.data
-                output_numpy = output_data.numpy()
-                for ii in range(0, output_data.size(0)):
-                    for jj in range(0, output_data.size(1)):
+                output_numpy = np.copy(output.detach().numpy())
+
+                # DEBUGGING VARIABLE
+                quantization_in = output_numpy
+
+                for ii in range(0, output_numpy.shape[0]):
+                    for jj in range(0, output_numpy.shape[1]):
                         output[ii, jj], kk = SoftToHardQuantization.quantize(
                             output_numpy[ii, jj], a, b, q)
+
+                        # DEBUGGING VARIABLE
+                        quantization_out = output.detach().numpy()
             else:
                 output = layer(output)
+
+        # DEBUGGING VARIABLE
+        net_out = output.detach().numpy()
+
         # sum up batch loss
         test_loss += criterion(output.view(-1, 1), target.view(-1, 1))
         Ui.test_iteration(model.modelname, batch_idx, data, testLoader)
@@ -98,13 +117,14 @@ def test_soft_to_hard_quantization(model):
 log = create_mat_file(TEST_LOG_MAT_FILE)
 
 
-constantPermutations = [(dataFile, lr, architecture, epoch, codebookSize, c_range)
+constantPermutations = [(dataFile, lr, architecture, epoch, codebookSize, c_range, a_coefficient)
                         for dataFile in DATA_MAT_FILE
                         for lr in LR_RANGE
                         for architecture in ARCHITECTURE
                         for epoch in EPOCH_RANGE
                         for codebookSize in M_RANGE
-                        for c_range in C_INCREMENT_RANGE]
+                        for c_range in C_INCREMENT_RANGE
+                        for a_coefficient in A_RANGE]
 
 # Iterating over all possible permutations of train epochs, learning rate, and
 # codebookSize arrays defined in the ProjectConstants module
@@ -115,6 +135,7 @@ for constPerm in constantPermutations:
     corrTopEpoch = constPerm[3]
     codebookSize = constPerm[4]
     c_bounds = constPerm[5]
+    a_coeff = constPerm[6]
 
     loadedDataFile = sio.loadmat(dataFile)
 
@@ -166,8 +187,8 @@ for constPerm in constantPermutations:
             passingGradient_optimizer, gamma=0.7, last_epoch=-1)
 
         QUANTIZATION_RATE = math.log2(codebookSize) * \
-                            passingGradient_model.quantization_layer.out_features / \
-                            trainData.inputDim
+            passingGradient_model.quantization_layer.out_features / \
+            trainData.inputDim
 
         # Training 'Passing Gradient':
         Ui.train_message(passingGradient_model, dataFile, corrTopEpoch, lr,
@@ -203,12 +224,12 @@ for constPerm in constantPermutations:
         # Defining the 'Soft to Hard Quantization' model, as described in the
         # paper.
         if FORCE_QUANTIZATION_DIM:
-            quantization_dimention = trainData.outputDim
+            quantization_dimension = trainData.outputDim
         else:
-            quantization_dimention = None
+            quantization_dimension = None
         softToHardQuantization_model = SoftToHardQuantization.Network(
-            model_name, codebookSize, trainData.inputDim, trainData.outputDim,
-            c_bounds[0], architecture, quantization_dimention)
+            model_name, codebookSize, trainData, a_coeff,
+            c_bounds[0], architecture, quantization_dimension)
 
         softToHardQuantization_optimizer = optim.SGD(
             softToHardQuantization_model.parameters(), lr=lr, momentum=0.5)
@@ -216,9 +237,12 @@ for constPerm in constantPermutations:
         softToHardQuantization_scheduler = optim.lr_scheduler.ExponentialLR(
             softToHardQuantization_optimizer, gamma=0.7, last_epoch=-1)
 
-        QUANTIZATION_RATE = math.log2(codebookSize) * \
-                            softToHardQuantization_model.quantization_layer.out_features / \
-                            trainData.inputDim
+        if not softToHardQuantization_model.quantizationLayerIndex:
+            QUANTIZATION_RATE = 1
+        else:
+            QUANTIZATION_RATE = math.log2(codebookSize) * \
+                softToHardQuantization_model.quantization_layer.out_features / \
+                trainData.inputDim
 
         # Training 'Soft to Hard Quantization':
         Ui.train_message(softToHardQuantization_model, dataFile, corrTopEpoch,
