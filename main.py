@@ -13,6 +13,7 @@ import SoftToHardQuantization
 from ProjectConstants import *
 import UniformQuantizer
 from testLogger import *
+from EpochLossLogger import *
 import UserInterface as Ui
 
 from DataLoader import *
@@ -55,6 +56,8 @@ def train(model, optimizer, epoch, train_loader, scheduler=None, c_confines=None
             if batch_idx % 10 == 0:
                     Ui.train_iteration(model, corrEpoch, epoch, batch_idx,  data,
                                        train_loader, loss, c_confines)
+
+        epoch_loss_log.log(epoch=corrEpoch+1, loss=loss)
 
 
 def test_passing_gradient(model):
@@ -115,6 +118,8 @@ def test_soft_to_hard_quantization(model):
 
 # Trying to create a new test log mat file for the case that such one does not exist
 log = create_mat_file(TEST_LOG_MAT_FILE)
+# Trying to create a new logger for loss vs epoch graph
+epoch_loss_log = create_epoch_loss_log(EPOCH_LOSS_LOG_MAT_FILE)
 
 
 constantPermutations = [(dataFile, lr, architecture, epoch, codebookSize, c_range, a_coefficient)

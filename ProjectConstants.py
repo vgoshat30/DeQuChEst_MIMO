@@ -4,6 +4,7 @@
 
 DATA_MAT_FILE = ['dataGamma.mat', ]
 TEST_LOG_MAT_FILE = 'testLogGamma.mat'
+EPOCH_LOSS_LOG_MAT_FILE = 'epochLog.mat'
 
 ################################################################################
 #                            Models to Activate                                #
@@ -20,7 +21,7 @@ modelsToActivate = [
 ################################################################################
 
 BATCH_SIZE = 8
-EPOCH_RANGE = [3, ]
+EPOCH_RANGE = [10, ]
 LR_RANGE = [0.005, ]
 M_RANGE = [40, ]
 C_INCREMENT_RANGE = [[50, 50], ]
@@ -30,42 +31,7 @@ FORCE_QUANTIZATION_DIM = False
 
 ARCHITECTURE = [
 
-    ['linear', 1.2,
-     'relu',
-     'linear', 1.2,
-     'relu',
-     'linear', 1.2,
-     'relu',
-     'linear', 0.97,
-     'relu',
-     'linear', 0.97,
-     'quantization',
-     'relu',
-     'linear', 0.97,
-     'relu',
-     'linear', 0.97,
-     'relu',
-     'linear', 0.97,
-     'relu',
-     'linear', 0.97,
-     'relu',
-     'linear', 0.8,
-     'relu',
-     'linear', 0.8,
-     'relu',
-     'linear', 0.8,
-     'relu',
-     'linear', 0.8,
-     'relu',
-     'linear', 0.8,
-     'relu',
-     'linear', 0.8,
-     'relu',
-     'linear', 0.8,
-     'relu',
-     'linear', 0.8,
-     'relu',
-     'linear', 0.8
+    ['linear', 0.1
      ],
 
     # ['linear', 0.8,
