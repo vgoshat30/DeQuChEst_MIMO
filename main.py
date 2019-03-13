@@ -57,7 +57,7 @@ def train(model, optimizer, epoch, train_loader, scheduler=None, c_confines=None
                     Ui.train_iteration(model, corrEpoch, epoch, batch_idx,  data,
                                        train_loader, loss, c_confines)
 
-        epoch_loss_log.log(epoch=corrEpoch+1, loss=loss)
+        epoch_loss_log.log(epoch=corrEpoch+1, loss=test_soft_to_hard_quantization(model))
 
 
 def test_passing_gradient(model):

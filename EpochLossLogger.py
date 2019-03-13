@@ -186,7 +186,7 @@ class EpochLossLogger:
         fig = plt.figure(figsize=size_of_figure)
         ax = fig.add_subplot(111)
 
-        ax.plot(self.epoch, self.loss, marker=marker,
+        ax.semilogy(self.epoch, self.loss, marker=marker,
                 markersize=marker_size, color=line_color,
                 linestyle=line_style, linewidth=line_width)
 
